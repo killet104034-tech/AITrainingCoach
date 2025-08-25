@@ -84,6 +84,14 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     console.log('✅ 템플릿 복사 완료! ID:', spreadsheetId);
 
     // 🔥 프로급 파워리프팅 시트 구조 생성 (기존 코드 완전 제거)
+    console.log('💡 시트 생성 전 프로그램 데이터 확인:', {
+      has_training_weeks: !!programData.training_weeks,
+      training_weeks_length: programData.training_weeks ? programData.training_weeks.length : 0,
+      training_weeks_type: typeof programData.training_weeks,
+      user_maxes: programData.user_maxes,
+      program_title: programData.program_title
+    });
+    
     await createProPowerliftingSheets(spreadsheetId, programData);
 
     // 공개 권한 설정
@@ -115,24 +123,30 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
 async function createProPowerliftingSheets(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
   try {
     console.log('🔥 프로급 파워리프팅 시트 구조 생성 중...');
+    console.log('📊 전체 프로그램 데이터:', JSON.stringify(programData, null, 2));
     
     // 1. 메인 시트 이름 변경 및 개요 생성
     await createMainOverviewSheet(spreadsheetId, programData);
     
     // 2. 블럭별 시트 생성
     if (programData.training_weeks && Array.isArray(programData.training_weeks)) {
+      console.log(`📋 총 ${programData.training_weeks.length}주 훈련 데이터 확인됨`);
       const blocksData = organizeWeeksIntoBlocks(programData.training_weeks);
+      console.log(`🔥 총 ${blocksData.length}개 블럭으로 구성`);
       
       for (let i = 0; i < blocksData.length; i++) {
         const blockData = blocksData[i];
+        console.log(`📝 Block ${i + 1} 생성 중... (${blockData.length}주 포함)`);
         await createBlockSheet(spreadsheetId, i + 1, blockData);
       }
+    } else {
+      console.log('❌ training_weeks 데이터가 없거나 배열이 아님:', programData.training_weeks);
     }
     
     console.log('✅ 프로급 파워리프팅 시트 구조 완성!');
     
   } catch (error) {
-    console.log('❌ 프로급 시트 생성 실패:', (error as any)?.message);
+    console.log('❌ 프로급 시트 생성 실패:', (error as any)?.message, error);
   }
 }
 
