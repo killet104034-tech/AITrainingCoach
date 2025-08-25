@@ -24,7 +24,7 @@ export function AdvancedSurveySection({
   onSubmit, 
   isSubmitting 
 }: AdvancedSurveySectionProps) {
-  const totalSteps = 15; // 완전한 15단계 전문가 시스템
+  const totalSteps = 20; // 완전한 20단계 전문가 시스템 (40-50개 질문)
 
   // 1단계: 기본 정보
   const renderStep1 = () => (
@@ -60,7 +60,7 @@ export function AdvancedSurveySection({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="age" className="text-white">나이</Label>
+            <Label htmlFor="age" className="text-white">나이 *</Label>
             <Input
               id="age"
               data-testid="input-age"
@@ -70,7 +70,7 @@ export function AdvancedSurveySection({
             />
           </div>
           <div>
-            <Label className="text-white">성별</Label>
+            <Label className="text-white">성별 *</Label>
             <RadioGroup 
               value={form.watch("gender")} 
               onValueChange={(value) => form.setValue("gender", value)}
@@ -83,6 +83,78 @@ export function AdvancedSurveySection({
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="female" id="female" />
                 <label htmlFor="female" className="text-gray-300">여성</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="weight" className="text-white">현재 체중 (kg) *</Label>
+            <Input
+              id="weight"
+              data-testid="input-weight"
+              {...form.register("bodyweight")}
+              placeholder="70"
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+          <div>
+            <Label htmlFor="bodyFat" className="text-white">체지방률 (%, 대략적으로)</Label>
+            <Input
+              id="bodyFat"
+              data-testid="input-body-fat"
+              {...form.register("bodyFatPercent")}
+              placeholder="15"
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">주요 직업군</Label>
+            <RadioGroup 
+              value={form.watch("occupation")} 
+              onValueChange={(value) => form.setValue("occupation", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="desk_job" id="desk-job" />
+                <label htmlFor="desk-job" className="text-gray-300">사무직 (하루 8시간+ 앉아서)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="active_job" id="active-job" />
+                <label htmlFor="active-job" className="text-gray-300">활동적 직업 (서서 일하거나 걸어다님)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="physical_job" id="physical-job" />
+                <label htmlFor="physical-job" className="text-gray-300">육체적 직업 (무거운 것 들거나 힘쓰는 일)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="student" id="student" />
+                <label htmlFor="student" className="text-gray-300">학생</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label className="text-white">일주일 근무시간</Label>
+            <RadioGroup 
+              value={form.watch("workHours")} 
+              onValueChange={(value) => form.setValue("workHours", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="part_time" id="part-time" />
+                <label htmlFor="part-time" className="text-gray-300">30시간 미만</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="full_time" id="full-time" />
+                <label htmlFor="full-time" className="text-gray-300">40-50시간</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="overtime" id="overtime" />
+                <label htmlFor="overtime" className="text-gray-300">50시간 이상</label>
               </div>
             </RadioGroup>
           </div>
@@ -144,6 +216,74 @@ export function AdvancedSurveySection({
               placeholder="60"
               className="bg-gray-800 border-gray-600 text-white"
             />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="shoulderWidth" className="text-white">어깨 너비 (cm)</Label>
+            <Input
+              id="shoulderWidth"
+              data-testid="input-shoulder-width"
+              {...form.register("shoulderWidth")}
+              placeholder="45"
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+          <div>
+            <Label htmlFor="hipWidth" className="text-white">골반 너비 (cm)</Label>
+            <Input
+              id="hipWidth"
+              data-testid="input-hip-width"
+              {...form.register("hipWidth")}
+              placeholder="40"
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">발목 유연성</Label>
+            <RadioGroup 
+              value={form.watch("ankleFlexibility")} 
+              onValueChange={(value) => form.setValue("ankleFlexibility", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="poor" id="ankle-poor" />
+                <label htmlFor="ankle-poor" className="text-gray-300">나쁨 (스쿼트 시 뒷꿈치 들림)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="average" id="ankle-average" />
+                <label htmlFor="ankle-average" className="text-gray-300">보통</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="good" id="ankle-good" />
+                <label htmlFor="ankle-good" className="text-gray-300">좋음 (깊게 스쿼트 가능)</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label className="text-white">엉덩이 유연성</Label>
+            <RadioGroup 
+              value={form.watch("hipFlexibility")} 
+              onValueChange={(value) => form.setValue("hipFlexibility", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="poor" id="hip-poor" />
+                <label htmlFor="hip-poor" className="text-gray-300">나쁨 (앉았다 일어나기 힘듦)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="average" id="hip-average" />
+                <label htmlFor="hip-average" className="text-gray-300">보통</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="good" id="hip-good" />
+                <label htmlFor="hip-good" className="text-gray-300">좋음 (깊은 스쿼트 편함)</label>
+              </div>
+            </RadioGroup>
           </div>
         </div>
 
@@ -1483,12 +1623,600 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // Placeholder for any future steps
-  const renderStepPlaceholder = (stepNumber: number, title: string) => (
+  // 16단계: 수면 및 회복 패턴
+  const renderStep16 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-light text-white mb-3">{title}</h2>
-        <p className="text-gray-400">전문가 설문 시스템 구현 중...</p>
+        <h2 className="text-3xl font-light text-white mb-3">😴 수면 및 회복 패턴</h2>
+        <p className="text-gray-400">회복 능력은 훈련 성과에 직접적인 영향을 미칩니다</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="sleepHours" className="text-white">평균 수면시간 (시간/일)</Label>
+            <Input
+              id="sleepHours"
+              data-testid="input-sleep-hours"
+              {...form.register("sleepHours")}
+              placeholder="7.5"
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+          <div>
+            <Label className="text-white">수면 품질</Label>
+            <RadioGroup 
+              value={form.watch("sleepQuality")} 
+              onValueChange={(value) => form.setValue("sleepQuality", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="poor" id="sleep-poor" />
+                <label htmlFor="sleep-poor" className="text-gray-300">나쁨 (자주 깸, 피곤함)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="fair" id="sleep-fair" />
+                <label htmlFor="sleep-fair" className="text-gray-300">보통</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="good" id="sleep-good" />
+                <label htmlFor="sleep-good" className="text-gray-300">좋음 (푹 잠, 상쾌함)</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">일상 스트레스 수준</Label>
+            <RadioGroup 
+              value={form.watch("stressLevel")} 
+              onValueChange={(value) => form.setValue("stressLevel", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="low" id="stress-low" />
+                <label htmlFor="stress-low" className="text-gray-300">낮음 (여유로움)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="moderate" id="stress-moderate" />
+                <label htmlFor="stress-moderate" className="text-gray-300">보통 (약간 바쁨)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="high" id="stress-high" />
+                <label htmlFor="stress-high" className="text-gray-300">높음 (매우 바쁘고 스트레스)</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label className="text-white">카페인 섭취량</Label>
+            <RadioGroup 
+              value={form.watch("caffeineIntake")} 
+              onValueChange={(value) => form.setValue("caffeineIntake", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="none" id="caffeine-none" />
+                <label htmlFor="caffeine-none" className="text-gray-300">안 마심</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="light" id="caffeine-light" />
+                <label htmlFor="caffeine-light" className="text-gray-300">가끔 (주 1-3회)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="moderate" id="caffeine-moderate" />
+                <label htmlFor="caffeine-moderate" className="text-gray-300">보통 (매일 1-2잔)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="high" id="caffeine-high" />
+                <label htmlFor="caffeine-high" className="text-gray-300">많음 (매일 3잔+)</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-white">사용하는 회복 방법 (복수 선택)</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {[
+              { value: "massage", label: "마사지" },
+              { value: "stretching", label: "스트레칭" },
+              { value: "sauna", label: "사우나" },
+              { value: "cold_bath", label: "냉찜질/얼음목욕" },
+              { value: "meditation", label: "명상/요가" },
+              { value: "foam_rolling", label: "폼롤링" },
+              { value: "rest_days", label: "충분한 휴식일" },
+              { value: "none", label: "특별한 방법 없음" }
+            ].map((method) => (
+              <div key={method.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`recovery-${method.value}`}
+                  checked={form.watch("recoveryMethods")?.includes(method.value) || false}
+                  onCheckedChange={(checked) => {
+                    const currentMethods = form.watch("recoveryMethods") || [];
+                    if (checked) {
+                      form.setValue("recoveryMethods", [...currentMethods, method.value]);
+                    } else {
+                      form.setValue("recoveryMethods", currentMethods.filter(m => m !== method.value));
+                    }
+                  }}
+                />
+                <label htmlFor={`recovery-${method.value}`} className="text-gray-300">{method.label}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 17단계: 영양 및 보충제
+  const renderStep17 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">🥗 영양 및 보충제</h2>
+        <p className="text-gray-400">영양 상태는 근력 향상과 회복에 핵심적입니다</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">영양 지식 수준</Label>
+            <RadioGroup 
+              value={form.watch("nutritionKnowledge")} 
+              onValueChange={(value) => form.setValue("nutritionKnowledge", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="beginner" id="nutrition-beginner" />
+                <label htmlFor="nutrition-beginner" className="text-gray-300">초보 (칼로리, 단백질 잘 모름)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="intermediate" id="nutrition-intermediate" />
+                <label htmlFor="nutrition-intermediate" className="text-gray-300">중급 (기본적인 영양 관리)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="advanced" id="nutrition-advanced" />
+                <label htmlFor="nutrition-advanced" className="text-gray-300">고급 (매크로 추적, 세밀한 관리)</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label htmlFor="dailyProtein" className="text-white">일일 단백질 섭취량 (g, 대략)</Label>
+            <Input
+              id="dailyProtein"
+              data-testid="input-daily-protein"
+              {...form.register("dailyProteinGrams")}
+              placeholder="120"
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-white">식단 제한사항 (복수 선택)</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {[
+              { value: "none", label: "제한사항 없음" },
+              { value: "vegetarian", label: "채식주의" },
+              { value: "vegan", label: "비건" },
+              { value: "lactose_intolerant", label: "유당불내증" },
+              { value: "gluten_free", label: "글루텐 프리" },
+              { value: "low_carb", label: "저탄수화물" },
+              { value: "halal", label: "할랄" },
+              { value: "budget_limited", label: "예산 제한" }
+            ].map((diet) => (
+              <div key={diet.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`diet-${diet.value}`}
+                  checked={form.watch("dietaryRestrictions")?.includes(diet.value) || false}
+                  onCheckedChange={(checked) => {
+                    const currentDiets = form.watch("dietaryRestrictions") || [];
+                    if (checked) {
+                      form.setValue("dietaryRestrictions", [...currentDiets, diet.value]);
+                    } else {
+                      form.setValue("dietaryRestrictions", currentDiets.filter(d => d !== diet.value));
+                    }
+                  }}
+                />
+                <label htmlFor={`diet-${diet.value}`} className="text-gray-300">{diet.label}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-white">복용 중인 보충제 (복수 선택)</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {[
+              { value: "none", label: "복용 안 함" },
+              { value: "whey_protein", label: "웨이 프로틴" },
+              { value: "creatine", label: "크레아틴" },
+              { value: "bcaa", label: "BCAA" },
+              { value: "pre_workout", label: "프리워크아웃" },
+              { value: "multivitamin", label: "종합비타민" },
+              { value: "omega3", label: "오메가3" },
+              { value: "vitamin_d", label: "비타민D" }
+            ].map((supplement) => (
+              <div key={supplement.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`supplement-${supplement.value}`}
+                  checked={form.watch("supplementUsage")?.includes(supplement.value) || false}
+                  onCheckedChange={(checked) => {
+                    const currentSupplements = form.watch("supplementUsage") || [];
+                    if (checked) {
+                      form.setValue("supplementUsage", [...currentSupplements, supplement.value]);
+                    } else {
+                      form.setValue("supplementUsage", currentSupplements.filter(s => s !== supplement.value));
+                    }
+                  }}
+                />
+                <label htmlFor={`supplement-${supplement.value}`} className="text-gray-300">{supplement.label}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 18단계: 프로그램 선호도
+  const renderStep18 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">⚙️ 프로그램 선호도</h2>
+        <p className="text-gray-400">당신에게 맞는 훈련 스타일을 찾아보겠습니다</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">자동조절 방식 선호도</Label>
+            <RadioGroup 
+              value={form.watch("autoregulationPreference")} 
+              onValueChange={(value) => form.setValue("autoregulationPreference", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="percentage" id="auto-percentage" />
+                <label htmlFor="auto-percentage" className="text-gray-300">% 기반 (정확한 퍼센트 선호)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rpe" id="auto-rpe" />
+                <label htmlFor="auto-rpe" className="text-gray-300">RPE 기반 (체감도 기준)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="hybrid" id="auto-hybrid" />
+                <label htmlFor="auto-hybrid" className="text-gray-300">혼합 (둘 다 사용)</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label className="text-white">운동 변화 빈도</Label>
+            <RadioGroup 
+              value={form.watch("variationFrequency")} 
+              onValueChange={(value) => form.setValue("variationFrequency", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="low" id="variation-low" />
+                <label htmlFor="variation-low" className="text-gray-300">낮음 (기본 동작 위주)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="moderate" id="variation-moderate" />
+                <label htmlFor="variation-moderate" className="text-gray-300">보통 (가끔 변형 동작)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="high" id="variation-high" />
+                <label htmlFor="variation-high" className="text-gray-300">높음 (다양한 변형 선호)</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">주기화 스타일 선호도</Label>
+            <RadioGroup 
+              value={form.watch("periodizationStyle")} 
+              onValueChange={(value) => form.setValue("periodizationStyle", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="linear" id="period-linear" />
+                <label htmlFor="period-linear" className="text-gray-300">선형 (점진적 강도 증가)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="conjugate" id="period-conjugate" />
+                <label htmlFor="period-conjugate" className="text-gray-300">컨주게이트 (다양한 강도 병행)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="daily_undulating" id="period-du" />
+                <label htmlFor="period-du" className="text-gray-300">일일변동 (매일 다른 강도)</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label className="text-white">볼륨 선호도</Label>
+            <RadioGroup 
+              value={form.watch("volumePreference")} 
+              onValueChange={(value) => form.setValue("volumePreference", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="low" id="volume-low" />
+                <label htmlFor="volume-low" className="text-gray-300">낮음 (적은 세트, 고강도)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="moderate" id="volume-moderate" />
+                <label htmlFor="volume-moderate" className="text-gray-300">보통 (균형잡힌 볼륨)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="high" id="volume-high" />
+                <label htmlFor="volume-high" className="text-gray-300">높음 (많은 세트, 다양한 운동)</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-white">경험해본 프로그램들 (복수 선택)</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {[
+              { value: "5x5", label: "5x5 프로그램" },
+              { value: "531", label: "5/3/1" },
+              { value: "linear_progression", label: "선형 진행" },
+              { value: "upper_lower", label: "상체/하체 분할" },
+              { value: "ppl", label: "Push/Pull/Legs" },
+              { value: "westside", label: "웨스트사이드" },
+              { value: "sheiko", label: "쉐이코" },
+              { value: "none", label: "체계적 프로그램 경험 없음" }
+            ].map((program) => (
+              <div key={program.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`program-${program.value}`}
+                  checked={form.watch("pastPrograms")?.includes(program.value) || false}
+                  onCheckedChange={(checked) => {
+                    const currentPrograms = form.watch("pastPrograms") || [];
+                    if (checked) {
+                      form.setValue("pastPrograms", [...currentPrograms, program.value]);
+                    } else {
+                      form.setValue("pastPrograms", currentPrograms.filter(p => p !== program.value));
+                    }
+                  }}
+                />
+                <label htmlFor={`program-${program.value}`} className="text-gray-300">{program.label}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 19단계: 추가 운동 및 활동
+  const renderStep19 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">🏃 추가 운동 및 활동</h2>
+        <p className="text-gray-400">다른 운동들이 파워리프팅에 미치는 영향을 고려합니다</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div>
+          <Label className="text-white">하는 다른 스포츠 (복수 선택)</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {[
+              { value: "none", label: "파워리프팅만" },
+              { value: "running", label: "달리기" },
+              { value: "cycling", label: "자전거" },
+              { value: "swimming", label: "수영" },
+              { value: "martial_arts", label: "격투기/무술" },
+              { value: "team_sports", label: "팀 스포츠 (축구, 농구 등)" },
+              { value: "rock_climbing", label: "클라이밍" },
+              { value: "crossfit", label: "크로스핏" }
+            ].map((sport) => (
+              <div key={sport.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`sport-${sport.value}`}
+                  checked={form.watch("otherSports")?.includes(sport.value) || false}
+                  onCheckedChange={(checked) => {
+                    const currentSports = form.watch("otherSports") || [];
+                    if (checked) {
+                      form.setValue("otherSports", [...currentSports, sport.value]);
+                    } else {
+                      form.setValue("otherSports", currentSports.filter(s => s !== sport.value));
+                    }
+                  }}
+                />
+                <label htmlFor={`sport-${sport.value}`} className="text-gray-300">{sport.label}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">유산소 운동 빈도</Label>
+            <RadioGroup 
+              value={form.watch("cardioPreference")} 
+              onValueChange={(value) => form.setValue("cardioPreference", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="none" id="cardio-none" />
+                <label htmlFor="cardio-none" className="text-gray-300">안 함</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="light" id="cardio-light" />
+                <label htmlFor="cardio-light" className="text-gray-300">가끔 (주 1-2회)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="moderate" id="cardio-moderate" />
+                <label htmlFor="cardio-moderate" className="text-gray-300">보통 (주 3-4회)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="high" id="cardio-high" />
+                <label htmlFor="cardio-high" className="text-gray-300">많이 (주 5회+)</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label className="text-white">유연성/모빌리티 운동</Label>
+            <RadioGroup 
+              value={form.watch("mobilityWork")} 
+              onValueChange={(value) => form.setValue("mobilityWork", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="none" id="mobility-none" />
+                <label htmlFor="mobility-none" className="text-gray-300">안 함</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="light" id="mobility-light" />
+                <label htmlFor="mobility-light" className="text-gray-300">가끔 (주 1-2회)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="moderate" id="mobility-moderate" />
+                <label htmlFor="mobility-moderate" className="text-gray-300">보통 (거의 매일)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="high" id="mobility-high" />
+                <label htmlFor="mobility-high" className="text-gray-300">많이 (매일 30분+)</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="cardioDetails" className="text-white">유산소 운동 세부사항 (선택사항)</Label>
+          <Textarea
+            id="cardioDetails"
+            data-testid="textarea-cardio-details"
+            {...form.register("cardioDetails")}
+            placeholder="예: 주 2회 30분 조깅, HIIT 주 1회 등"
+            className="bg-gray-800 border-gray-600 text-white min-h-[100px]"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  // 20단계: 최종 정보 및 목표
+  const renderStep20 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">🎯 최종 정보 및 목표</h2>
+        <p className="text-gray-400">마지막으로 추가 정보와 세부 목표를 설정해주세요</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-white">원하는 프로그램 기간</Label>
+            <RadioGroup 
+              value={form.watch("programLength")} 
+              onValueChange={(value) => form.setValue("programLength", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="8" id="length-8" />
+                <label htmlFor="length-8" className="text-gray-300">8주 (단기 집중)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="12" id="length-12" />
+                <label htmlFor="length-12" className="text-gray-300">12주 (표준)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="16" id="length-16" />
+                <label htmlFor="length-16" className="text-gray-300">16주 (심화)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="20" id="length-20" />
+                <label htmlFor="length-20" className="text-gray-300">20주 (장기)</label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label className="text-white">설명 방식 선호도</Label>
+            <RadioGroup 
+              value={form.watch("communicationPreference")} 
+              onValueChange={(value) => form.setValue("communicationPreference", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="simple" id="comm-simple" />
+                <label htmlFor="comm-simple" className="text-gray-300">간단히 (운동, 세트, 횟수만)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="detailed" id="comm-detailed" />
+                <label htmlFor="comm-detailed" className="text-gray-300">상세히 (원리, 주의사항 포함)</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="email" id="comm-email" />
+                <label htmlFor="comm-email" className="text-gray-300">이메일로 추가 설명</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="specificGoals" className="text-white">구체적인 목표 중량 (선택사항)</Label>
+          <div className="grid grid-cols-3 gap-4 mt-2">
+            <div>
+              <Label htmlFor="squatGoal" className="text-gray-300 text-sm">스쿼트 목표 (kg)</Label>
+              <Input
+                id="squatGoal"
+                data-testid="input-squat-goal"
+                {...form.register("squatGoal")}
+                placeholder="120"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="benchGoal" className="text-gray-300 text-sm">벤치프레스 목표 (kg)</Label>
+              <Input
+                id="benchGoal"
+                data-testid="input-bench-goal"
+                {...form.register("benchGoal")}
+                placeholder="100"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="deadliftGoal" className="text-gray-300 text-sm">데드리프트 목표 (kg)</Label>
+              <Input
+                id="deadliftGoal"
+                data-testid="input-deadlift-goal"
+                {...form.register("deadliftGoal")}
+                placeholder="150"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="targetDate" className="text-white">목표 달성 희망 시기 (선택사항)</Label>
+          <Input
+            id="targetDate"
+            data-testid="input-target-date"
+            {...form.register("targetCompetitionDate")}
+            placeholder="2025년 12월"
+            className="bg-gray-800 border-gray-600 text-white"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="additionalInfo" className="text-white">추가로 알려주고 싶은 정보</Label>
+          <Textarea
+            id="additionalInfo"
+            data-testid="textarea-additional-info"
+            {...form.register("additionalInfo")}
+            placeholder="예: 특별한 제약사항, 개인적인 선호도, 과거 경험 등 프로그램 설계에 도움이 될 만한 정보를 자유롭게 작성해주세요."
+            className="bg-gray-800 border-gray-600 text-white min-h-[120px]"
+          />
+        </div>
       </div>
     </div>
   );
@@ -1554,7 +2282,7 @@ export function AdvancedSurveySection({
     }
   };
 
-  if (currentStep === 16) {
+  if (currentStep === 21) {
     return (
       <div className="max-w-4xl mx-auto px-8 py-16">
         <div className="text-center">

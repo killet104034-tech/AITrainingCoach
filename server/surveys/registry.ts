@@ -55,6 +55,9 @@ export const advancedSurveyV1Schema = z.object({
   email: z.string().email('유효한 이메일을 입력해주세요'),
   age: z.string().optional().transform(val => val ? parseInt(val) : undefined),
   gender: z.enum(['male', 'female', 'other']).optional(),
+  bodyFatPercent: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  occupation: z.enum(['desk_job', 'active_job', 'physical_job', 'student']).optional(),
+  workHours: z.enum(['part_time', 'full_time', 'overtime']).optional(),
   
   // ===== 2단계: 신체 정보 =====
   height: z.string().optional().transform(val => val ? parseInt(val) : undefined),
@@ -62,6 +65,10 @@ export const advancedSurveyV1Schema = z.object({
   legLength: z.string().optional().transform(val => val ? parseInt(val) : undefined), 
   torsoLength: z.string().optional().transform(val => val ? parseInt(val) : undefined),
   bodyweight: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  shoulderWidth: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  hipWidth: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  ankleFlexibility: z.enum(['poor', 'average', 'good']).optional(),
+  hipFlexibility: z.enum(['poor', 'average', 'good']).optional(),
   
   // ===== 3단계: 경험 수준 =====
   experience: z.enum(['beginner', 'intermediate', 'advanced']),
@@ -89,6 +96,10 @@ export const advancedSurveyV1Schema = z.object({
     benchGoal: z.string().optional().transform(val => val ? parseInt(val) : undefined),
     deadliftGoal: z.string().optional().transform(val => val ? parseInt(val) : undefined),
   }).optional(),
+  squatGoal: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  benchGoal: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  deadliftGoal: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  targetCompetitionDate: z.string().optional(),
   
   // ===== 7단계: 훈련 빈도 & 스케줄 =====
   frequency: z.string().transform(val => parseInt(val)),
@@ -121,11 +132,13 @@ export const advancedSurveyV1Schema = z.object({
   sleepQuality: z.enum(['poor', 'fair', 'good', 'excellent']).optional(),
   stressLevel: z.enum(['low', 'moderate', 'high']).optional(),
   recoveryMethods: z.array(z.string()).optional(),
+  caffeineIntake: z.enum(['none', 'light', 'moderate', 'high']).optional(),
   
   // ===== 12단계: 영양 & 보충제 =====
   nutritionKnowledge: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   dietaryRestrictions: z.array(z.string()).optional(),
   supplementUsage: z.array(z.string()).optional(),
+  dailyProteinGrams: z.string().optional().transform(val => val ? parseInt(val) : undefined),
   
   // ===== 13단계: 이전 프로그램 경험 =====
   pastPrograms: z.array(z.string()).optional(),
@@ -134,15 +147,21 @@ export const advancedSurveyV1Schema = z.object({
     variationFrequency: z.enum(['low', 'moderate', 'high']).optional(),
     periodizationStyle: z.enum(['linear', 'conjugate', 'daily_undulating']).optional(),
   }).optional(),
+  autoregulationPreference: z.enum(['percentage', 'rpe', 'hybrid']).optional(),
+  volumePreference: z.enum(['low', 'moderate', 'high']).optional(),
   
   // ===== 14단계: 운동 외 활동 =====
   otherSports: z.array(z.string()).optional(),
   cardioPreference: z.enum(['none', 'light', 'moderate', 'high']).optional(),
   mobilityWork: z.enum(['none', 'light', 'moderate', 'high']).optional(),
+  cardioDetails: z.string().optional(),
   
   // ===== 15단계: 추가 정보 =====
   additionalInfo: z.string().optional(),
   programLength: z.enum(['8', '12', '16', '20']).optional(),
+  communicationPreference: z.enum(['simple', 'detailed', 'email']).optional(),
+  variationFrequency: z.enum(['low', 'moderate', 'high']).optional(),
+  periodizationStyle: z.enum(['linear', 'conjugate', 'daily_undulating']).optional(),
   communicationPreference: z.enum(['email', 'detailed', 'simple']).optional(),
 });
 
