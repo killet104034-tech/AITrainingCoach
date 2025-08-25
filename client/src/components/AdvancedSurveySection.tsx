@@ -122,154 +122,179 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 5단계: 🚀 신체 특성 분석 (Distance Traveled Programming)
+  // 5단계: 🎯 3대 운동 실패 패턴 분석 (Leverages & Weak Points)
   const renderStep5 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-light text-white mb-3">🚀 신체 특성 분석</h2>
-        <p className="text-gray-400">개인 최적화를 위한 핵심 신체 특성을 분석합니다</p>
-        <p className="text-gray-300 text-sm mt-2">⚡ Distance Traveled Programming: 당신의 신체 구조에 맞춘 완전 개인화</p>
+        <h2 className="text-3xl font-light text-white mb-3">🎯 운동 실패 패턴 분석</h2>
+        <p className="text-gray-400">실제 운동 수행 패턴을 분석해 당신의 레버리지를 파악합니다</p>
+        <p className="text-gray-300 text-sm mt-2">⚡ 실패 지점과 폼 특성으로 최적화된 개인 맞춤 프로그램 설계</p>
       </div>
       
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="height" className="text-white">신장 (cm)</Label>
-            <Input
-              id="height"
-              data-testid="input-height"
-              {...form.register("height")}
-              placeholder="175"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-          <div>
-            <Label htmlFor="armSpan" className="text-white">양팔 벌린 길이 (cm)</Label>
-            <Input
-              id="armSpan"
-              data-testid="input-arm-span"
-              {...form.register("armSpan")}
-              placeholder="180"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
+      <div className="space-y-8">
+        {/* 스쿼트 분석 */}
+        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
+          <h3 className="text-xl text-blue-300 mb-4">🦵 스쿼트 패턴</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white">스쿼트 실패 지점</Label>
+              <RadioGroup 
+                value={form.watch("squatFailurePoint")} 
+                onValueChange={(value) => form.setValue("squatFailurePoint", value)}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="bottom" id="squat-fail-bottom" />
+                  <label htmlFor="squat-fail-bottom" className="text-gray-300">바닥 (홀 아래쪽에서 못 일어남)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="middle" id="squat-fail-middle" />
+                  <label htmlFor="squat-fail-middle" className="text-gray-300">중간 (절반쯤에서 멈춤)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="top" id="squat-fail-top" />
+                  <label htmlFor="squat-fail-top" className="text-gray-300">상단 (거의 다 올라가서 실패)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="knee_cave" id="squat-fail-knee" />
+                  <label htmlFor="squat-fail-knee" className="text-gray-300">무릎 붕괴 (무릎이 안쪽으로 들어옴)</label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="text-white">스쿼트 자세 특성</Label>
+              <RadioGroup 
+                value={form.watch("squatPosture")} 
+                onValueChange={(value) => form.setValue("squatPosture", value)}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="upright" id="squat-upright" />
+                  <label htmlFor="squat-upright" className="text-gray-300">수직 (상체가 세워져 있음, 무릎 많이 앞으로)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="forward_lean" id="squat-lean" />
+                  <label htmlFor="squat-lean" className="text-gray-300">전경 (상체가 앞으로 기울어짐)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="hip_dominant" id="squat-hip" />
+                  <label htmlFor="squat-hip" className="text-gray-300">힙 주도 (엉덩이부터 뒤로 빠짐)</label>
+                </div>
+              </RadioGroup>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="legLength" className="text-white">다리 길이 (바닥에서 엉덩이까지, cm)</Label>
-            <Input
-              id="legLength"
-              data-testid="input-leg-length"
-              {...form.register("legLength")}
-              placeholder="90"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-          <div>
-            <Label htmlFor="torsoLength" className="text-white">상체 길이 (엉덩이에서 어깨까지, cm)</Label>
-            <Input
-              id="torsoLength"
-              data-testid="input-torso-length"
-              {...form.register("torsoLength")}
-              placeholder="60"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
+        {/* 벤치프레스 분석 */}
+        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
+          <h3 className="text-xl text-red-300 mb-4">💪 벤치프레스 패턴</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white">벤치프레스 실패 지점</Label>
+              <RadioGroup 
+                value={form.watch("benchFailurePoint")} 
+                onValueChange={(value) => form.setValue("benchFailurePoint", value)}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="chest" id="bench-fail-chest" />
+                  <label htmlFor="bench-fail-chest" className="text-gray-300">가슴 (가슴에서 떨어뜨림)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="middle" id="bench-fail-middle" />
+                  <label htmlFor="bench-fail-middle" className="text-gray-300">중간 (절반쯤에서 멈춤)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="lockout" id="bench-fail-lockout" />
+                  <label htmlFor="bench-fail-lockout" className="text-gray-300">락아웃 (거의 다 올라가서 실패)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="uneven" id="bench-fail-uneven" />
+                  <label htmlFor="bench-fail-uneven" className="text-gray-300">불균형 (한쪽만 먼저 올라감)</label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="text-white">벤치프레스 그립 & 아치</Label>
+              <RadioGroup 
+                value={form.watch("benchStyle")} 
+                onValueChange={(value) => form.setValue("benchStyle", value)}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="close_flat" id="bench-close-flat" />
+                  <label htmlFor="bench-close-flat" className="text-gray-300">클로즈 그립 + 플랫 (좁은 그립, 아치 적음)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="wide_arch" id="bench-wide-arch" />
+                  <label htmlFor="bench-wide-arch" className="text-gray-300">와이드 그립 + 하이 아치 (넓은 그립, 아치 많이)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="medium" id="bench-medium" />
+                  <label htmlFor="bench-medium" className="text-gray-300">미디엄 (보통 그립, 적당한 아치)</label>
+                </div>
+              </RadioGroup>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="shoulderWidth" className="text-white">어깨 너비 (cm)</Label>
-            <Input
-              id="shoulderWidth"
-              data-testid="input-shoulder-width"
-              {...form.register("shoulderWidth")}
-              placeholder="45"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-          <div>
-            <Label htmlFor="hipWidth" className="text-white">골반 너비 (cm)</Label>
-            <Input
-              id="hipWidth"
-              data-testid="input-hip-width"
-              {...form.register("hipWidth")}
-              placeholder="40"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-        </div>
+        {/* 데드리프트 분석 */}
+        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-6">
+          <h3 className="text-xl text-green-300 mb-4">🏋️ 데드리프트 패턴</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white">데드리프트 실패 지점</Label>
+              <RadioGroup 
+                value={form.watch("deadliftFailurePoint")} 
+                onValueChange={(value) => form.setValue("deadliftFailurePoint", value)}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="floor" id="deadlift-fail-floor" />
+                  <label htmlFor="deadlift-fail-floor" className="text-gray-300">바닥 (아예 안 올라감)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="knee" id="deadlift-fail-knee" />
+                  <label htmlFor="deadlift-fail-knee" className="text-gray-300">무릎 높이 (무릎 지나면서 멈춤)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="lockout" id="deadlift-fail-lockout" />
+                  <label htmlFor="deadlift-fail-lockout" className="text-gray-300">락아웃 (거의 다 올라가서 실패)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="back_round" id="deadlift-fail-back" />
+                  <label htmlFor="deadlift-fail-back" className="text-gray-300">허리 굽음 (등이 둥글게 말림)</label>
+                </div>
+              </RadioGroup>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label className="text-white">발목 유연성</Label>
-            <RadioGroup 
-              value={form.watch("ankleFlexibility")} 
-              onValueChange={(value) => form.setValue("ankleFlexibility", value)}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="poor" id="ankle-poor" />
-                <label htmlFor="ankle-poor" className="text-gray-300">나쁨 (스쿼트 시 뒷꿈치 들림)</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="average" id="ankle-average" />
-                <label htmlFor="ankle-average" className="text-gray-300">보통</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="good" id="ankle-good" />
-                <label htmlFor="ankle-good" className="text-gray-300">좋음 (깊게 스쿼트 가능)</label>
-              </div>
-            </RadioGroup>
+            <div>
+              <Label className="text-white">데드리프트 시작 자세</Label>
+              <RadioGroup 
+                value={form.watch("deadliftStyle")} 
+                onValueChange={(value) => form.setValue("deadliftStyle", value)}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="conventional" id="deadlift-conventional" />
+                  <label htmlFor="deadlift-conventional" className="text-gray-300">컨벤셔널 (다리 좁게, 손 바깥쪽)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="sumo" id="deadlift-sumo" />
+                  <label htmlFor="deadlift-sumo" className="text-gray-300">스모 (다리 넓게, 손 안쪽)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="both" id="deadlift-both" />
+                  <label htmlFor="deadlift-both" className="text-gray-300">둘 다 (상황에 따라)</label>
+                </div>
+              </RadioGroup>
+            </div>
           </div>
-          <div>
-            <Label className="text-white">엉덩이 유연성</Label>
-            <RadioGroup 
-              value={form.watch("hipFlexibility")} 
-              onValueChange={(value) => form.setValue("hipFlexibility", value)}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="poor" id="hip-poor" />
-                <label htmlFor="hip-poor" className="text-gray-300">나쁨 (앉았다 일어나기 힘듦)</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="average" id="hip-average" />
-                <label htmlFor="hip-average" className="text-gray-300">보통</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="good" id="hip-good" />
-                <label htmlFor="hip-good" className="text-gray-300">좋음 (깊은 스쿼트 편함)</label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-
-        <div>
-          <Label className="text-white">관절 가동 범위</Label>
-          <RadioGroup 
-            value={form.watch("flexibility")} 
-            onValueChange={(value) => form.setValue("flexibility", value)}
-            className="mt-2"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="high" id="flex-high" />
-              <label htmlFor="flex-high" className="text-gray-300">높음 (유연함)</label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="medium" id="flex-medium" />
-              <label htmlFor="flex-medium" className="text-gray-300">보통</label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="low" id="flex-low" />
-              <label htmlFor="flex-low" className="text-gray-300">낮음 (뻣뻣함)</label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="unknown" id="flex-unknown" />
-              <label htmlFor="flex-unknown" className="text-gray-300">모르겠음</label>
-            </div>
-          </RadioGroup>
         </div>
       </div>
     </div>
