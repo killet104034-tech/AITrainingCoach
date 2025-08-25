@@ -37,6 +37,12 @@ export interface TrainingProgram {
   program_title: string;
   overview: string;
   training_weeks: TrainingWeek[];
+  user_maxes?: {
+    squat: string;
+    bench: string;
+    deadlift: string;
+  };
+  expert_analysis?: any;
   progression_notes: string;
   warmup_protocol: string;
   cooldown_protocol: string;
@@ -164,15 +170,20 @@ const PROGRAM_TEMPLATES = {
   }
 };
 
+import { EXPERT_INSIGHTS, generateExpertProgram } from "../knowledge/expertInsights.js";
+
 export function generateTrainingProgram(surveyData: SurveyData): string {
-  // 1. 설문 데이터 분석
+  // 🧠 1. 전문가 지식 기반 분석
+  const expertAnalysis = generateExpertProgram(surveyData);
+  
+  // 2. 기존 설문 데이터 분석 (호환성)
   const analysis = analyzeSurveyData(surveyData);
   
-  // 2. 적절한 프로그램 템플릿 선택
-  const template = selectProgramTemplate(analysis);
+  // 3. 전문가 인사이트로 강화된 템플릿 선택
+  const template = selectEnhancedProgramTemplate(analysis, expertAnalysis);
   
-  // 3. 개인화된 프로그램 생성
-  const program = createPersonalizedProgram(analysis, template, surveyData);
+  // 4. 전문가 지식 통합 개인화 프로그램 생성
+  const program = createExpertPersonalizedProgram(analysis, template, surveyData, expertAnalysis);
   
   return JSON.stringify(program, null, 2);
 }
@@ -227,7 +238,35 @@ function selectProgramTemplate(analysis: any) {
   }
 }
 
-function createPersonalizedProgram(analysis: any, template: any, surveyData: SurveyData): TrainingProgram {
+// 전문가 지식 강화 템플릿 선택
+function selectEnhancedProgramTemplate(analysis: any, expertAnalysis: any) {
+  const { frequency, strengthLevel, goals } = analysis;
+  const { weeklySplt, periodizationStrategy } = expertAnalysis;
+  
+  // 전문가 추천 주간 분할 적용
+  const recommendedSessions = weeklySplt.total_sessions;
+  
+  // 대회 준비 목표가 있는 경우
+  if (goals.includes("competition") || goals.includes("대회")) {
+    return {
+      ...PROGRAM_TEMPLATES.competition_prep,
+      workouts_per_week: recommendedSessions,
+      expert_enhanced: true,
+      periodization: periodizationStrategy
+    };
+  }
+  
+  // 전문가 권장 빈도 기반 선택
+  if (strengthLevel === "beginner") {
+    return recommendedSessions <= 2 ? PROGRAM_TEMPLATES.beginner_2day : PROGRAM_TEMPLATES.beginner_3day;
+  } else if (strengthLevel === "intermediate") {
+    return recommendedSessions <= 3 ? PROGRAM_TEMPLATES.beginner_3day : PROGRAM_TEMPLATES.intermediate_4day;
+  } else {
+    return recommendedSessions <= 4 ? PROGRAM_TEMPLATES.intermediate_4day : PROGRAM_TEMPLATES.advanced_5day;
+  }
+}
+
+function createExpertPersonalizedProgram(analysis: any, template: any, surveyData: SurveyData, expertAnalysis: any): TrainingProgram {
   const weeks: TrainingWeek[] = [];
   let currentWeek = 1;
   
@@ -269,19 +308,20 @@ function createPersonalizedProgram(analysis: any, template: any, surveyData: Sur
   }
   
   return {
-    program_title: template.title,
-    overview: `${template.overview} 총 ${template.blocks.length}개 블럭, ${currentWeek - 1}주 프로그램입니다.`,
+    program_title: `🏆 ${template.title} (전문가 강화버전)`,
+    overview: `${template.overview} 총 ${template.blocks.length}개 블럭, ${currentWeek - 1}주 프로그램입니다.\n\n💪 **전문가 분석 결과:**\n- 개인화 점수: ${expertAnalysis.individualizationScore?.toFixed(2)}/1.0\n- 추천 스쿼트 빈도: 주 ${expertAnalysis.weeklySplt?.squat_frequency}회\n- 추천 벤치 빈도: 주 ${expertAnalysis.weeklySplt?.bench_frequency}회\n- 추천 데드리프트 빈도: 주 ${expertAnalysis.weeklySplt?.deadlift_frequency}회`,
     training_weeks: weeks,
     user_maxes: {
       squat: surveyData.squatMax,
       bench: surveyData.benchMax,
       deadlift: surveyData.deadliftMax
     },
-    progression_notes: getProgressionNotes(analysis, template),
-    warmup_protocol: getWarmupProtocol(),
+    expert_analysis: expertAnalysis,
+    progression_notes: getExpertProgressionNotes(analysis, template, expertAnalysis),
+    warmup_protocol: getExpertWarmupProtocol(expertAnalysis),
     cooldown_protocol: getCooldownProtocol(),
     nutrition_guidelines: getNutritionGuidelines(analysis),
-    recovery_guidelines: getRecoveryGuidelines(analysis),
+    recovery_guidelines: getExpertRecoveryGuidelines(analysis, expertAnalysis),
     safety_guidelines: getSafetyGuidelines(analysis)
   };
 }
@@ -424,7 +464,8 @@ function getExerciseNotes(exercise: string, strengthLevel: string, blockInfo?: a
   return baseNote;
 }
 
-function getProgressionNotes(analysis: any, template?: any): string {
+// 전문가 강화 가이드라인들
+function getExpertProgressionNotes(analysis: any, template: any, expertAnalysis: any): string {
   let notes = "";
   
   if (template?.blocks) {
@@ -437,20 +478,60 @@ function getProgressionNotes(analysis: any, template?: any): string {
     notes += "\n";
   }
   
-  notes += `중량 진행 방법:
-- 목표 반복수를 모두 완료하면 다음 주에 2.5-5kg 증가
-- RPE 9를 넘지 않도록 주의
-- 기술이 무너지면 중량을 낮추고 폼 교정
-- 블럭 전환 시 디로드 주간 적용`;
+  // 🧠 전문가 지식 기반 진행 방법
+  notes += `\n🎯 **전문가 권장 진행 방법:**\n`;
+  
+  // Back-off 전략 적용
+  if (expertAnalysis.backoffStrategy?.description) {
+    notes += `- Back-off 세트: ${expertAnalysis.backoffStrategy.description}\n`;
+  }
+  
+  // Wave Loading vs Deload 전략
+  if (expertAnalysis.periodizationStrategy?.primary === 'wave_load') {
+    notes += `- Wave Loading 적용: 블럭 시작 시 볼륨 조절\n`;
+  } else {
+    notes += `- 전통적 Deload: 4주마다 회복주간\n`;
+  }
+  
+  // 변형운동 활용
+  if (expertAnalysis.variationProgram) {
+    notes += `- 약점 보강 변형운동 포함\n`;
+  }
+  
+  notes += `\n📊 **중량 진행 원칙:**
+- RPE 기반 오토레귤레이션 적용
+- 일관된 RPE 유지가 목표
+- 3회 연속 RPE 초과 시 자동 조정
+- 블럭 전환 시 전문가 피리어다이제이션 적용`;
   
   return notes;
 }
 
-function getWarmupProtocol(): string {
-  return `1. 5-10분 가벼운 유산소 (트레드밀, 자전거)
+function getExpertWarmupProtocol(expertAnalysis: any): string {
+  let protocol = `🔥 **전문가 맞춤 웜업 프로토콜:**\n\n`;
+  
+  // 웜업 선호도 반영
+  if (expertAnalysis.warmupPreference === 'extensive') {
+    protocol += `📋 **충분한 웜업 (15-20분):**
+1. 10분 가벼운 유산소 + 가동성 운동
+2. 전신 동적 스트레칭 (각 부위 1분씩)
+3. 빈 바벨로 운동 패턴 연습 (2세트)
+4. 세밀한 중량 증가 (20% → 40% → 60% → 80% → 운동중량)`;
+  } else if (expertAnalysis.warmupPreference === 'minimal') {
+    protocol += `⚡ **효율적 웜업 (8-10분):**
+1. 5분 가벼운 움직임
+2. 핵심 동적 스트레칭
+3. 빈 바벨 동작 연습
+4. 빠른 중량 증가 (40% → 70% → 운동중량)`;
+  } else {
+    protocol += `🎯 **표준 웜업 (12-15분):**
+1. 5-8분 가벼운 유산소
 2. 동적 스트레칭 (레그 스윙, 암 서클 등)
 3. 빈 바벨로 운동 동작 연습
-4. 점진적 중량 증가 (40% → 60% → 80% → 운동 중량)`;
+4. 점진적 중량 증가 (40% → 60% → 80% → 운동중량)`;
+  }
+  
+  return protocol;
 }
 
 function getCooldownProtocol(): string {
@@ -476,12 +557,42 @@ function getNutritionGuidelines(analysis: any): string {
 - 운동 전후 적절한 영양 보충`;
 }
 
-function getRecoveryGuidelines(analysis: any): string {
-  return `효과적인 회복을 위한 가이드:
-- 충분한 수면 (하루 7-9시간)
-- 운동 사이 최소 48시간 휴식
-- 가벼운 활동적 회복 (산책, 요가)
-- 스트레스 관리와 명상`;
+function getExpertRecoveryGuidelines(analysis: any, expertAnalysis: any): string {
+  let guidelines = `💤 **전문가 맞춤 회복 가이드:**\n\n`;
+  
+  // 개인화 점수에 따른 회복 권장사항
+  const individualizationScore = expertAnalysis.individualizationScore || 0.5;
+  
+  if (individualizationScore > 0.8) {
+    guidelines += `🎯 **고급자 회복 프로토콜:**
+- 수면: 8-9시간 (회복 우선)
+- 능동적 회복: 매일 20분 가벼운 움직임
+- HRV 모니터링으로 회복 상태 추적
+- 주 1-2회 마사지/스트레칭 세션`;
+  } else if (individualizationScore > 0.6) {
+    guidelines += `💪 **중급자 회복 가이드:**
+- 수면: 7-8시간 규칙적 수면패턴
+- 운동간 48-72시간 충분한 휴식
+- 주 2-3회 가벼운 활동적 회복
+- 스트레스 관리 및 영양 최적화`;
+  } else {
+    guidelines += `🌱 **초급자 회복 기초:**
+- 수면: 최소 7시간 이상
+- 운동 사이 충분한 휴식 (72시간)
+- 가벼운 산책, 스트레칭
+- 기본적인 영양과 수분 섭취`;
+  }
+  
+  // 주간 빈도에 따른 추가 권장사항
+  const weeklyFreq = expertAnalysis.weeklySplt?.total_sessions || 3;
+  if (weeklyFreq >= 5) {
+    guidelines += `\n\n⚠️ **고빈도 훈련 특별 회복:**
+- 일일 수분 섭취량 증가 (3L+)
+- 주 1회 완전 휴식일 필수
+- 수면 환경 최적화 (온도, 빛 차단)`;
+  }
+  
+  return guidelines;
 }
 
 function getSafetyGuidelines(analysis: any): string {
