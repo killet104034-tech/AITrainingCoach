@@ -1,0 +1,5 @@
+{
+  "recovery": { "setsDelta": -2, "pctDelta": -0.08, "rpeCap": 7.5 },
+  "technique": { "pctDelta": -0.05, "rpeCap": 7.0 },
+  "overload": { "pctDelta": +0.03, "rpeCap": 8.5, "setsDelta": +1 }
+}

@@ -346,7 +346,10 @@ function generateFromRules(
           notes: `${blockType} 블록 - Week ${week}`
         };
         
-        // dayOverrides 적용
+        // dayTags 규칙 적용
+        applyDayTags(block, input.planning?.dayTags);
+        
+        // dayOverrides 적용 (dayTags 이후에 적용)
         applyDayOverrides(block, input.planning?.dayOverrides);
         
         blocks.push(block);
@@ -401,7 +404,47 @@ function getRepsByBlockType(blockType: string): number {
   }
 }
 
-// ⚙️ dayOverrides 적용
+// 🎯 dayTags 규칙 적용 (config/rules/dayTypes.json 기반)
+function applyDayTags(block: Block, dayTags?: Array<{week:number; day:number; tag:'recovery'|'technique'|'overload'}>) {
+  if (!dayTags) return;
+  
+  const dayTag = dayTags.find(t => t.week === block.week && t.day === block.day);
+  if (!dayTag) return;
+  
+  // dayTypes 규칙 로드 (실제로는 파일에서 로드, 지금은 하드코딩)
+  const dayTypesRules = {
+    "recovery": { "setsDelta": -2, "pctDelta": -0.08, "rpeCap": 7.5 },
+    "technique": { "pctDelta": -0.05, "rpeCap": 7.0 },
+    "overload": { "pctDelta": +0.03, "rpeCap": 8.5, "setsDelta": +1 }
+  };
+  
+  const rule = dayTypesRules[dayTag.tag];
+  if (!rule) return;
+  
+  // 세트수 조정
+  if (rule.setsDelta) {
+    block.sets = Math.max(1, block.sets + rule.setsDelta);
+  }
+  
+  // 강도 조정 (% 단위를 비율로 변환: -0.08 = -8%)
+  if (rule.pctDelta && block.intensity.type === '%1RM') {
+    const deltaPercent = rule.pctDelta * 100; // -0.08 → -8%
+    block.intensity.value = Math.max(50, Math.min(100, block.intensity.value + deltaPercent));
+  }
+  
+  // RPE 제한
+  if (rule.rpeCap) {
+    block.intensity = {
+      type: 'RPE',
+      value: rule.rpeCap
+    };
+  }
+  
+  // 태그 표시
+  block.notes = `${block.notes} [${dayTag.tag}]`;
+}
+
+// ⚙️ dayOverrides 적용 (개별 날짜 미세 조정)
 function applyDayOverrides(block: Block, overrides?: Array<{week:number; day:number; setsDelta?:number; pctDelta?:number; rpeCap?:number}>) {
   if (!overrides) return;
   
