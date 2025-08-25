@@ -1,6 +1,37 @@
-import SurveySection from '@/components/SurveySection';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { AdvancedSurveySection } from '@/components/AdvancedSurveySection';
+import { useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Survey() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const form = useForm();
+  const { toast } = useToast();
+
+  const submitSurvey = useMutation({
+    mutationFn: (data) => apiRequest("POST", "/api/surveys?kind=basic_v1", data),
+    onSuccess: (response) => {
+      toast({
+        title: "🔥 파워리프팅 프로그램 생성 완료!",
+        description: "최고의 개인화된 훈련이 이메일로 전송되었습니다.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "오류 발생",
+        description: "프로그램 생성 중 문제가 발생했습니다.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleSubmit = () => {
+    const formData = form.getValues();
+    submitSurvey.mutate(formData);
+  };
+
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Dark Navigation */}
@@ -25,7 +56,13 @@ export default function Survey() {
         </div>
       </nav>
 
-      <SurveySection />
+      <AdvancedSurveySection 
+        form={form}
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        onSubmit={handleSubmit}
+        isSubmitting={submitSurvey.isPending}
+      />
     </div>
   );
 }
