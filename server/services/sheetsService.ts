@@ -103,6 +103,77 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     
     console.log('✅ 템플릿 데이터 업데이트 완료!');
 
+    // 🔥 실제 훈련 프로그램 데이터를 스프레드시트에 추가!
+    try {
+      console.log('📊 훈련 프로그램 스케줄 추가 중...');
+      console.log('🔍 프로그램 데이터 구조:', Object.keys(programData));
+      console.log('🔍 프로그램 데이터 전체:', JSON.stringify(programData, null, 2));
+    
+    // A8부터 실제 훈련 프로그램 시작
+    let currentRow = 8;
+    const programScheduleData: string[][] = [];
+    
+    // 헤더 추가
+    programScheduleData.push(['', '', '', '', '', '', '']);
+    programScheduleData.push(['📋 18주 훈련 프로그램 스케줄', '', '', '', '', '', '']);
+    programScheduleData.push(['', '', '', '', '', '', '']);
+    
+    // 실제 프로그램 JSON 데이터 파싱 및 추가
+    if (programData.training_weeks && Array.isArray(programData.training_weeks)) {
+      // 스프레드시트 헤더
+      programScheduleData.push(['운동', '세트', '렙수', '무게(%)', '휴식(분)', 'RPE', '비고']);
+      programScheduleData.push(['', '', '', '', '', '', '']);
+      
+      // 각 주차별 데이터 추가
+      for (const week of programData.training_weeks) {
+        // 주차 헤더
+        programScheduleData.push([`${week.week}주차 - ${week.focus || ''}`, '', '', '', '', '', '']);
+        
+        // 각 운동일별 데이터
+        if (week.workouts && Array.isArray(week.workouts)) {
+          for (const workout of week.workouts) {
+            // 운동일 헤더
+            programScheduleData.push([`Day ${workout.day}: ${workout.workout_name || ''}`, '', '', '', '', '', '']);
+            
+            // 각 운동별 데이터
+            if (workout.exercises && Array.isArray(workout.exercises)) {
+              for (const exercise of workout.exercises) {
+                const row = [
+                  exercise.exercise || '',
+                  exercise.sets?.toString() || '',
+                  exercise.reps || '',
+                  exercise.weight_percent || '',
+                  exercise.rest_minutes?.toString() || '',
+                  exercise.rpe || '',
+                  exercise.notes || ''
+                ];
+                programScheduleData.push(row);
+              }
+            }
+            
+            // 운동일 간 구분선
+            programScheduleData.push(['', '', '', '', '', '', '']);
+          }
+        }
+      }
+    }
+    
+    // 스프레드시트에 훈련 프로그램 데이터 추가
+    if (programScheduleData.length > 0) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `A${currentRow}:G${currentRow + programScheduleData.length - 1}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: programScheduleData
+        }
+      });
+      console.log('✅ 훈련 프로그램 스케줄 추가 완료!');
+    }
+    } catch (scheduleError) {
+      console.log('❌ 훈련 프로그램 스케줄 추가 실패:', scheduleError);
+    }
+
     // 공개 권한 설정
     try {
       await drive.permissions.create({
