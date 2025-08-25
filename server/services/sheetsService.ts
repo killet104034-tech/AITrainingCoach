@@ -1,7 +1,6 @@
 import { google } from 'googleapis';
 
 // Google Sheets 인증 설정
-// 더 넓은 권한으로 시도
 const auth = new google.auth.GoogleAuth({
   credentials: {
     client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
@@ -43,192 +42,76 @@ export interface WorkoutProgram {
   }>;
 }
 
+// 템플릿 스프레드시트 ID (환경변수로 설정 가능)
+const TEMPLATE_SHEET_ID = process.env.SHEET_TEMPLATE_ID;
+
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
-    console.log('🔥 템플릿 복사 방식으로 스프레드시트 생성 시작...');
+    console.log('🔥 비서님 제안: 템플릿 복사 방식으로 스프레드시트 생성 시작...');
     console.log('🔐 서비스 계정:', process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL);
+    console.log('📋 템플릿 ID:', TEMPLATE_SHEET_ID);
 
     // 인증 테스트
     const authClient = await auth.getClient();
     console.log('✅ 인증 성공!');
 
-    // 1. 우선 간단한 방법: 기본 스프레드시트를 생성하고 바로 공유
-    console.log('📋 기본 스프레드시트 생성 중...');
-    
-    // 2. 서비스 계정의 드라이브에 스프레드시트 생성 후 공유
-    const createResponse = await drive.files.create({
-      requestBody: {
-        name: `${programData.program_title} - ${new Date().toLocaleDateString('ko-KR')}`,
-        mimeType: 'application/vnd.google-apps.spreadsheet',
-        parents: [] // 서비스 계정의 루트 폴더에 생성
-      }
-    });
+    let spreadsheetId: string;
 
-    const spreadsheetId = createResponse.data.id;
-    if (!spreadsheetId) {
-      throw new Error('스프레드시트 ID를 받을 수 없습니다.');
-    }
-
-    console.log('✅ 스프레드시트 생성 완료! ID:', spreadsheetId);
-
-    // 2. 프로그램 정보 시트에 데이터 추가
-    const infoData = [
-      ['항목', '값'],
-      ['프로그램명', programData.program_title],
-      ['생성일', new Date().toLocaleDateString('ko-KR')],
-      ['', ''],
-      ['현재 최대중량 (KG)', ''],
-      ['Squat', programData.user_maxes.squat],
-      ['Bench Press', programData.user_maxes.bench],
-      ['Deadlift', programData.user_maxes.deadlift],
-      ['', ''],
-      ['RPE 평가 기준', ''],
-      ['10', '최대 노력 - 더 이상 불가능'],
-      ['9.5', '아마도 한 번 더 가능'],
-      ['9', '확실히 한 번 더 가능'],
-      ['8.5', '아마도 두 번 더 가능'],
-      ['8', '확실히 두 번 더 가능'],
-      ['7.5', '아마도 세 번 더 가능'],
-      ['7', '확실히 세 번 더 가능']
-    ];
-
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: '프로그램 정보!A1',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: infoData
-      }
-    });
-
-    // 3. 각 주차별 시트 생성 및 데이터 추가
-    for (let i = 0; i < programData.training_weeks.length; i++) {
-      const week = programData.training_weeks[i];
-      const sheetTitle = `Week ${week.week}`;
-
-      // 새 시트 추가
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
+    if (TEMPLATE_SHEET_ID) {
+      // 🎯 비서님 제안: 템플릿 복사 방식 (drive.files.copy)
+      console.log('📋 템플릿 복사 중... (용량 효율적!)');
+      
+      const copy = await drive.files.copy({
+        fileId: TEMPLATE_SHEET_ID,
+        supportsAllDrives: true,
         requestBody: {
-          requests: [{
-            addSheet: {
-              properties: {
-                title: sheetTitle,
-                gridProperties: {
-                  rowCount: 100,
-                  columnCount: 11
-                }
-              }
-            }
-          }]
+          name: `SINABRO_${Date.now()}`,
+          parents: process.env.SHARED_FOLDER_ID ? [process.env.SHARED_FOLDER_ID] : undefined
         }
       });
+      
+      spreadsheetId = copy.data.id!;
+      console.log('✅ 템플릿 복사 완료! ID:', spreadsheetId);
 
-      // 시트 헤더 설정
-      const headers = [
-        '일차', '운동명', '목표세트', '목표렙', '목표중량(%)', 
-        '실제세트', '실제렙', '실제중량(kg)', 'RPE', '볼륨(kg)', '메모'
+      // 핵심 데이터만 업데이트 (빠르고 효율적)
+      const updateData = [
+        [programData.user_maxes.squat],    // B6: Squat 1RM
+        [programData.user_maxes.bench],    // B7: Bench 1RM  
+        [programData.user_maxes.deadlift], // B8: Deadlift 1RM
+        [programData.program_title],       // B9: Program Title
+        [new Date().toLocaleDateString('ko-KR')] // B10: Created Date
       ];
-
-      const weekData = [headers];
-
-      // 운동 데이터 추가
-      for (const workout of week.workouts) {
-        // 일차 헤더
-        weekData.push([
-          `Day ${workout.day}`,
-          workout.workout_name,
-          '', '', '', '', '', '', '', '', ''
-        ]);
-
-        // 각 운동
-        for (const exercise of workout.exercises) {
-          weekData.push([
-            '',
-            exercise.exercise,
-            exercise.sets,
-            exercise.reps,
-            exercise.weight_percent,
-            '', // 실제세트
-            '', // 실제렙
-            '', // 실제중량
-            exercise.rpe || '', // RPE
-            '', // 볼륨
-            exercise.notes || '' // 메모
-          ]);
-        }
-
-        // 공백 행
-        weekData.push(['', '', '', '', '', '', '', '', '', '', '']);
-      }
-
-      // 데이터 추가
+      
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetTitle}!A1`,
+        range: 'Program Info!B6:B10',
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: weekData
+          values: updateData
         }
       });
+      
+      console.log('✅ 템플릿 데이터 업데이트 완료!');
+      
+    } else {
+      // 기존 방식: 새로 생성 (템플릿이 없는 경우)
+      console.log('📋 기본 스프레드시트 생성 중...');
+      
+      const createResponse = await drive.files.create({
+        requestBody: {
+          name: `${programData.program_title} - ${new Date().toLocaleDateString('ko-KR')}`,
+          mimeType: 'application/vnd.google-apps.spreadsheet',
+        }
+      });
+
+      spreadsheetId = createResponse.data.id!;
+      console.log('✅ 스프레드시트 생성 완료! ID:', spreadsheetId);
+
+      // 기본 시트 생성
+      await createBasicSheets(spreadsheetId, programData);
     }
 
-    // 4. 진행상황 추적 시트 생성
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      requestBody: {
-        requests: [{
-          addSheet: {
-            properties: {
-              title: '진행상황 추적',
-              gridProperties: {
-                rowCount: 50,
-                columnCount: 6
-              }
-            }
-          }
-        }]
-      }
-    });
-
-    const progressData = [
-      ['날짜', '운동명', '최고중량(kg)', '예상1RM', '총볼륨(kg)', '메모'],
-      [
-        new Date().toLocaleDateString('ko-KR'),
-        'Squat',
-        programData.user_maxes.squat,
-        programData.user_maxes.squat,
-        '',
-        '시작 중량'
-      ],
-      [
-        new Date().toLocaleDateString('ko-KR'),
-        'Bench Press',
-        programData.user_maxes.bench,
-        programData.user_maxes.bench,
-        '',
-        '시작 중량'
-      ],
-      [
-        new Date().toLocaleDateString('ko-KR'),
-        'Deadlift',
-        programData.user_maxes.deadlift,
-        programData.user_maxes.deadlift,
-        '',
-        '시작 중량'
-      ]
-    ];
-
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: '진행상황 추적!A1',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: progressData
-      }
-    });
-
-    // 5. 스프레드시트를 공개로 설정 (권한 문제 시 스킵)
+    // 공개 권한 설정
     try {
       await drive.permissions.create({
         fileId: spreadsheetId,
@@ -248,10 +131,31 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     return spreadsheetUrl;
 
   } catch (error) {
-    console.error('구글 스프레드시트 생성 실패 - 상세 에러:', error);
-    console.error('에러 타입:', typeof error);
-    console.error('에러 객체:', JSON.stringify(error, null, 2));
-    
+    console.error('구글 스프레드시트 생성 실패:', error);
     throw new Error(`구글 스프레드시트 생성 실패: ${(error as any)?.message || 'Unknown error'}`);
   }
+}
+
+// 기본 시트 생성 함수 (템플릿이 없는 경우)
+async function createBasicSheets(spreadsheetId: string, programData: WorkoutProgram) {
+  // 간단한 기본 시트만 생성
+  const infoData = [
+    ['항목', '값'],
+    ['프로그램명', programData.program_title],
+    ['생성일', new Date().toLocaleDateString('ko-KR')],
+    ['', ''],
+    ['현재 최대중량 (KG)', ''],
+    ['Squat', programData.user_maxes.squat],
+    ['Bench Press', programData.user_maxes.bench],
+    ['Deadlift', programData.user_maxes.deadlift]
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: '프로그램 정보!A1',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: infoData
+    }
+  });
 }
