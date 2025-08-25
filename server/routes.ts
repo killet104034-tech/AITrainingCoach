@@ -1,11 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import express from "express";
+import path from "path";
 import { storage } from "./storage";
 import { insertSurveyResponseSchema } from "@shared/schema";
 import { generateTrainingProgram } from "./services/openai";
 import { sendTrainingProgram } from "./services/email";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve attached assets (images, etc.) statically
+  app.use('/api/assets', express.static(path.resolve(import.meta.dirname, '..', 'attached_assets')));
   // Survey submission endpoint
   app.post("/api/survey", async (req, res) => {
     try {
