@@ -103,93 +103,8 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     
     console.log('✅ 템플릿 데이터 업데이트 완료!');
 
-    // 🎨 먼저 디자인부터 적용! (가장 중요)
-    console.log('🔥 스프레드시트 디자인 우선 적용!');
-    try {
-      await formatWorkoutSheet(spreadsheetId, 100);
-      console.log('✅ 스프레드시트 디자인 적용 완료!');
-    } catch (formatError) {
-      console.log('❌ 디자인 적용 실패:', formatError);
-    }
-
-    // 🔥 실제 훈련 프로그램 데이터를 스프레드시트에 추가!
-    try {
-      console.log('📊 훈련 프로그램 스케줄 추가 중...');
-    
-    // A8부터 실제 훈련 프로그램 시작
-    let currentRow = 8;
-    const programScheduleData: string[][] = [];
-    
-    // 헤더 추가
-    programScheduleData.push(['', '', '', '', '', '', '']);
-    programScheduleData.push(['📋 18주 훈련 프로그램 스케줄', '', '', '', '', '', '']);
-    programScheduleData.push(['', '', '', '', '', '', '']);
-    
-    // 실제 프로그램 JSON 데이터 파싱 및 추가
-    if (programData.training_weeks && Array.isArray(programData.training_weeks)) {
-      // 스프레드시트 헤더
-      programScheduleData.push(['운동', '세트', '렙수', '무게(%)', '휴식(분)', 'RPE', '비고']);
-      programScheduleData.push(['', '', '', '', '', '', '']);
-      
-      // 각 주차별 데이터 추가
-      for (const week of programData.training_weeks) {
-        // 주차 헤더
-        programScheduleData.push([`${week.week}주차 - ${week.focus || ''}`, '', '', '', '', '', '']);
-        
-        // 각 운동일별 데이터
-        if (week.workouts && Array.isArray(week.workouts)) {
-          for (const workout of week.workouts) {
-            // 운동일 헤더
-            programScheduleData.push([`Day ${workout.day}: ${workout.workout_name || ''}`, '', '', '', '', '', '']);
-            
-            // 각 운동별 데이터
-            if (workout.exercises && Array.isArray(workout.exercises)) {
-              for (const exercise of workout.exercises) {
-                const row = [
-                  exercise.exercise || '',
-                  exercise.sets?.toString() || '',
-                  exercise.reps || '',
-                  exercise.weight_percent || '',
-                  exercise.rest_minutes?.toString() || '',
-                  exercise.rpe || '',
-                  exercise.notes || ''
-                ];
-                programScheduleData.push(row);
-              }
-            }
-            
-            // 운동일 간 구분선
-            programScheduleData.push(['', '', '', '', '', '', '']);
-          }
-        }
-      }
-    }
-    
-    // 스프레드시트에 훈련 프로그램 데이터 추가
-    if (programScheduleData.length > 0) {
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `A${currentRow}:G${currentRow + programScheduleData.length - 1}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: programScheduleData
-        }
-      });
-      console.log('✅ 훈련 프로그램 스케줄 추가 완료!');
-    }
-    
-    } catch (scheduleError) {
-      console.log('❌ 훈련 프로그램 스케줄 추가 실패:', scheduleError);
-    }
-
-    // 🎨 스프레드시트 포맷팅 적용 (프로페셔널한 디자인) - 별도 실행
-    try {
-      console.log('🎨 스프레드시트 디자인 적용 중...');
-      await formatWorkoutSheet(spreadsheetId, 100); // 충분한 행 수로 설정
-      console.log('✅ 스프레드시트 디자인 완료!');
-    } catch (formatError) {
-      console.log('❌ 스프레드시트 디자인 적용 실패:', formatError);
-    }
+    // 🔥 프로급 파워리프팅 시트 구조 생성!
+    await createProPowerliftingSheets(spreadsheetId, programData);
 
     // 공개 권한 설정
     try {
@@ -216,155 +131,280 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
   }
 }
 
-// 🎨 프로페셔널한 스프레드시트 포맷팅 함수
-async function formatWorkoutSheet(spreadsheetId: string, totalRows: number): Promise<void> {
+// 🔥 프로급 파워리프팅 시트 생성 함수 (블럭별 시트 구조)
+async function createProPowerliftingSheets(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
   try {
-    const requests = [
-      // 전체 시트 기본 스타일
-      {
-        repeatCell: {
-          range: {
-            sheetId: 0,
-            startRowIndex: 0,
-            endRowIndex: totalRows,
-            startColumnIndex: 0,
-            endColumnIndex: 7
-          },
-          cell: {
-            userEnteredFormat: {
-              textFormat: {
-                fontFamily: 'Noto Sans KR',
-                fontSize: 10
-              },
-              borders: {
-                top: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
-                bottom: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
-                left: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
-                right: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } }
-              }
-            }
-          },
-          fields: 'userEnteredFormat(textFormat,borders)'
-        }
-      },
+    console.log('🔥 프로급 파워리프팅 시트 구조 생성 중...');
+    
+    // 1. 메인 시트 이름 변경 및 개요 생성
+    await createMainOverviewSheet(spreadsheetId, programData);
+    
+    // 2. 블럭별 시트 생성
+    if (programData.training_weeks && Array.isArray(programData.training_weeks)) {
+      const blocksData = organizeWeeksIntoBlocks(programData.training_weeks);
       
-      // 메인 헤더 (1-5행) 스타일
-      {
-        repeatCell: {
-          range: {
-            sheetId: 0,
-            startRowIndex: 0,
-            endRowIndex: 6,
-            startColumnIndex: 0,
-            endColumnIndex: 7
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: { red: 0.1, green: 0.1, blue: 0.1 },
-              textFormat: {
-                foregroundColor: { red: 1, green: 1, blue: 1 },
-                fontSize: 12,
-                bold: true
-              },
-              horizontalAlignment: 'LEFT',
-              verticalAlignment: 'MIDDLE'
-            }
-          },
-          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
-        }
-      },
-      
-      // 훈련 프로그램 제목 헤더
-      {
-        repeatCell: {
-          range: {
-            sheetId: 0,
-            startRowIndex: 8,
-            endRowIndex: 10,
-            startColumnIndex: 0,
-            endColumnIndex: 7
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: { red: 0.2, green: 0.3, blue: 0.8 },
-              textFormat: {
-                foregroundColor: { red: 1, green: 1, blue: 1 },
-                fontSize: 14,
-                bold: true
-              },
-              horizontalAlignment: 'CENTER',
-              verticalAlignment: 'MIDDLE'
-            }
-          },
-          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
-        }
-      },
-      
-      // 컬럼 헤더 스타일 (운동, 세트, 렙수 등)
-      {
-        repeatCell: {
-          range: {
-            sheetId: 0,
-            startRowIndex: 11,
-            endRowIndex: 12,
-            startColumnIndex: 0,
-            endColumnIndex: 7
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: { red: 0.4, green: 0.4, blue: 0.4 },
-              textFormat: {
-                foregroundColor: { red: 1, green: 1, blue: 1 },
-                fontSize: 11,
-                bold: true
-              },
-              horizontalAlignment: 'CENTER',
-              verticalAlignment: 'MIDDLE'
-            }
-          },
-          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
-        }
-      },
-      
-      // 컬럼 너비 자동 조정
-      {
-        autoResizeDimensions: {
-          dimensions: {
-            sheetId: 0,
-            dimension: 'COLUMNS',
-            startIndex: 0,
-            endIndex: 7
-          }
-        }
-      },
-      
-      // 행 높이 조정
-      {
-        updateDimensionProperties: {
-          range: {
-            sheetId: 0,
-            dimension: 'ROWS',
-            startIndex: 0,
-            endIndex: totalRows
-          },
-          properties: {
-            pixelSize: 25
-          },
-          fields: 'pixelSize'
-        }
+      for (let i = 0; i < blocksData.length; i++) {
+        const blockData = blocksData[i];
+        await createBlockSheet(spreadsheetId, i + 1, blockData);
       }
-    ];
-
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      requestBody: {
-        requests
-      }
-    });
+    }
+    
+    console.log('✅ 프로급 파워리프팅 시트 구조 완성!');
     
   } catch (error) {
-    console.log('포맷팅 적용 실패 (스킵):', (error as any)?.message);
+    console.log('❌ 프로급 시트 생성 실패:', (error as any)?.message);
   }
+}
+
+// 메인 개요 시트 생성
+async function createMainOverviewSheet(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  // 메인 시트 이름 변경
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [{
+        updateSheetProperties: {
+          properties: {
+            sheetId: 0,
+            title: '📊 PROGRAM OVERVIEW'
+          },
+          fields: 'title'
+        }
+      }]
+    }
+  });
+
+  // 메인 개요 데이터 구성
+  const overviewData = [
+    ['', '', '', '', '', '', ''],
+    ['🏋️ SINABRO STRENGTH', '', '', '', '', '', ''],
+    ['개인 맞춤형 파워리프팅 프로그램', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['📋 TRAINING MAXES', '', '🎯 RPE REFERENCE', '', '', '', ''],
+    ['Squat 1RM', `${programData.user_maxes.squat}kg`, 'RPE 10', '최대 반복 (실패)', '', '', ''],
+    ['Bench 1RM', `${programData.user_maxes.bench}kg`, 'RPE 9.5', '실패 직전 (1회 더 가능)', '', '', ''],
+    ['Deadlift 1RM', `${programData.user_maxes.deadlift}kg`, 'RPE 9', '2-3회 더 가능', '', '', ''],
+    ['', '', 'RPE 8', '4-6회 더 가능', '', '', ''],
+    ['📈 PROGRAM INFO', '', 'RPE 7', '7-8회 더 가능', '', '', ''],
+    ['프로그램명', programData.program_title, 'RPE 6', '9-10회 더 가능', '', '', ''],
+    ['생성일', new Date().toLocaleDateString('ko-KR'), '', '', '', '', ''],
+    ['', '', '', '', '', '', ''],
+    ['💡 사용법', '', '', '', '', '', ''],
+    ['• 각 블럭 탭을 클릭하여 주차별 훈련 확인', '', '', '', '', '', ''],
+    ['• RPE 기준으로 중량 조절', '', '', '', '', '', ''],
+    ['• 개인 상황에 맞게 조정 가능', '', '', '', '', '', '']
+  ];
+
+  // 데이터 입력
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: 'A1:G17',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: overviewData
+    }
+  });
+
+  // 메인 시트 스타일링
+  await formatMainSheet(spreadsheetId);
+}
+
+// 주차를 블럭으로 그룹화
+function organizeWeeksIntoBlocks(trainingWeeks: any[]): any[][] {
+  const blocksData = [];
+  let currentBlock = [];
+  
+  for (let i = 0; i < trainingWeeks.length; i++) {
+    currentBlock.push(trainingWeeks[i]);
+    
+    // 6주마다 또는 마지막에 블럭 완성
+    if (currentBlock.length === 6 || i === trainingWeeks.length - 1) {
+      blocksData.push([...currentBlock]);
+      currentBlock = [];
+    }
+  }
+  
+  return blocksData;
+}
+
+// 블럭별 시트 생성
+async function createBlockSheet(spreadsheetId: string, blockNumber: number, blockWeeks: any[]): Promise<void> {
+  // 새 시트 생성
+  const newSheet = await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [{
+        addSheet: {
+          properties: {
+            title: `Block ${blockNumber}`,
+            gridProperties: {
+              rowCount: 100,
+              columnCount: 20
+            }
+          }
+        }
+      }]
+    }
+  });
+
+  const sheetId = newSheet.data.replies?.[0]?.addSheet?.properties?.sheetId;
+  if (!sheetId) return;
+
+  // 블럭 데이터 구성
+  const blockData = [];
+  
+  // 헤더
+  blockData.push(['', '', '', '', '', '', '', '', '', '']);
+  blockData.push([`🔥 BLOCK ${blockNumber}`, '', '', '', '', '', '', '', '', '']);
+  blockData.push(['', '', '', '', '', '', '', '', '', '']);
+
+  // 각 주차별 데이터
+  for (const week of blockWeeks) {
+    blockData.push(['', '', '', '', '', '', '', '', '', '']);
+    blockData.push([`📅 ${week.week}주차 - ${week.focus || ''}`, '', '', '', '', '', '', '', '', '']);
+    blockData.push(['', '', '', '', '', '', '', '', '', '']);
+    
+    if (week.workouts && Array.isArray(week.workouts)) {
+      for (const workout of week.workouts) {
+        // 운동일 헤더
+        blockData.push([`💪 Day ${workout.day}: ${workout.workout_name || ''}`, '', '', '', '', '', '', '', '', '']);
+        blockData.push(['운동', '세트', '렙수', '무게%', '휴식', 'RPE', '비고', '', '', '']);
+        
+        // 운동 데이터
+        if (workout.exercises && Array.isArray(workout.exercises)) {
+          for (const exercise of workout.exercises) {
+            blockData.push([
+              exercise.exercise || '',
+              exercise.sets?.toString() || '',
+              exercise.reps || '',
+              exercise.weight_percent || '',
+              `${exercise.rest_minutes || ''}분`,
+              exercise.rpe || '',
+              exercise.notes || '',
+              '', '', ''
+            ]);
+          }
+        }
+        
+        blockData.push(['', '', '', '', '', '', '', '', '', '']);
+      }
+    }
+  }
+
+  // 데이터 입력
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `A1:J${blockData.length}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: blockData
+    }
+  });
+
+  // 블럭 시트 스타일링
+  await formatBlockSheet(spreadsheetId, sheetId, blockData.length);
+}
+
+// 메인 시트 스타일링
+async function formatMainSheet(spreadsheetId: string): Promise<void> {
+  const requests = [
+    // 전체 기본 스타일
+    {
+      repeatCell: {
+        range: { sheetId: 0, startRowIndex: 0, endRowIndex: 20, startColumnIndex: 0, endColumnIndex: 7 },
+        cell: {
+          userEnteredFormat: {
+            textFormat: { fontFamily: 'Noto Sans KR', fontSize: 11 },
+            backgroundColor: { red: 0.95, green: 0.95, blue: 0.95 }
+          }
+        },
+        fields: 'userEnteredFormat(textFormat,backgroundColor)'
+      }
+    },
+    // 메인 타이틀 (검은색)
+    {
+      repeatCell: {
+        range: { sheetId: 0, startRowIndex: 1, endRowIndex: 3, startColumnIndex: 0, endColumnIndex: 7 },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: { red: 0.1, green: 0.1, blue: 0.1 },
+            textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, fontSize: 16, bold: true },
+            horizontalAlignment: 'CENTER'
+          }
+        },
+        fields: 'userEnteredFormat'
+      }
+    },
+    // Training Maxes 섹션 (빨간색)
+    {
+      repeatCell: {
+        range: { sheetId: 0, startRowIndex: 4, endRowIndex: 8, startColumnIndex: 0, endColumnIndex: 2 },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: { red: 0.8, green: 0.2, blue: 0.2 },
+            textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+          }
+        },
+        fields: 'userEnteredFormat'
+      }
+    },
+    // RPE 섹션 (파란색)
+    {
+      repeatCell: {
+        range: { sheetId: 0, startRowIndex: 4, endRowIndex: 10, startColumnIndex: 2, endColumnIndex: 5 },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: { red: 0.2, green: 0.4, blue: 0.8 },
+            textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+          }
+        },
+        fields: 'userEnteredFormat'
+      }
+    }
+  ];
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: { requests }
+  });
+}
+
+// 블럭 시트 스타일링
+async function formatBlockSheet(spreadsheetId: string, sheetId: number, totalRows: number): Promise<void> {
+  const requests = [
+    // 전체 기본 스타일
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 0, endRowIndex: totalRows, startColumnIndex: 0, endColumnIndex: 10 },
+        cell: {
+          userEnteredFormat: {
+            textFormat: { fontFamily: 'Noto Sans KR', fontSize: 10 },
+            backgroundColor: { red: 0.98, green: 0.98, blue: 0.98 }
+          }
+        },
+        fields: 'userEnteredFormat(textFormat,backgroundColor)'
+      }
+    },
+    // 블럭 타이틀 (검은색)
+    {
+      repeatCell: {
+        range: { sheetId, startRowIndex: 1, endRowIndex: 2, startColumnIndex: 0, endColumnIndex: 10 },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: { red: 0.1, green: 0.1, blue: 0.1 },
+            textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, fontSize: 18, bold: true },
+            horizontalAlignment: 'CENTER'
+          }
+        },
+        fields: 'userEnteredFormat'
+      }
+    }
+  ];
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: { requests }
+  });
 }
 
 // 기본 시트 생성 함수 (템플릿이 없는 경우)
