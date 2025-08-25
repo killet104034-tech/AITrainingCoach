@@ -21,26 +21,26 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 bg-gray-900">
+    <section id="how-it-works" className="py-32 bg-black border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-light text-white mb-8">
             3단계로 시작하는 맞춤형 훈련
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto font-light">
             복잡한 과정 없이 간단한 설문만으로 전문가 수준의 파워리프팅 프로그램을 받아보세요.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-12">
+        <div className="grid md:grid-cols-3 gap-12 mt-20">
           {steps.map((step, index) => (
             <div key={index}>
               <div className="text-center relative">
-                <div className={`w-16 h-16 ${step.bgColor} text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6`}>
+                <div className={`w-16 h-16 bg-gray-800 text-white rounded-full flex items-center justify-center text-2xl font-light mx-auto mb-6`}>
                   {step.number}
                 </div>
-                <h3 className="text-2xl font-semibold text-white mb-4">{step.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{step.description}</p>
+                <h3 className="text-2xl font-medium text-white mb-4">{step.title}</h3>
+                <p className="text-gray-400 leading-relaxed font-light">{step.description}</p>
               </div>
               
               {index < steps.length - 1 && (

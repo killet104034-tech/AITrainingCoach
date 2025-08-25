@@ -39,29 +39,29 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section id="features" className="py-20 bg-gray-800">
+    <section id="features" className="py-32 bg-black border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-light text-white mb-8">
             왜 Sinabro Strength를 선택해야 할까요?
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto font-light">
             과학적 근거와 AI 분석을 바탕으로 한 개인 맞춤형 훈련으로 더 빠르고 안전하게 목표를 달성하세요.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
           {features.map((feature, index) => (
             <div 
               key={index}
               data-testid={`feature-card-${index}`}
-              className="bg-gray-700 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
+              className="bg-transparent border border-gray-800 p-8 rounded-lg hover:border-gray-700 transition-colors duration-300"
             >
-              <div className={`w-12 h-12 ${feature.bgColor} text-white rounded-lg flex items-center justify-center mb-6`}>
+              <div className={`w-12 h-12 bg-gray-800 text-white rounded-lg flex items-center justify-center mb-6`}>
                 <i className={`${feature.icon} text-xl`}></i>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4">{feature.title}</h3>
-              <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+              <h3 className="text-xl font-medium text-white mb-4">{feature.title}</h3>
+              <p className="text-gray-400 leading-relaxed font-light">{feature.description}</p>
             </div>
           ))}
         </div>
