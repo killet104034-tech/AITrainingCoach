@@ -232,7 +232,7 @@ export async function planFromTables(input: CanonicalInput): Promise<ProgramPlan
     const blockPattern = determineBlockPattern(input);
     
     // 3. 운동별 빈도 적용
-    const liftFrequencies = getLiftFrequencies(input);
+    const liftFrequencies = await getLiftFrequencies(input);
     
     // 4. ProgramPlan 생성
     const programPlan = generateFromRules(input, intensityPattern, blockPattern, liftFrequencies);
@@ -246,31 +246,39 @@ export async function planFromTables(input: CanonicalInput): Promise<ProgramPlan
   }
 }
 
+// 📊 규칙 파일 동적 로드 시스템
+async function loadRuleData<T>(fileName: string, fallback: T): Promise<T> {
+  try {
+    // TODO: 실제 파일 로드 구현 (fs.readFile 또는 dynamic import)
+    // const data = await fs.readFile(`config/rules/${fileName}`, 'utf-8');
+    // return JSON.parse(data) as T;
+    
+    // 지금은 하드코딩으로 대체
+    return fallback;
+  } catch (error) {
+    console.log(`⚠️ ${fileName} 로드 실패, 기본값 사용`);
+    return fallback;
+  }
+}
+
 // 📊 강도 패턴 로드 (config/rules/weeks.json에서)
 async function loadIntensityPattern(input: CanonicalInput): Promise<number[]> {
-  try {
-    // 실제 파일 로드는 나중에 구현, 지금은 하드코딩
-    const weeksRules = {
-      "default": [0.68, 0.72, 0.76, 0.62],
-      "meso3":   [0.70, 0.76, 0.62],
-      "peaking": [0.72, 0.78, 0.84, 0.64]
-    };
-    
-    // 설문에서 planning.mesoWeeks=3 이면 meso3 사용, 없으면 default
-    if (input.planning?.mesoWeeks === 3) {
-      return weeksRules.meso3;
-    }
-    
-    if (input.goal === 'peaking') {
-      return weeksRules.peaking;
-    }
-    
-    return weeksRules.default;
-    
-  } catch (error) {
-    console.log('⚠️ 강도 패턴 로드 실패, 기본값 사용');
-    return [0.68, 0.72, 0.76, 0.62]; // 기본 4주 패턴
+  const weeksRules = await loadRuleData('weeks.json', {
+    "default": [0.68, 0.72, 0.76, 0.62],
+    "meso3":   [0.70, 0.76, 0.62],
+    "peaking": [0.72, 0.78, 0.84, 0.64]
+  });
+  
+  // 설문에서 planning.mesoWeeks=3 이면 meso3 사용, 없으면 default
+  if (input.planning?.mesoWeeks === 3) {
+    return weeksRules.meso3;
   }
+  
+  if (input.goal === 'peaking') {
+    return weeksRules.peaking;
+  }
+  
+  return weeksRules.default;
 }
 
 // 🎯 블록 패턴 결정
@@ -294,7 +302,7 @@ function determineBlockPattern(input: CanonicalInput): string[] {
 }
 
 // 🏋️ 운동별 빈도 결정 (볼륨 안전장치 포함)
-function getLiftFrequencies(input: CanonicalInput): { SQ: number; BP: number; DL: number } {
+async function getLiftFrequencies(input: CanonicalInput): Promise<{ SQ: number; BP: number; DL: number }> {
   let frequencies: { SQ: number; BP: number; DL: number };
   
   // planning.perLiftFrequency가 있으면 그것 사용
@@ -315,20 +323,19 @@ function getLiftFrequencies(input: CanonicalInput): { SQ: number; BP: number; DL
   }
   
   // 볼륨 안전장치 적용 (config/rules/volume.json 기반)
-  return applyVolumeSafeguards(frequencies, input.experience);
+  return await applyVolumeSafeguards(frequencies, input.experience);
 }
 
 // 🛡️ 볼륨 안전장치 (건강 가드 역할)
-function applyVolumeSafeguards(
+async function applyVolumeSafeguards(
   frequencies: { SQ: number; BP: number; DL: number }, 
   experience: string
-): { SQ: number; BP: number; DL: number } {
-  // volume 규칙 로드 (실제로는 파일에서 로드, 지금은 하드코딩)
-  const volumeRules = {
+): Promise<{ SQ: number; BP: number; DL: number }> {
+  const volumeRules = await loadRuleData('volume.json', {
     "SQ": { "beginner":[10,14], "intermediate":[12,18], "advanced":[14,22] },
     "BP": { "beginner":[12,18], "intermediate":[14,22], "advanced":[16,26] },
     "DL": { "beginner":[6,10],  "intermediate":[8,12],  "advanced":[10,14] }
-  };
+  });
   
   const experienceLevel = experience as keyof (typeof volumeRules.SQ);
   
@@ -389,7 +396,7 @@ function generateFromRules(
         };
         
         // dayTags 규칙 적용
-        applyDayTags(block, input.planning?.dayTags);
+        await applyDayTags(block, input.planning?.dayTags);
         
         // dayOverrides 적용 (dayTags 이후에 적용)
         applyDayOverrides(block, input.planning?.dayOverrides);
@@ -447,18 +454,17 @@ function getRepsByBlockType(blockType: string): number {
 }
 
 // 🎯 dayTags 규칙 적용 (config/rules/dayTypes.json 기반)
-function applyDayTags(block: Block, dayTags?: Array<{week:number; day:number; tag:'recovery'|'technique'|'overload'}>) {
+async function applyDayTags(block: Block, dayTags?: Array<{week:number; day:number; tag:'recovery'|'technique'|'overload'}>) {
   if (!dayTags) return;
   
   const dayTag = dayTags.find(t => t.week === block.week && t.day === block.day);
   if (!dayTag) return;
   
-  // dayTypes 규칙 로드 (실제로는 파일에서 로드, 지금은 하드코딩)
-  const dayTypesRules = {
+  const dayTypesRules = await loadRuleData('dayTypes.json', {
     "recovery": { "setsDelta": -2, "pctDelta": -0.08, "rpeCap": 7.5 },
     "technique": { "pctDelta": -0.05, "rpeCap": 7.0 },
     "overload": { "pctDelta": +0.03, "rpeCap": 8.5, "setsDelta": +1 }
-  };
+  });
   
   const rule = dayTypesRules[dayTag.tag];
   if (!rule) return;
