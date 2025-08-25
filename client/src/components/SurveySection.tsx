@@ -48,7 +48,8 @@ export default function SurveySection() {
     emailSent?: boolean;
   }, Error, SurveyForm>({
     mutationFn: async (data: SurveyForm) => {
-      return apiRequest("POST", "/api/survey", data);
+      const response = await apiRequest("POST", "/api/survey", data);
+      return await response.json();
     },
     onSuccess: () => {
       setCurrentStep(8); // Success state
