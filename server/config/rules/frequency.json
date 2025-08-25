@@ -1,0 +1,29 @@
+{
+  "frequencyPatterns": {
+    "3day": {
+      "squat": 2,
+      "bench": 2, 
+      "deadlift": 1
+    },
+    "4day": {
+      "squat": 2,
+      "bench": 3,
+      "deadlift": 2
+    },
+    "5day": {
+      "squat": 3,
+      "bench": 3,
+      "deadlift": 2
+    },
+    "6day": {
+      "squat": 3,
+      "bench": 4,
+      "deadlift": 2
+    }
+  },
+  "experienceMultipliers": {
+    "beginner": 0.8,
+    "intermediate": 1.0,
+    "advanced": 1.2
+  }
+}

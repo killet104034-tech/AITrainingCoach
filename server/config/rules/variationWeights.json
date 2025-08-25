@@ -1,0 +1,46 @@
+{
+  "squat": {
+    "competition": {
+      "back_squat": 8,
+      "pause_squat": 5,
+      "box_squat": 3,
+      "front_squat": 2
+    },
+    "beginner": {
+      "back_squat": 10,
+      "pause_squat": 3,
+      "front_squat": 2,
+      "goblet_squat": 1
+    }
+  },
+  "bench": {
+    "competition": {
+      "bench_press": 8,
+      "pause_bench": 6,
+      "close_grip_bench": 4,
+      "incline_bench": 3,
+      "dumbbell_bench": 2
+    },
+    "beginner": {
+      "bench_press": 10,
+      "pause_bench": 2,
+      "incline_bench": 3,
+      "dumbbell_bench": 3
+    }
+  },
+  "deadlift": {
+    "competition": {
+      "conventional_deadlift": 8,
+      "sumo_deadlift": 6,
+      "deficit_deadlift": 4,
+      "rack_pull": 3,
+      "romanian_deadlift": 2
+    },
+    "beginner": {
+      "conventional_deadlift": 10,
+      "romanian_deadlift": 4,
+      "rack_pull": 2,
+      "trap_bar_deadlift": 3
+    }
+  }
+}

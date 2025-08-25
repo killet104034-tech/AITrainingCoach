@@ -1,0 +1,55 @@
+{
+  "intensitySchemes": {
+    "heavy": {
+      "squat": [
+        { "sets": 1, "reps": 1, "percentage": 95, "rpe": 9 },
+        { "sets": 1, "reps": 2, "percentage": 90, "rpe": 8 },
+        { "sets": 2, "reps": 3, "percentage": 85, "rpe": 7 }
+      ],
+      "bench": [
+        { "sets": 1, "reps": 1, "percentage": 95, "rpe": 9 },
+        { "sets": 1, "reps": 2, "percentage": 90, "rpe": 8 },
+        { "sets": 3, "reps": 3, "percentage": 85, "rpe": 7 }
+      ],
+      "deadlift": [
+        { "sets": 1, "reps": 1, "percentage": 95, "rpe": 9 },
+        { "sets": 1, "reps": 2, "percentage": 90, "rpe": 8 },
+        { "sets": 2, "reps": 3, "percentage": 85, "rpe": 7 }
+      ]
+    },
+    "moderate": {
+      "squat": [
+        { "sets": 3, "reps": 5, "percentage": 80, "rpe": 7 },
+        { "sets": 2, "reps": 8, "percentage": 75, "rpe": 6 }
+      ],
+      "bench": [
+        { "sets": 4, "reps": 5, "percentage": 80, "rpe": 7 },
+        { "sets": 3, "reps": 8, "percentage": 75, "rpe": 6 }
+      ],
+      "deadlift": [
+        { "sets": 3, "reps": 5, "percentage": 80, "rpe": 7 },
+        { "sets": 2, "reps": 8, "percentage": 75, "rpe": 6 }
+      ]
+    },
+    "light": {
+      "squat": [
+        { "sets": 4, "reps": 8, "percentage": 70, "rpe": 6 },
+        { "sets": 3, "reps": 10, "percentage": 65, "rpe": 5 }
+      ],
+      "bench": [
+        { "sets": 4, "reps": 8, "percentage": 70, "rpe": 6 },
+        { "sets": 3, "reps": 10, "percentage": 65, "rpe": 5 }
+      ],
+      "deadlift": [
+        { "sets": 3, "reps": 8, "percentage": 70, "rpe": 6 },
+        { "sets": 2, "reps": 10, "percentage": 65, "rpe": 5 }
+      ]
+    }
+  },
+  "dayTypes": {
+    "3day": ["heavy", "moderate", "light"],
+    "4day": ["heavy", "moderate", "light", "moderate"],
+    "5day": ["heavy", "moderate", "light", "moderate", "light"],
+    "6day": ["heavy", "moderate", "light", "moderate", "light", "moderate"]
+  }
+}
