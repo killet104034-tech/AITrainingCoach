@@ -15,6 +15,7 @@ const surveySchema = z.object({
   squatMax: z.string().min(1, "스쿼트 최대중량을 입력해주세요"),
   benchMax: z.string().min(1, "벤치프레스 최대중량을 입력해주세요"), 
   deadliftMax: z.string().min(1, "데드리프트 최대중량을 입력해주세요"),
+  bodyweight: z.string().optional(),
   goals: z.array(z.string()).min(1, "최소 하나의 목표를 선택해주세요"),
   frequency: z.string().min(1, "훈련 빈도를 선택해주세요"),
   equipment: z.array(z.string()).min(1, "최소 하나의 장비를 선택해주세요"),
@@ -48,7 +49,7 @@ export default function SurveySection() {
     emailSent?: boolean;
   }, Error, SurveyForm>({
     mutationFn: async (data: SurveyForm) => {
-      const response = await apiRequest("POST", "/api/survey", data);
+      const response = await apiRequest("POST", "/api/surveys?kind=basic_v1", data);
       return await response.json();
     },
     onSuccess: () => {
