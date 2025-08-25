@@ -1,20 +1,21 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false,
-  requireTLS: true,
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
+  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.SMTP_USER || process.env.EMAIL_USER || 'default_user',
-    pass: process.env.SMTP_PASS || process.env.EMAIL_PASS || 'default_pass'
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   },
-  tls: {
-    rejectUnauthorized: false
-  }
+  connectionTimeout: 60000,
+  greetingTimeout: 30000,
+  socketTimeout: 60000,
+  pool: true,
+  maxConnections: 1,
+  rateDelta: 20000,
+  rateLimit: 5
 });
 
 export async function sendTrainingProgram(
@@ -137,8 +138,10 @@ export async function sendTrainingProgram(
     </html>
     `;
 
+    const fromEmail = process.env.SMTP_FROM || `Sinabro Strength <${process.env.SMTP_USER}>`;
+    
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.EMAIL_FROM || 'AI 파워리프팅 <noreply@aipowerlifting.com>',
+      from: fromEmail,
       to: email,
       subject: `💪 ${name ? `${name}님의` : '당신의'} Sinabro Strength 맞춤형 파워리프팅 프로그램`,
       html: htmlContent
