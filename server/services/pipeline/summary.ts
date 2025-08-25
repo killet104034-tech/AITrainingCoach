@@ -1,5 +1,5 @@
 // 📊 Summary: 피벗 테이블 및 차트 생성
-import { sheets } from '../google';
+import { sheets } from '../googleSheets';
 import type { PersistResult } from './persist';
 
 export interface SummaryResult {

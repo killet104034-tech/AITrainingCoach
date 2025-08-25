@@ -1,5 +1,6 @@
 // 📋 Survey Registry: 설문 타입별 스키마 관리
 import { z, type ZodSchema } from 'zod';
+import type { CanonicalInput } from '../domain/canonical';
 
 export type SurveyKind = 'basic_v1' | 'coach_v2' | 'rehab_v1';
 
@@ -9,41 +10,6 @@ export interface SurveySchema {
   zod: ZodSchema<any>; // 입력 검증
   toCanonical: (raw: any) => CanonicalInput; // 변환기
   conflicts: (raw: any) => Conflict[];      // 사전 충돌 검사
-}
-
-// 표준 입력 형식
-export interface CanonicalInput {
-  // 기본 정보
-  name: string;
-  email: string;
-  age: number;
-  gender: string;
-  weight: number;
-  height: number;
-  
-  // 운동 경험
-  experienceYears: number;
-  experienceLevel: string;
-  currentMax: {
-    squat: number;
-    bench: number;
-    deadlift: number;
-  };
-  
-  // 목표 및 제약
-  primaryGoal: string;
-  timeframe: string;
-  daysPerWeek: number;
-  injuryHistory: string;
-  equipment: string[];
-  timeAvailable: number;
-  
-  // 기타 설정
-  metadata: {
-    surveyKind: SurveyKind;
-    version: string;
-    submittedAt: string;
-  };
 }
 
 // 충돌/경고 타입
@@ -119,30 +85,66 @@ const rehabV1Schema = basicV1Schema.extend({
 
 // 변환 함수들
 function basicV1ToCanonical(raw: any): CanonicalInput {
+  // 목표 매핑
+  const goalMap: Record<string, CanonicalInput['goal']> = {
+    'Strength': 'strength',
+    'Powerlifting Competition': 'peaking',
+    'General Fitness': 'balanced',
+    'Muscle Building': 'hypertrophy'
+  };
+  
+  // 경험 매핑
+  const expMap: Record<string, CanonicalInput['experience']> = {
+    'Beginner': 'beginner',
+    'Intermediate': 'intermediate', 
+    'Advanced': 'advanced',
+    'Elite': 'elite'
+  };
+  
+  // 제약사항 정리
+  const constraints: string[] = [];
+  if (raw.injuryHistory && raw.injuryHistory !== 'None') {
+    constraints.push(`injury:${raw.injuryHistory}`);
+  }
+  if (raw.equipment && !raw.equipment.includes('Full gym')) {
+    constraints.push(`equipment:${raw.equipment.join(',')}`);
+  }
+  if (raw.timeAvailable && raw.timeAvailable < 60) {
+    constraints.push(`time:${raw.timeAvailable}min`);
+  }
+  
   return {
-    name: raw.name,
-    email: raw.email,
-    age: raw.age,
-    gender: raw.gender,
-    weight: raw.weight,
-    height: raw.height,
-    experienceYears: raw.experienceYears,
-    experienceLevel: raw.experienceLevel,
-    currentMax: {
-      squat: raw.squatMax,
-      bench: raw.benchMax,
-      deadlift: raw.deadliftMax
+    profile: {
+      sex: raw.gender === 'Male' ? 'M' : raw.gender === 'Female' ? 'F' : undefined,
+      age: raw.age,
+      height: raw.height,
+      weight: raw.weight
     },
-    primaryGoal: raw.primaryGoal,
-    timeframe: raw.timeframe,
-    daysPerWeek: raw.daysPerWeek,
-    injuryHistory: raw.injuryHistory,
-    equipment: raw.equipment,
-    timeAvailable: raw.timeAvailable,
-    metadata: {
-      surveyKind: 'basic_v1',
-      version: '1.0.0',
-      submittedAt: new Date().toISOString()
+    strength: {
+      SQ1RM: raw.squatMax,
+      BP1RM: raw.benchMax,
+      DL1RM: raw.deadliftMax
+    },
+    goal: goalMap[raw.primaryGoal] || 'balanced',
+    experience: expMap[raw.experienceLevel] || 'beginner',
+    frequency: {
+      total: raw.daysPerWeek,
+      bench: raw.benchFrequency
+    },
+    constraints: constraints.length > 0 ? constraints : undefined,
+    psychology: {
+      arousal: raw.intensityPreference === 'High (85%+)' ? 'high' : 
+               raw.intensityPreference === 'Low (60-70%)' ? 'low' : 'moderate',
+      stress: raw.stressLevel === 'High' ? 'high' : 
+              raw.stressLevel === 'Low' ? 'low' : 'moderate'
+    },
+    volumes: {
+      tolerance: raw.volumeTolerance === 'high' ? 'high' :
+                 raw.volumeTolerance === 'low' ? 'low' : 'typical'
+    },
+    meta: {
+      survey_kind: 'basic_v1',
+      survey_version: '1.0.0'
     }
   };
 }
@@ -150,19 +152,17 @@ function basicV1ToCanonical(raw: any): CanonicalInput {
 function coachV2ToCanonical(raw: any): CanonicalInput {
   const basic = basicV1ToCanonical(raw);
   
-  // 코치 전용 데이터를 메타데이터에 추가
-  basic.metadata = {
-    ...basic.metadata,
-    surveyKind: 'coach_v2',
-    version: '2.0.0',
-    coachData: {
-      clientGoals: raw.clientGoals,
-      programmingExperience: raw.programmingExperience,
-      certifications: raw.certifications,
-      preferredMethodology: raw.preferredMethodology,
-      clientProgress: raw.clientProgress
-    }
+  // 코치 전용 데이터를 메타에 추가
+  basic.meta = {
+    ...basic.meta,
+    survey_kind: 'coach_v2',
+    survey_version: '2.0.0'
   };
+  
+  // 코치 경험에 따른 볼륨 조정
+  if (raw.programmingExperience === 'Advanced') {
+    basic.volumes = { tolerance: 'high' };
+  }
   
   return basic;
 }
@@ -170,20 +170,33 @@ function coachV2ToCanonical(raw: any): CanonicalInput {
 function rehabV1ToCanonical(raw: any): CanonicalInput {
   const basic = basicV1ToCanonical(raw);
   
-  // 재활 전용 데이터를 메타데이터에 추가
-  basic.metadata = {
-    ...basic.metadata,
-    surveyKind: 'rehab_v1',
-    version: '1.0.0',
-    rehabData: {
-      injuryDetails: raw.injuryDetails,
-      painLevel: raw.painLevel,
-      movementRestrictions: raw.movementRestrictions,
-      medicalClearance: raw.medicalClearance,
-      physicalTherapy: raw.physicalTherapy,
-      previousSurgeries: raw.previousSurgeries
-    }
+  // 재활 전용 설정
+  basic.meta = {
+    ...basic.meta,
+    survey_kind: 'rehab_v1',
+    survey_version: '1.0.0'
   };
+  
+  // 재활 제약사항 추가
+  const rehabConstraints = basic.constraints || [];
+  if (raw.injuryDetails) {
+    rehabConstraints.push(`injury_detail:${raw.injuryDetails}`);
+  }
+  if (raw.painLevel > 3) {
+    rehabConstraints.push(`pain_level:${raw.painLevel}`);
+  }
+  if (raw.movementRestrictions?.length > 0) {
+    rehabConstraints.push(`movement:${raw.movementRestrictions.join(',')}`);
+  }
+  
+  basic.constraints = rehabConstraints;
+  
+  // 재활은 보수적 설정
+  basic.psychology = {
+    arousal: 'low',
+    stress: raw.painLevel > 5 ? 'high' : 'moderate'
+  };
+  basic.volumes = { tolerance: 'low' };
   
   return basic;
 }

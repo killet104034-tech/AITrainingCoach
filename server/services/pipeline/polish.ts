@@ -1,5 +1,5 @@
 // ✨ Polish: batchUpdate를 통한 스타일링 및 포맷팅
-import { sheets } from '../google';
+import { sheets } from '../googleSheets';
 import type { PersistResult } from './persist';
 
 export interface PolishResult {

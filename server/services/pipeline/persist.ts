@@ -1,5 +1,5 @@
 // 💾 Persist: Google Drive 복사 및 스프레드시트 생성
-import { sheets } from '../google';
+import { sheets } from '../googleSheets';
 import type { WorkoutProgram } from './generate';
 import type { UserProfile } from './ingest';
 
