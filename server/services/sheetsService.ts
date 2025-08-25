@@ -44,6 +44,23 @@ export interface WorkoutProgram {
     experience?: string;
     daysPerWeek?: number;
   };
+  // 🆕 Meta 데이터 추가 (시트 파이프라인 개선)
+  meta_data?: {
+    templateVersion?: string;
+    engineVersion?: string;
+    surveyKind?: string;
+    surveyVersion?: string;
+    canonicalHash?: string;
+    warnings?: Array<{
+      type: 'warn' | 'error' | 'info';
+      rule: string;
+      message: string;
+      original: any;
+      corrected: any;
+    }>;
+    createdAt?: string;
+    processingTimeMs?: number;
+  };
 }
 
 // 템플릿 스프레드시트 ID (환경변수로 설정 가능)
@@ -125,6 +142,24 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ Program 시트 생성 실패:', error);
     }
 
+    // 📈 Summary 탭 차트 생성
+    console.log('🎯 Summary 탭 생성 시작...');
+    try {
+      await createSummarySheet(spreadsheetId, programData);
+      console.log('🎯 Summary 탭 생성 완료!');
+    } catch (error) {
+      console.log('❌ Summary 탭 생성 실패:', error);
+    }
+
+    // 📋 Meta 탭 생성
+    console.log('🎯 Meta 탭 생성 시작...');
+    try {
+      await createMetaSheet(spreadsheetId, programData);
+      console.log('🎯 Meta 탭 생성 완료!');
+    } catch (error) {
+      console.log('❌ Meta 탭 생성 실패:', error);
+    }
+
     // 🎨 3단계: 고급 스타일링 + 고정 기능
     console.log('🎯 3단계 시작: 고급 스타일링 + 고정 기능...');
     try {
@@ -161,18 +196,44 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ 마스터 스프레드시트 업데이트 실패:', error);
     }
 
-    // 공개 권한 설정
-    try {
-      await drive.permissions.create({
-        fileId: spreadsheetId,
-        requestBody: {
-          role: 'writer',
-          type: 'anyone'
-        }
-      });
-      console.log('공개 권한 설정 완료');
-    } catch (permError) {
-      console.log('공개 권한 설정 실패 (스킵):', (permError as any)?.message);
+    // 🔐 권한 설정 (제출자 이메일 우선, 실패해도 공개 권한으로 폴백)
+    console.log('🔐 권한 설정 시작...');
+    let permissionGranted = false;
+    
+    // 1) 제출자 이메일에 read 권한 시도
+    if (programData.survey_data?.email) {
+      try {
+        await drive.permissions.create({
+          fileId: spreadsheetId,
+          supportsAllDrives: true,
+          requestBody: {
+            role: 'reader',
+            type: 'user',
+            emailAddress: programData.survey_data.email
+          }
+        });
+        console.log(`✅ 제출자 이메일 권한 설정 완료: ${programData.survey_data.email}`);
+        permissionGranted = true;
+      } catch (emailPermError) {
+        console.log('⚠️ 제출자 이메일 권한 설정 실패 (폴백 진행):', (emailPermError as any)?.message);
+      }
+    }
+    
+    // 2) 폴백: 공개 권한 설정 (실패해도 응름 유지)
+    if (!permissionGranted) {
+      try {
+        await drive.permissions.create({
+          fileId: spreadsheetId,
+          supportsAllDrives: true,
+          requestBody: {
+            role: 'writer',
+            type: 'anyone'
+          }
+        });
+        console.log('✅ 공개 권한 설정 완료');
+      } catch (permError) {
+        console.log('⚠️ 권한 설정 실패 (계속 진행):', (permError as any)?.message);
+      }
     }
 
     const spreadsheetUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit#gid=0`;
@@ -2248,6 +2309,278 @@ async function addFormSheetConditionalFormatting(spreadsheetId: string): Promise
     
   } catch (error) {
     console.log('❌ Form 시트 조건부 포맷팅 추가 실패:', error);
+  }
+}
+
+// 📈 Summary 탭 차트 생성 (파젓&라인/스택 차트)
+async function createSummarySheet(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  try {
+    console.log('📈 Summary 탭 차트 생성 중...');
+    
+    // Summary 시트 추가
+    const addSheetRequest = {
+      addSheet: {
+        properties: {
+          title: '📈 Summary',
+          sheetType: 'GRID',
+          gridProperties: { rowCount: 100, columnCount: 10 }
+        }
+      }
+    };
+    
+    const addSheetResponse = await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests: [addSheetRequest] }
+    });
+    
+    const summarySheetId = addSheetResponse.data.replies![0].addSheet!.properties!.sheetId!;
+    console.log('✅ Summary 시트 생성 완료, ID:', summarySheetId);
+    
+    // 주차별 볼륨 데이터 생성
+    const summaryData = [
+      ['주차', 'Squat 세트', 'Bench 세트', 'Deadlift 세트', '총 볼륨'],
+      ...Array.from({ length: Math.min(programData.training_weeks?.length || 0, 18) }, (_, i) => {
+        const week = programData.training_weeks?.[i];
+        if (!week) return [`Week ${i + 1}`, 0, 0, 0, 0];
+        
+        let sqSets = 0, bpSets = 0, dlSets = 0;
+        week.workouts?.forEach(workout => {
+          workout.exercises?.forEach(ex => {
+            const sets = parseInt(ex.sets) || 0;
+            if (ex.exercise.toLowerCase().includes('squat')) sqSets += sets;
+            else if (ex.exercise.toLowerCase().includes('bench')) bpSets += sets;
+            else if (ex.exercise.toLowerCase().includes('deadlift')) dlSets += sets;
+          });
+        });
+        
+        return [`Week ${i + 1}`, sqSets, bpSets, dlSets, sqSets + bpSets + dlSets];
+      })
+    ];
+    
+    // 데이터 입력
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `'📈 Summary'!A1`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: summaryData }
+    });
+    
+    // 차트 생성 (라인 차트)
+    const chartRequest = {
+      addChart: {
+        chart: {
+          spec: {
+            title: '주차별 훈련 볼륨 추이',
+            basicChart: {
+              chartType: 'LINE',
+              legendPosition: 'RIGHT_LEGEND',
+              axis: [
+                {
+                  position: 'BOTTOM_AXIS',
+                  title: '주차'
+                },
+                {
+                  position: 'LEFT_AXIS', 
+                  title: '세트 수'
+                }
+              ],
+              domains: [{
+                domain: {
+                  sourceRange: {
+                    sources: [{
+                      sheetId: summarySheetId,
+                      startRowIndex: 0,
+                      endRowIndex: summaryData.length,
+                      startColumnIndex: 0,
+                      endColumnIndex: 1
+                    }]
+                  }
+                }
+              }],
+              series: [
+                {
+                  series: {
+                    sourceRange: {
+                      sources: [{
+                        sheetId: summarySheetId,
+                        startRowIndex: 0,
+                        endRowIndex: summaryData.length,
+                        startColumnIndex: 1,
+                        endColumnIndex: 2
+                      }]
+                    }
+                  },
+                  targetAxis: 'LEFT_AXIS'
+                },
+                {
+                  series: {
+                    sourceRange: {
+                      sources: [{
+                        sheetId: summarySheetId,
+                        startRowIndex: 0,
+                        endRowIndex: summaryData.length,
+                        startColumnIndex: 2,
+                        endColumnIndex: 3
+                      }]
+                    }
+                  },
+                  targetAxis: 'LEFT_AXIS'
+                },
+                {
+                  series: {
+                    sourceRange: {
+                      sources: [{
+                        sheetId: summarySheetId,
+                        startRowIndex: 0,
+                        endRowIndex: summaryData.length,
+                        startColumnIndex: 3,
+                        endColumnIndex: 4
+                      }]
+                    }
+                  },
+                  targetAxis: 'LEFT_AXIS'
+                }
+              ]
+            }
+          },
+          position: {
+            overlayPosition: {
+              anchorCell: { sheetId: summarySheetId, rowIndex: 2, columnIndex: 6 },
+              offsetXPixels: 10,
+              offsetYPixels: 10,
+              widthPixels: 600,
+              heightPixels: 400
+            }
+          }
+        }
+      }
+    };
+    
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests: [chartRequest] }
+    });
+    
+    console.log('✅ Summary 차트 생성 완료!');
+    
+  } catch (error) {
+    console.log('❌ Summary 탭 생성 실패:', error);
+  }
+}
+
+// 📋 Meta 탭 생성 (TemplateVersion, EngineVersion, SurveyKind, SurveyVersion, CanonicalHash, Warnings)
+async function createMetaSheet(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  try {
+    console.log('📋 Meta 탭 생성 중...');
+    
+    // Meta 시트 추가
+    const addSheetRequest = {
+      addSheet: {
+        properties: {
+          title: '📋 Meta',
+          sheetType: 'GRID',
+          gridProperties: { rowCount: 50, columnCount: 5 }
+        }
+      }
+    };
+    
+    const addSheetResponse = await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests: [addSheetRequest] }
+    });
+    
+    const metaSheetId = addSheetResponse.data.replies![0].addSheet!.properties!.sheetId!;
+    console.log('✅ Meta 시트 생성 완료, ID:', metaSheetId);
+    
+    // Meta 데이터 구성
+    const metaData = [
+      ['🔧 SYSTEM METADATA', '', '', '', ''],
+      ['', '', '', '', ''],
+      ['Template Version', programData.meta_data?.templateVersion || 'v1.0', '', '', ''],
+      ['Engine Version', programData.meta_data?.engineVersion || 'rules-v3', '', '', ''],
+      ['Survey Kind', programData.meta_data?.surveyKind || 'powerlifting-survey', '', '', ''],
+      ['Survey Version', programData.meta_data?.surveyVersion || 'v2.0', '', '', ''],
+      ['Canonical Hash', programData.meta_data?.canonicalHash || 'N/A', '', '', ''],
+      ['Created At', programData.meta_data?.createdAt || new Date().toISOString(), '', '', ''],
+      ['Processing Time', programData.meta_data?.processingTimeMs ? `${programData.meta_data.processingTimeMs}ms` : 'N/A', '', '', ''],
+      ['', '', '', '', ''],
+      ['⚠️ WARNINGS & CORRECTIONS', '', '', '', ''],
+      ['', '', '', '', '']
+    ];
+    
+    // Warnings 추가
+    if (programData.meta_data?.warnings && programData.meta_data.warnings.length > 0) {
+      metaData.push(['Type', 'Rule', 'Message', 'Original', 'Corrected']);
+      programData.meta_data.warnings.forEach(warning => {
+        metaData.push([
+          warning.type,
+          warning.rule,
+          warning.message,
+          JSON.stringify(warning.original),
+          JSON.stringify(warning.corrected)
+        ]);
+      });
+    } else {
+      metaData.push(['No warnings', '', '', '', '']);
+    }
+    
+    // 설문 요약 추가
+    metaData.push(['', '', '', '', '']);
+    metaData.push(['👤 USER PROFILE', '', '', '', '']);
+    metaData.push(['Name', programData.survey_data?.name || 'Anonymous', '', '', '']);
+    metaData.push(['Email', programData.survey_data?.email || 'N/A', '', '', '']);
+    metaData.push(['Age', programData.survey_data?.age?.toString() || 'N/A', '', '', '']);
+    metaData.push(['Experience', programData.survey_data?.experience || 'N/A', '', '', '']);
+    metaData.push(['Goal', programData.survey_data?.goal || 'N/A', '', '', '']);
+    metaData.push(['Days Per Week', programData.survey_data?.daysPerWeek?.toString() || 'N/A', '', '', '']);
+    
+    // 데이터 입력
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `'📋 Meta'!A1`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: metaData }
+    });
+    
+    // Meta 시트 스타일링
+    const formatRequests = [
+      // 헤더 스타일
+      {
+        repeatCell: {
+          range: { sheetId: metaSheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 5 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.2, green: 0.3, blue: 0.8 },
+              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      // Warnings 헤더 스타일
+      {
+        repeatCell: {
+          range: { sheetId: metaSheetId, startRowIndex: 10, endRowIndex: 11, startColumnIndex: 0, endColumnIndex: 5 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.8, green: 0.3, blue: 0.2 },
+              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      }
+    ];
+    
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests: formatRequests }
+    });
+    
+    console.log('✅ Meta 탭 생성 및 스타일링 완료!');
+    
+  } catch (error) {
+    console.log('❌ Meta 탭 생성 실패:', error);
   }
 }
 
