@@ -618,8 +618,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 7단계: 훈련 빈도 및 구성
-  const renderStep7 = () => (
+  // 10단계: 훈련 빈도 및 구성
+  const renderStep10 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">📅 훈련 빈도 및 구성</h2>
@@ -764,8 +764,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 8단계: 훈련 블럭 선호도
-  const renderStep8 = () => (
+  // 11단계: 훈련 블럭 선호도
+  const renderStep11 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">📋 훈련 블럭 선호도</h2>
@@ -854,8 +854,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 9단계: 기술적 선호도
-  const renderStep9 = () => (
+  // 12단계: 기술적 선호도
+  const renderStep12 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🎯 기술적 선호도</h2>
