@@ -1,0 +1,5 @@
+{
+  "SQ": { "beginner":[10,14], "intermediate":[12,18], "advanced":[14,22] },
+  "BP": { "beginner":[12,18], "intermediate":[14,22], "advanced":[16,26] },
+  "DL": { "beginner":[6,10],  "intermediate":[8,12],  "advanced":[10,14] }
+}

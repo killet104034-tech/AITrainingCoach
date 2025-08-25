@@ -293,24 +293,66 @@ function determineBlockPattern(input: CanonicalInput): string[] {
   }
 }
 
-// 🏋️ 운동별 빈도 결정
+// 🏋️ 운동별 빈도 결정 (볼륨 안전장치 포함)
 function getLiftFrequencies(input: CanonicalInput): { SQ: number; BP: number; DL: number } {
+  let frequencies: { SQ: number; BP: number; DL: number };
+  
   // planning.perLiftFrequency가 있으면 그것 사용
   if (input.planning?.perLiftFrequency) {
-    return {
+    frequencies = {
       SQ: input.planning.perLiftFrequency.SQ || Math.floor(input.frequency.total * 0.4),
       BP: input.planning.perLiftFrequency.BP || Math.floor(input.frequency.total * 0.5),
       DL: input.planning.perLiftFrequency.DL || Math.floor(input.frequency.total * 0.3)
     };
+  } else {
+    // 전체 빈도에서 비율로 계산
+    const total = input.frequency.total;
+    frequencies = {
+      SQ: Math.floor(total * 0.4), // 40%
+      BP: Math.floor(total * 0.5), // 50% (벤치가 가장 많음)
+      DL: Math.floor(total * 0.3)  // 30%
+    };
   }
   
-  // 전체 빈도에서 비율로 계산
-  const total = input.frequency.total;
-  return {
-    SQ: Math.floor(total * 0.4), // 40%
-    BP: Math.floor(total * 0.5), // 50% (벤치가 가장 많음)
-    DL: Math.floor(total * 0.3)  // 30%
+  // 볼륨 안전장치 적용 (config/rules/volume.json 기반)
+  return applyVolumeSafeguards(frequencies, input.experience);
+}
+
+// 🛡️ 볼륨 안전장치 (건강 가드 역할)
+function applyVolumeSafeguards(
+  frequencies: { SQ: number; BP: number; DL: number }, 
+  experience: string
+): { SQ: number; BP: number; DL: number } {
+  // volume 규칙 로드 (실제로는 파일에서 로드, 지금은 하드코딩)
+  const volumeRules = {
+    "SQ": { "beginner":[10,14], "intermediate":[12,18], "advanced":[14,22] },
+    "BP": { "beginner":[12,18], "intermediate":[14,22], "advanced":[16,26] },
+    "DL": { "beginner":[6,10],  "intermediate":[8,12],  "advanced":[10,14] }
   };
+  
+  const experienceLevel = experience as keyof (typeof volumeRules.SQ);
+  
+  // 각 운동별로 안전한 범위 내로 조정
+  const safeguarded = {
+    SQ: clampToVolumeRange(frequencies.SQ, volumeRules.SQ[experienceLevel] || volumeRules.SQ.intermediate),
+    BP: clampToVolumeRange(frequencies.BP, volumeRules.BP[experienceLevel] || volumeRules.BP.intermediate), 
+    DL: clampToVolumeRange(frequencies.DL, volumeRules.DL[experienceLevel] || volumeRules.DL.intermediate)
+  };
+  
+  // 조정이 일어났으면 로그 출력
+  if (frequencies.SQ !== safeguarded.SQ || frequencies.BP !== safeguarded.BP || frequencies.DL !== safeguarded.DL) {
+    console.log(`🛡️ 볼륨 안전장치 적용: ${experience} 수준`);
+    console.log(`   원본: SQ:${frequencies.SQ} BP:${frequencies.BP} DL:${frequencies.DL}`);
+    console.log(`   조정: SQ:${safeguarded.SQ} BP:${safeguarded.BP} DL:${safeguarded.DL}`);
+  }
+  
+  return safeguarded;
+}
+
+// 📊 볼륨 범위 내로 제한
+function clampToVolumeRange(frequency: number, range: [number, number]): number {
+  const [min, max] = range;
+  return Math.max(min, Math.min(max, frequency));
 }
 
 // 🔧 규칙 기반 ProgramPlan 생성
