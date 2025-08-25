@@ -8,8 +8,8 @@ import { sendTrainingProgram } from "../services/email";
 import { createWorkoutSheet } from "../sheets/sheetsService";
 import { operationalGuardMiddleware, operationalGuardCleanup, type GuardedRequest } from "../ops/operationalGuardMiddleware";
 import { operationalGuard, OperationalError, ErrorCategory } from "../ops/operationalGuard";
-import { processSurvey, inferSurveyType } from "../surveys/index";
-import { createEngine } from "../engine/index";
+import { processSurvey } from "../surveys/registry";
+import { createSimpleEngine } from "../engine/planFromTables";
 
 export function registerSurveyRoutes(app: Express): void {
   // 🔒 운영 가드 미들웨어 적용 (Idempotency + Rate Limiting + Audit)
@@ -18,18 +18,19 @@ export function registerSurveyRoutes(app: Express): void {
   
   // Survey submission endpoint 
   app.post("/api/surveys", async (req, res) => {
+    // 🔍 Query parameter로 설문 타입 지정 지원
+    const surveyKind = req.query.kind as string || 'basic_v1';
     const guardedReq = req as GuardedRequest;
     const { auditContext } = guardedReq.guardContext;
     
     try {
       // 🔄 운영 가드와 함께 프로그램 생성 실행
       const result = await operationalGuard.executeWithRetry(async () => {
-        // 🔍 설문 타입 추론 및 처리 (새로운 아키텍처)
-        const surveyKind = inferSurveyType(req.body);
+        // 🔍 설문 처리 (새로운 아키텍처)  
         const { canonical, conflicts, warnings } = processSurvey(surveyKind, req.body);
         
         // 📊 엔진으로 프로그램 생성
-        const engine = createEngine();
+        const engine = createSimpleEngine();
         const programPlan = await engine.planFromTables(canonical);
         
         // Legacy 포맷으로 변환 (기존 시스템 호환성)
