@@ -116,6 +116,15 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ Form 시트 생성 실패:', error);
     }
 
+    // 📊 Program 시트 추가 및 데이터 변환
+    console.log('🎯 Program 시트 생성 시작...');
+    try {
+      await createProgramSheet(spreadsheetId, programData);
+      console.log('🎯 Program 시트 생성 완료!');
+    } catch (error) {
+      console.log('❌ Program 시트 생성 실패:', error);
+    }
+
     // 📊 관리자용 마스터 스프레드시트에도 데이터 추가
     console.log('🎯 마스터 스프레드시트 업데이트 시작...');
     try {
@@ -643,10 +652,244 @@ async function createFormSheet(spreadsheetId: string, programData: WorkoutProgra
     // 6. Form 시트 조건부 포맷팅 추가
     await addFormSheetConditionalFormatting(spreadsheetId);
     
-    console.log('✅ Form 시트 생성, 데이터 저장 및 스타일링 완료!');
-    
+    console.log('✅ 1단계 완료: Form 시트 생성, 데이터 저장 및 스타일링 완료!');
   } catch (error) {
     console.log('❌ Form 시트 생성 실패:', (error as any)?.message);
+  }
+}
+
+// 🎯 2단계: Program 시트 + 데이터 변환 생성
+async function createProgramSheet(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  try {
+    console.log('🎯 2단계 시작: Program 시트 + 데이터 변환 생성...');
+    
+    // 1. Program 시트 생성
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [{
+          addSheet: {
+            properties: {
+              title: 'Program',
+              gridProperties: {
+                rowCount: 500,
+                columnCount: 15
+              }
+            }
+          }
+        }]
+      }
+    });
+    
+    // 2. 프로그램 데이터 변환 및 입력
+    await populateProgramData(spreadsheetId, programData);
+    
+    // 3. Program 시트 스타일링
+    await formatProgramSheet(spreadsheetId);
+    
+    console.log('✅ 2단계 완료: Program 시트 + 데이터 변환 완료!');
+    
+  } catch (error) {
+    console.log('❌ Program 시트 생성 실패:', (error as any)?.message);
+  }
+}
+
+// 📊 Program 시트 데이터 입력
+async function populateProgramData(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  try {
+    console.log('📊 Program 데이터 변환 중...');
+    
+    // 헤더 구성
+    const headers = [
+      'Week', 'Block', 'Day', 'Exercise', 'Sets', 'Reps', 'Weight(%)', 'RPE', 
+      'Rest(min)', 'Notes', 'Squat Freq', 'Bench Freq', 'Deadlift Freq', 'Volume Index', 'Intensity Avg'
+    ];
+    
+    // 프로그램 데이터를 행 단위로 변환
+    const programRows: any[][] = [headers];
+    
+    // 각 블록 처리
+    programData.training_blocks.forEach((block, blockIndex) => {
+      const blockNum = blockIndex + 1;
+      
+      block.weeks.forEach((week, weekIndex) => {
+        const weekNum = weekIndex + 1;
+        
+        week.days.forEach((day, dayIndex) => {
+          const dayNum = dayIndex + 1;
+          
+          day.exercises.forEach((exercise, exerciseIndex) => {
+            // 각 운동을 하나의 행으로 변환
+            const row = [
+              weekNum, // Week
+              `Block ${blockNum}`, // Block  
+              `Day ${dayNum}`, // Day
+              exercise.name, // Exercise
+              exercise.sets, // Sets
+              exercise.reps, // Reps
+              exercise.weight, // Weight(%)
+              exercise.rpe || 'N/A', // RPE
+              exercise.rest || '2-3', // Rest(min)
+              exercise.notes || '', // Notes
+              '', '', '', '', '' // 통계 필드들 (나중에 계산)
+            ];
+            
+            // 첫 번째 운동인 경우에만 통계 추가
+            if (exerciseIndex === 0) {
+              // 주당 빈도 계산
+              const dayExercises = day.exercises.map(e => e.name);
+              row[10] = dayExercises.filter(name => name.toLowerCase().includes('squat')).length.toString(); // Squat Freq
+              row[11] = dayExercises.filter(name => name.toLowerCase().includes('bench')).length.toString(); // Bench Freq
+              row[12] = dayExercises.filter(name => name.toLowerCase().includes('deadlift')).length.toString(); // Deadlift Freq
+              
+              // 볼륨 인덱스 계산 (세트 x 렙스의 총합)
+              const totalVolume = day.exercises.reduce((sum, ex) => {
+                const sets = parseInt(ex.sets?.toString() || '0');
+                const reps = parseInt(ex.reps?.toString() || '0');
+                return sum + (sets * reps);
+              }, 0);
+              row[13] = totalVolume.toString(); // Volume Index
+              
+              // 평균 강도 계산
+              const weights = day.exercises
+                .map(ex => parseInt(ex.weight?.toString().replace('%', '') || '0'))
+                .filter(w => w > 0);
+              const avgIntensity = weights.length > 0 
+                ? Math.round(weights.reduce((sum, w) => sum + w, 0) / weights.length)
+                : 0;
+              row[14] = `${avgIntensity}%`; // Intensity Avg
+            }
+            
+            programRows.push(row);
+          });
+        });
+      });
+    });
+    
+    // 데이터 입력
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `Program!A1:O${programRows.length}`,
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: programRows
+      }
+    });
+    
+    console.log(`✅ Program 데이터 입력 완료! (총 ${programRows.length-1}개 운동 행)`);
+    
+  } catch (error) {
+    console.log('❌ Program 데이터 입력 실패:', error);
+  }
+}
+
+// 🎨 Program 시트 스타일링
+async function formatProgramSheet(spreadsheetId: string): Promise<void> {
+  try {
+    // Program 시트 ID 찾기
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const programSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Program');
+    if (!programSheet?.properties?.sheetId) return;
+    
+    const sheetId = programSheet.properties.sheetId;
+    
+    const requests = [
+      // 📋 헤더 행 스타일링
+      {
+        repeatCell: {
+          range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 15 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.1, green: 0.2, blue: 0.4 }, // 어두운 파랑
+              textFormat: { 
+                foregroundColor: { red: 1, green: 1, blue: 1 }, // 흰색 텍스트
+                fontSize: 11, 
+                bold: true 
+              },
+              horizontalAlignment: 'CENTER',
+              borders: {
+                top: { style: 'SOLID', width: 2 },
+                bottom: { style: 'SOLID', width: 2 },
+                left: { style: 'SOLID', width: 1 },
+                right: { style: 'SOLID', width: 1 }
+              }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      
+      // 🏋️ 주요 운동 하이라이트 (D열: Exercise)
+      {
+        repeatCell: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 3, endColumnIndex: 4 },
+          cell: {
+            userEnteredFormat: {
+              textFormat: { fontSize: 10, bold: true },
+              borders: {
+                left: { style: 'SOLID', width: 1 },
+                right: { style: 'SOLID', width: 1 }
+              }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      
+      // 📊 통계 컬럼 스타일링 (K:O열)
+      {
+        repeatCell: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 10, endColumnIndex: 15 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.95, green: 0.98, blue: 1 }, // 연한 파랑
+              textFormat: { fontSize: 9 },
+              horizontalAlignment: 'CENTER',
+              borders: {
+                left: { style: 'SOLID', width: 1 },
+                right: { style: 'SOLID', width: 1 }
+              }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      
+      // 📏 컬럼 너비 자동 조정
+      {
+        autoResizeDimensions: {
+          dimensions: {
+            sheetId,
+            dimension: 'COLUMNS',
+            startIndex: 0,
+            endIndex: 15
+          }
+        }
+      },
+      
+      // 🧊 헤더 행 고정
+      {
+        updateSheetProperties: {
+          properties: {
+            sheetId,
+            gridProperties: {
+              frozenRowCount: 1
+            }
+          },
+          fields: 'gridProperties.frozenRowCount'
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests }
+    });
+    
+    console.log('✅ Program 시트 스타일링 완료!');
+    
+  } catch (error) {
+    console.log('❌ Program 시트 스타일링 실패:', error);
   }
 }
 
