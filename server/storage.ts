@@ -38,7 +38,9 @@ export class MemStorage implements IStorage {
   async createSurveyResponse(insertSurveyResponse: InsertSurveyResponse): Promise<SurveyResponse> {
     const id = randomUUID();
     const surveyResponse: SurveyResponse = { 
-      ...insertSurveyResponse, 
+      ...insertSurveyResponse,
+      name: insertSurveyResponse.name || null,
+      injuryDetails: insertSurveyResponse.injuryDetails ?? null,
       id,
       trainingProgram: null,
       createdAt: new Date()

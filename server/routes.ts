@@ -25,8 +25,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         frequency: validatedData.frequency,
         equipment: validatedData.equipment as string[],
         injuries: validatedData.injuries,
-        injuryDetails: validatedData.injuryDetails,
-        name: validatedData.name
+        injuryDetails: validatedData.injuryDetails || undefined,
+        name: validatedData.name || undefined
       };
       
       const trainingProgram = await generateTrainingProgram(programData);
@@ -37,7 +37,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send email with training program
       await sendTrainingProgram(
         validatedData.email, 
-        validatedData.name, 
+        validatedData.name || undefined, 
         trainingProgram
       );
       
@@ -51,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Survey submission error:", error);
       res.status(400).json({ 
         success: false, 
-        message: error.message || "설문 제출 처리 중 오류가 발생했습니다." 
+        message: (error as Error).message || "설문 제출 처리 중 오류가 발생했습니다." 
       });
     }
   });

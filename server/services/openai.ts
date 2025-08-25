@@ -78,6 +78,6 @@ ${surveyData.injuryDetails ? `- 부상 상세: ${surveyData.injuryDetails}` : ''
     return response.choices[0].message.content || "프로그램 생성에 실패했습니다.";
   } catch (error) {
     console.error("OpenAI API 오류:", error);
-    throw new Error("AI 훈련 프로그램 생성에 실패했습니다: " + error.message);
+    throw new Error("AI 훈련 프로그램 생성에 실패했습니다: " + (error as Error).message);
   }
 }

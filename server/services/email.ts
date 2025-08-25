@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.SMTP_PORT || '587'),
   secure: false,
@@ -49,9 +49,9 @@ export async function sendTrainingProgram(
 
         <div class="section">
             <h2>📅 주간 훈련 스케줄</h2>
-            ${parsedProgram.weekly_schedule.map(day => `
+            ${parsedProgram.weekly_schedule.map((day: any) => `
                 <div class="day-title">${day.day}</div>
-                ${day.exercises.map(exercise => `
+                ${day.exercises.map((exercise: any) => `
                     <div class="exercise">
                         <strong>${exercise.name}</strong><br>
                         세트/반복: ${exercise.sets_reps}<br>
@@ -110,6 +110,6 @@ export async function sendTrainingProgram(
     console.log('훈련 프로그램 이메일 전송 완료:', email);
   } catch (error) {
     console.error('이메일 전송 오류:', error);
-    throw new Error('이메일 전송에 실패했습니다: ' + error.message);
+    throw new Error('이메일 전송에 실패했습니다: ' + (error as Error).message);
   }
 }
