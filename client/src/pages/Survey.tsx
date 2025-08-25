@@ -1,41 +1,6 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { AdvancedSurveySection } from '@/components/AdvancedSurveySection';
-import { useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import SurveySection from '@/components/SurveySection';
 
 export default function Survey() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const form = useForm();
-  const { toast } = useToast();
-
-  const submitSurvey = useMutation({
-    mutationFn: (data) => apiRequest('/api/survey', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    }),
-    onSuccess: (response) => {
-      toast({
-        title: "프로그램 생성 완료!",
-        description: "이메일로 맞춤 프로그램이 전송되었습니다.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "오류 발생",
-        description: "프로그램 생성 중 문제가 발생했습니다.",
-        variant: "destructive"
-      });
-    }
-  });
-
-  const handleSubmit = () => {
-    const formData = form.getValues();
-    submitSurvey.mutate(formData);
-  };
-
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Dark Navigation */}
@@ -60,13 +25,7 @@ export default function Survey() {
         </div>
       </nav>
 
-      <AdvancedSurveySection 
-        form={form}
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-        onSubmit={handleSubmit}
-        isSubmitting={submitSurvey.isPending}
-      />
+      <SurveySection />
     </div>
   );
 }
