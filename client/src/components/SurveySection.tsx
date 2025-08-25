@@ -46,7 +46,7 @@ export default function SurveySection() {
     surveyId: string;
     programUrl?: string;
     emailSent?: boolean;
-  }>({
+  }, Error, SurveyForm>({
     mutationFn: async (data: SurveyForm) => {
       return apiRequest("POST", "/api/survey", data);
     },
