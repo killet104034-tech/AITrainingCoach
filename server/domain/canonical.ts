@@ -18,9 +18,11 @@ export type CanonicalInput = {
   experience: 'beginner' | 'intermediate' | 'advanced' | 'elite';
   frequency: { 
     total: number; 
-    bench?: number 
+    bench?: number; 
+    squat?: number; 
+    deadlift?: number 
   };
-  constraints?: string[];   // 통증/장비/시간
+  constraints?: string[];
   psychology?: { 
     arousal: 'low' | 'moderate' | 'high'; 
     stress: 'low' | 'moderate' | 'high' 
@@ -28,8 +30,29 @@ export type CanonicalInput = {
   volumes?: { 
     tolerance: 'low' | 'typical' | 'high' 
   };
+  planning?: {
+    mesoWeeks?: number;                    // 3주, 4주, 6주 등
+    blocks?: string[];                     // ['hypertrophy','strength','peaking','taper'] 등
+    perliftFrequency?: { 
+      SQ?: number; 
+      BP?: number; 
+      DL?: number 
+    };                                     // 벤치 6회 같은 것
+    dayTags?: Array<{ 
+      week: number; 
+      day: number; 
+      tag: 'recovery' | 'technique' | 'overload' 
+    }>;
+    dayOverrides?: Array<{ 
+      week: number; 
+      day: number; 
+      setsDelta?: number; 
+      pctDelta?: number; 
+      rpeCap?: number 
+    }>;
+  };
   meta: { 
-    survey_kind: SurveyKind; 
+    survey_kind: string; 
     survey_version: string 
   };
 };
