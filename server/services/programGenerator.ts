@@ -272,6 +272,11 @@ function createPersonalizedProgram(analysis: any, template: any, surveyData: Sur
     program_title: template.title,
     overview: `${template.overview} 총 ${template.blocks.length}개 블럭, ${currentWeek - 1}주 프로그램입니다.`,
     training_weeks: weeks,
+    user_maxes: {
+      squat: surveyData.squatMax,
+      bench: surveyData.benchMax,
+      deadlift: surveyData.deadliftMax
+    },
     progression_notes: getProgressionNotes(analysis, template),
     warmup_protocol: getWarmupProtocol(),
     cooldown_protocol: getCooldownProtocol(),
