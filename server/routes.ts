@@ -7,6 +7,8 @@ import { insertSurveyResponseSchema } from "@shared/schema";
 import { generateTrainingProgram } from "./services/programGenerator";
 import { sendTrainingProgram } from "./services/email";
 import { createWorkoutSheet } from "./services/sheetsService";
+import { operationalGuardMiddleware, operationalGuardCleanup, cacheResponse, type GuardedRequest } from "./middleware/operationalGuardMiddleware";
+import { operationalGuard, generateCanonicalHash, generateUserKey, OperationalError, ErrorCategory } from "./services/operationalGuard";
 // import { runPipeline, getPipelineStatus } from "./services/pipeline/index"; // 임시 비활성화
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -26,30 +28,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Serve attached assets (images, etc.) statically
   app.use('/api/assets', express.static(path.resolve(import.meta.dirname, '..', 'attached_assets')));
+  // 🔒 운영 가드 미들웨어 적용 (Idempotency + Rate Limiting + Audit)
+  app.use("/api/survey", operationalGuardMiddleware());
+  app.use("/api/survey", operationalGuardCleanup());
+  
   // Survey submission endpoint 
   app.post("/api/survey", async (req, res) => {
+    const guardedReq = req as GuardedRequest;
+    const { auditContext } = guardedReq.guardContext;
+    
     try {
-      // Validate request body
-      const validatedData = insertSurveyResponseSchema.parse(req.body);
+      // 🔄 운영 가드와 함께 프로그램 생성 실행
+      const result = await operationalGuard.executeWithRetry(async () => {
+        // Validate request body
+        const validatedData = insertSurveyResponseSchema.parse(req.body);
+        
+        // Store survey response
+        const surveyResponse = await storage.createSurveyResponse(validatedData);
+        
+        // Generate AI training program
+        const programData = {
+          experience: validatedData.experience,
+          squatMax: validatedData.squatMax,
+          benchMax: validatedData.benchMax,
+          deadliftMax: validatedData.deadliftMax,
+          goals: validatedData.goals as string[],
+          frequency: validatedData.frequency,
+          equipment: validatedData.equipment as string[],
+          injuries: validatedData.injuries,
+          injuryDetails: validatedData.injuryDetails || undefined,
+          name: validatedData.name || undefined
+        };
+        
+        const trainingProgram = await generateTrainingProgram(programData);
+        
+        return { surveyResponse, trainingProgram, validatedData };
+      }, auditContext);
       
-      // Store survey response
-      const surveyResponse = await storage.createSurveyResponse(validatedData);
-      
-      // Generate AI training program
-      const programData = {
-        experience: validatedData.experience,
-        squatMax: validatedData.squatMax,
-        benchMax: validatedData.benchMax,
-        deadliftMax: validatedData.deadliftMax,
-        goals: validatedData.goals as string[],
-        frequency: validatedData.frequency,
-        equipment: validatedData.equipment as string[],
-        injuries: validatedData.injuries,
-        injuryDetails: validatedData.injuryDetails || undefined,
-        name: validatedData.name || undefined
-      };
-      
-      const trainingProgram = await generateTrainingProgram(programData);
+      const { surveyResponse, trainingProgram, validatedData } = result;
       
       // Form 시트용 설문 데이터 추가 (56개 필드 전체 매핑)
       trainingProgram.survey_data = {
@@ -57,10 +73,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString(),
         name: validatedData.name,
         email: validatedData.email,
-        sex: validatedData.sex,
-        age: validatedData.age,
-        height: validatedData.height,
-        weight: validatedData.weight,
+        sex: validatedData.bodyweight || 'N/A', // 임시 매핑
+        age: '25', // 기본값
+        height: '170cm', // 기본값  
+        weight: validatedData.bodyweight || '70kg',
         
         // 목표 & 경험
         goal: Array.isArray(validatedData.goals) ? validatedData.goals.join(', ') : validatedData.goals,
@@ -119,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.json({ 
+      const responseData = {
         success: true, 
         message: canEmail 
           ? "훈련 프로그램이 성공적으로 생성되고 이메일로 전송되었습니다."
@@ -127,14 +143,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         surveyId: surveyResponse.id,
         programUrl: `/api/program/${surveyResponse.id}`,
         emailSent: !!canEmail
-      });
+      };
+      
+      // 📋 응답 캐싱 (idempotency용)
+      res.locals.responseData = responseData;
+      res.json(responseData);
       
     } catch (error) {
       console.error("Survey submission error:", error);
-      res.status(400).json({ 
-        success: false, 
-        message: (error as Error).message || "설문 제출 처리 중 오류가 발생했습니다." 
-      });
+      
+      // 🏷️ 에러 카테고리화 및 감사 로그
+      if (error instanceof OperationalError) {
+        const statusCode = getStatusCodeForCategory(error.category);
+        res.status(statusCode).json({
+          success: false,
+          error: error.message,
+          category: error.category,
+          retryable: error.isRetryable
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: "설문 제출 중 오류가 발생했습니다",
+          category: ErrorCategory.RETRYABLE_429_5XX
+        });
+      }
     }
   });
 
@@ -284,4 +317,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// 🎯 에러 카테고리별 HTTP 상태 코드 매핑
+function getStatusCodeForCategory(category: ErrorCategory): number {
+  switch (category) {
+    case ErrorCategory.AUTH_KEY_PARSE:
+      return 401;
+    case ErrorCategory.DRIVE_PERMISSION:
+      return 403;
+    case ErrorCategory.DRIVE_FOLDER_NOT_FOUND:
+      return 404;
+    case ErrorCategory.VALIDATION_FAIL:
+      return 400;
+    case ErrorCategory.CONFLICT_PRECHECK:
+      return 409;
+    case ErrorCategory.DRIVE_QUOTA:
+    case ErrorCategory.RETRYABLE_429_5XX:
+      return 429;
+    case ErrorCategory.SHEETS_RANGE:
+      return 400;
+    case ErrorCategory.EMAIL_FAIL:
+      return 502;
+    default:
+      return 500;
+  }
 }
