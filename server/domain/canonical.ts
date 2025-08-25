@@ -1,5 +1,5 @@
 // 📋 Canonical 모델 (전체 단일 입력)
-import type { ProgramPlan } from './program';
+import type { ProgramPlan } from './types';
 
 export type CanonicalInput = {
   profile: { 
@@ -57,7 +57,7 @@ export type CanonicalInput = {
 };
 
 // Re-export program types
-export type { Intensity, Block, ProgramPlan } from './program';
+export type { Intensity, Block, ProgramPlan } from './types';
 
 // 입력→계획 변환 함수 타입
-export type PlanningEngine = (input: CanonicalInput) => ProgramPlan;
+export type PlanningEngine = (input: CanonicalInput) => Promise<ProgramPlan>;
