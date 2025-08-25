@@ -65,8 +65,8 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
         fileId: TEMPLATE_SHEET_ID,
         supportsAllDrives: true,
         requestBody: {
-          name: `SINABRO_${Date.now()}`,
-          parents: process.env.SHARED_FOLDER_ID ? [process.env.SHARED_FOLDER_ID] : undefined
+          name: `SINABRO_${Date.now()}`
+          // parents 제거 - 권한 문제 해결
         }
       });
       
