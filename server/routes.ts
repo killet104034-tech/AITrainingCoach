@@ -9,12 +9,17 @@ import { sendTrainingProgram } from "./services/email";
 import { createWorkoutSheet } from "./services/sheetsService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // 🔧 임시: 환경변수 디버깅 엔드포인트
+  // 🔧 환경변수 상태 확인 엔드포인트
   app.get('/debug-env', (req, res) => {
+    const hasTemplate = !!process.env.SHEET_TEMPLATE_ID;
+    const hasFolder = !!process.env.SHARED_FOLDER_ID;
+    const googleEmail = process.env.GOOGLE_CLIENT_EMAIL || process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    const saEmailPrefix = googleEmail ? googleEmail.substring(0, googleEmail.indexOf('@') + 1) : '';
+    
     res.json({
-      SHEET_TEMPLATE_ID: process.env.SHEET_TEMPLATE_ID || 'NOT_SET',
-      SHARED_FOLDER_ID: process.env.SHARED_FOLDER_ID || 'NOT_SET',
-      has_google_creds: !!(process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY)
+      hasTemplate,
+      hasFolder,
+      saEmailPrefix: saEmailPrefix || 'not_set'
     });
   });
   
