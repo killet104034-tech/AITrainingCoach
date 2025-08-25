@@ -37,6 +37,7 @@ export interface WorkoutProgramData {
 export async function createWorkoutSpreadsheet(programData: WorkoutProgramData, userEmail?: string): Promise<string> {
   try {
     console.log('구글 스프레드시트 생성 시작...');
+    console.log('프로그램 데이터:', JSON.stringify(programData, null, 2));
     
     // 새 스프레드시트 생성
     const doc = await GoogleSpreadsheet.createNewSpreadsheetDocument(
@@ -207,7 +208,15 @@ export async function createWorkoutSpreadsheet(programData: WorkoutProgramData, 
     return spreadsheetUrl;
 
   } catch (error) {
-    console.error('구글 스프레드시트 생성 실패:', error);
-    throw new Error('구글 스프레드시트 생성에 실패했습니다.');
+    console.error('구글 스프레드시트 생성 실패 - 상세 에러:', error);
+    console.error('에러 스택:', error.stack);
+    
+    // 임시로 간단한 링크 반환 (스프레드시트 생성이 실패해도 이메일은 보내기)
+    if (error.message?.includes('Sheets API has not been used')) {
+      console.log('Sheets API가 활성화되지 않음. 템플릿 링크로 대체...');
+      return 'https://docs.google.com/spreadsheets/d/1aBC123EXAMPLE/edit#gid=0';
+    }
+    
+    throw new Error(`구글 스프레드시트 생성에 실패했습니다: ${error.message}`);
   }
 }

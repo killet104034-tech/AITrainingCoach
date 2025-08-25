@@ -27,10 +27,9 @@ export async function sendTrainingProgram(
   try {
     const parsedProgram = JSON.parse(program);
     
-    // 구글 스프레드시트 생성
-    console.log('구글 스프레드시트 생성 중...');
-    const spreadsheetUrl = await createWorkoutSpreadsheet(parsedProgram, email);
-    console.log('스프레드시트 생성 완료:', spreadsheetUrl);
+    // 임시로 구글 스프레드시트 기능 비활성화 (설정 완료 시 활성화 예정)
+    let spreadsheetUrl = '#';
+    console.log('구글 스프레드시트 기능은 현재 설정 중입니다. 이메일에 표 형태로 프로그램을 제공합니다.');
     
     const htmlContent = `
     <!DOCTYPE html>
@@ -80,14 +79,62 @@ export async function sendTrainingProgram(
                 4. "진행상황 추적" 시트에서 최고기록을 업데이트하세요
             </p>
             <div style="text-align: center; margin: 30px 0;">
-                <a href="${spreadsheetUrl}" target="_blank" style="display: inline-block; padding: 15px 30px; background: #4285f4; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                ${spreadsheetUrl !== '#' ? 
+                  `<a href="${spreadsheetUrl}" target="_blank" style="display: inline-block; padding: 15px 30px; background: #4285f4; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
                     📊 구글 스프레드시트로 훈련하기
-                </a>
+                  </a>` :
+                  `<p style="background: #fff3cd; padding: 15px; border-radius: 5px; border: 1px solid #ffc107;">
+                    ⚠️ 구글 스프레드시트 생성 중 오류가 발생했습니다.<br>
+                    아래 훈련 프로그램 표를 복사해서 엑셀/구글시트에 붙여넣어 사용하세요.
+                  </p>`
+                }
             </div>
             
             <p style="text-align: center; font-size: 14px; color: #666; margin-top: 20px;">
                 ※ 구글 스프레드시트에서 실제 훈련 기록을 작성하고 진행상황을 추적하세요!
             </p>
+            
+            <!-- 훈련 프로그램 표 (복사용) -->
+            <h3>📋 훈련 프로그램 (복사해서 사용)</h3>
+            ${parsedProgram.training_weeks.map((week: any) => `
+                <table class="workout-table" style="margin-bottom: 30px;">
+                    <tr class="week-header">
+                        <td colspan="10">Week ${week.week} - ${week.focus}</td>
+                    </tr>
+                    ${week.workouts.map((workout: any) => `
+                        <tr style="background: #e8f5e8;">
+                            <td colspan="10"><strong>Day ${workout.day} - ${workout.workout_name}</strong></td>
+                        </tr>
+                        <tr style="background: #f8f9fa; font-weight: bold;">
+                            <td>운동명</td>
+                            <td>목표 세트</td>
+                            <td>목표 렙</td>
+                            <td>목표 중량(%)</td>
+                            <td>실제 세트</td>
+                            <td>실제 렙</td>
+                            <td>실제 중량(kg)</td>
+                            <td>RPE</td>
+                            <td>볼륨(kg)</td>
+                            <td>메모</td>
+                        </tr>
+                        ${workout.exercises.map((exercise: any) => `
+                            <tr>
+                                <td><strong>${exercise.exercise}</strong></td>
+                                <td>${exercise.sets}</td>
+                                <td>${exercise.reps}</td>
+                                <td>${exercise.weight_percent}</td>
+                                <td style="background: #fff3cd;"></td>
+                                <td style="background: #fff3cd;"></td>
+                                <td style="background: #fff3cd;"></td>
+                                <td style="background: #fff3cd;"></td>
+                                <td style="background: #fff3cd;"></td>
+                                <td style="background: #fff3cd;"></td>
+                            </tr>
+                        `).join('')}
+                        <tr style="height: 10px;"><td colspan="10"></td></tr>
+                    `).join('')}
+                </table>
+            `).join('')}
         </div>
 
         <div class="info-grid">
@@ -140,6 +187,11 @@ export async function sendTrainingProgram(
     console.log('훈련 프로그램 이메일 전송 완료:', email);
   } catch (error) {
     console.error('이메일 전송 오류:', error);
-    throw new Error('이메일 전송에 실패했습니다: ' + (error as Error).message);
+    // 이메일 전송이 완전히 실패한 경우에만 에러
+    if ((error as Error)?.message?.includes('Invalid login') || (error as Error)?.message?.includes('authentication')) {
+      throw new Error(`이메일 인증에 실패했습니다: ${(error as Error).message}`);
+    } else {
+      throw new Error(`이메일 전송에 실패했습니다: ${(error as Error).message}`);
+    }
   }
 }
