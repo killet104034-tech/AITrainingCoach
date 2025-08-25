@@ -40,7 +40,13 @@ export default function SurveySection() {
     }
   });
 
-  const submitMutation = useMutation({
+  const submitMutation = useMutation<{
+    success: boolean;
+    message: string;
+    surveyId: string;
+    programUrl?: string;
+    emailSent?: boolean;
+  }>({
     mutationFn: async (data: SurveyForm) => {
       return apiRequest("POST", "/api/survey", data);
     },
@@ -96,18 +102,36 @@ export default function SurveySection() {
               <div className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-8">
                 <i className="fas fa-check text-lg"></i>
               </div>
-              <h3 className="text-3xl font-light text-white mb-6">프로그램 전송 완료!</h3>
-              <p className="text-gray-400 max-w-md mx-auto mb-8">
-                <span className="font-medium text-white">{form.getValues("email")}</span>로 맞춤형 파워리프팅 훈련 프로그램이 전송되었습니다. 
-                이메일을 확인하고 바로 훈련을 시작해보세요!
-              </p>
-              <button 
-                onClick={() => window.location.reload()} 
-                data-testid="button-new-program"
-                className="px-8 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
-              >
-                새로운 프로그램 만들기
-              </button>
+              <h3 className="text-3xl font-light text-white mb-6">프로그램 생성 완료!</h3>
+              <div className="space-y-6">
+                {submitMutation.data?.emailSent ? (
+                  <p className="text-gray-400 max-w-md mx-auto">
+                    <span className="font-medium text-white">{form.getValues("email")}</span>로 맞춤형 파워리프팅 훈련 프로그램이 전송되었습니다.
+                  </p>
+                ) : (
+                  <p className="text-gray-400 max-w-md mx-auto">
+                    맞춤형 파워리프팅 훈련 프로그램이 생성되었습니다. 아래 버튼을 클릭해서 프로그램을 확인하세요.
+                  </p>
+                )}
+                
+                {submitMutation.data?.programUrl && (
+                  <button 
+                    onClick={() => window.open(submitMutation.data.programUrl, '_blank')}
+                    data-testid="button-view-program"
+                    className="px-8 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors font-medium mr-4"
+                  >
+                    훈련 프로그램 보기
+                  </button>
+                )}
+                
+                <button 
+                  onClick={() => window.location.reload()} 
+                  data-testid="button-new-program"
+                  className="px-8 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
+                >
+                  새로운 프로그램 만들기
+                </button>
+              </div>
             </div>
           )}
         </div>

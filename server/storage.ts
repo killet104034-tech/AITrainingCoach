@@ -7,6 +7,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createSurveyResponse(surveyResponse: InsertSurveyResponse): Promise<SurveyResponse>;
   updateSurveyResponseProgram(id: string, program: string): Promise<SurveyResponse | undefined>;
+  getSurveyResponseById(id: string): Promise<SurveyResponse | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -56,6 +57,10 @@ export class MemStorage implements IStorage {
       this.surveyResponses.set(id, surveyResponse);
     }
     return surveyResponse;
+  }
+
+  async getSurveyResponseById(id: string): Promise<SurveyResponse | undefined> {
+    return this.surveyResponses.get(id);
   }
 }
 
