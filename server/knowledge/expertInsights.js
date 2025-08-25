@@ -92,10 +92,10 @@ export const EXPERT_INSIGHTS = {
   VARIATION_PERCENTAGES: {
     squat: {
       // 메인 변형들
-      pause_squat_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-1" },
-      pause_squat_3sec: { min: 80, max: 90, typical: 85, tempo: "2-3-1" },
-      tempo_squat_3110: { min: 75, max: 85, typical: 80, tempo: "3-1-1" },
-      tempo_squat_4210: { min: 70, max: 80, typical: 75, tempo: "4-2-1" },
+      pause_squat_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-0" },
+      pause_squat_3sec: { min: 80, max: 90, typical: 85, tempo: "2-3-0" },
+      tempo_squat_3110: { min: 75, max: 85, typical: 80, tempo: "3-1-0" },
+      tempo_squat_4210: { min: 70, max: 80, typical: 75, tempo: "4-2-0" },
       tempo_squat_controlled: { min: 70, max: 85, typical: 78, tempo: "3-1-2" },
       box_squat: { min: 80, max: 90, typical: 85 },
       pin_squat: { min: 85, max: 100, typical: 92 },
@@ -118,11 +118,11 @@ export const EXPERT_INSIGHTS = {
     
     bench: {
       // 메인 변형들
-      pause_bench_1sec: { min: 90, max: 100, typical: 95, tempo: "2-1-1" },
-      pause_bench_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-1" },
-      pause_bench_3sec: { min: 80, max: 90, typical: 85, tempo: "2-3-1" },
-      tempo_bench_3110: { min: 75, max: 85, typical: 80, tempo: "3-1-1" },
-      tempo_bench_4210: { min: 70, max: 80, typical: 75, tempo: "4-2-1" },
+      pause_bench_1sec: { min: 90, max: 100, typical: 95, tempo: "2-1-0" },
+      pause_bench_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-0" },
+      pause_bench_3sec: { min: 80, max: 90, typical: 85, tempo: "2-3-0" },
+      tempo_bench_3110: { min: 75, max: 85, typical: 80, tempo: "3-1-0" },
+      tempo_bench_4210: { min: 70, max: 80, typical: 75, tempo: "4-2-0" },
       tempo_bench_controlled: { min: 70, max: 85, typical: 78, tempo: "3-1-2" },
       
       // 그립 변형들
@@ -151,9 +151,9 @@ export const EXPERT_INSIGHTS = {
     
     deadlift: {
       // 메인 변형들
-      pause_deadlift_1sec: { min: 90, max: 100, typical: 95, tempo: "2-1-1" },
-      pause_deadlift_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-1" },
-      tempo_deadlift_3110: { min: 80, max: 90, typical: 85, tempo: "3-1-1" },
+      pause_deadlift_1sec: { min: 90, max: 100, typical: 95, tempo: "2-1-0" },
+      pause_deadlift_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-0" },
+      tempo_deadlift_3110: { min: 80, max: 90, typical: 85, tempo: "3-1-0" },
       tempo_deadlift_controlled: { min: 75, max: 90, typical: 82, tempo: "3-1-2" },
       
       // 데피싯 변형들
@@ -513,10 +513,10 @@ function selectSquatVariations(techniqueIssues) {
   
   if (techniqueIssues?.includes('speed')) {
     selected.push({ 
-      name: 'Tempo Squat (3-1-1)', 
+      name: 'Tempo Squat (3-1-0)', 
       percentage: variations.tempo_squat_3110.typical,
       tempo: variations.tempo_squat_3110.tempo,
-      notes: 'Control and timing development'
+      notes: 'Control and explosive development'
     });
     selected.push({ 
       name: 'Band-Assisted Squat', 
@@ -598,10 +598,10 @@ function selectBenchVariations(techniqueIssues) {
   
   if (techniqueIssues?.includes('speed')) {
     selected.push({ 
-      name: 'Tempo Bench Press (3-1-1)', 
+      name: 'Tempo Bench Press (3-1-0)', 
       percentage: variations.tempo_bench_3110.typical,
       tempo: variations.tempo_bench_3110.tempo,
-      notes: 'Control and timing'
+      notes: 'Control and explosive training'
     });
     selected.push({ 
       name: 'Band-Assisted Bench Press', 
@@ -669,10 +669,10 @@ function selectDeadliftVariations(techniqueIssues) {
       notes: 'Extended ROM for speed development'
     });
     selected.push({ 
-      name: 'Tempo Deadlift (3-1-1)', 
+      name: 'Tempo Deadlift (3-1-0)', 
       percentage: variations.tempo_deadlift_3110.typical,
       tempo: variations.tempo_deadlift_3110.tempo,
-      notes: 'Control and acceleration'
+      notes: 'Control and explosive acceleration'
     });
   }
   
@@ -747,7 +747,7 @@ function generateExpertRecommendations(surveyData) {
   
   // 경험 수준 기반
   if (surveyData.experience === 'advanced') {
-    recommendations.push("고급자로서 Wave Loading 전략과 Tempo Training (3-1-1, 4-2-1)을 활용한 피리어다이제이션을 권장합니다.");
+    recommendations.push("고급자로서 Wave Loading 전략과 Tempo Training (3-1-0, 4-2-0)을 활용한 피리어다이제이션을 권장합니다.");
   }
   
   if (surveyData.experience === 'elite') {

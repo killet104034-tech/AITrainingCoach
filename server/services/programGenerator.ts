@@ -63,10 +63,10 @@ const EXERCISES = {
       { name: "Anderson Squat", difficulty: "elite" }
     ],
     variations: [
-      { name: "Pause Squat (2-sec)", difficulty: "beginner", tempo: "2-2" },
-      { name: "Pause Squat (3-sec)", difficulty: "intermediate", tempo: "2-3" },
-      { name: "Tempo Squat (3-1)", difficulty: "intermediate", tempo: "3-1" },
-      { name: "Tempo Squat (4-2)", difficulty: "advanced", tempo: "4-2" },
+      { name: "Pause Squat (2-sec)", difficulty: "beginner", tempo: "2-2-0" },
+      { name: "Pause Squat (3-sec)", difficulty: "intermediate", tempo: "2-3-0" },
+      { name: "Tempo Squat (3-1-0)", difficulty: "intermediate", tempo: "3-1-0" },
+      { name: "Tempo Squat (4-2-0)", difficulty: "advanced", tempo: "4-2-0" },
       { name: "Safety Bar Squat", difficulty: "intermediate" },
       { name: "Wide Stance Squat", difficulty: "intermediate" },
       { name: "Narrow Stance Squat", difficulty: "intermediate" },
@@ -92,11 +92,11 @@ const EXERCISES = {
       { name: "Dumbbell Bench Press", difficulty: "beginner" }
     ],
     variations: [
-      { name: "Pause Bench Press (1-sec)", difficulty: "beginner", tempo: "2-1" },
-      { name: "Pause Bench Press (2-sec)", difficulty: "intermediate", tempo: "2-2" },
-      { name: "Pause Bench Press (3-sec)", difficulty: "advanced", tempo: "2-3" },
-      { name: "Tempo Bench Press (3-1)", difficulty: "intermediate", tempo: "3-1" },
-      { name: "Tempo Bench Press (4-2)", difficulty: "advanced", tempo: "4-2" },
+      { name: "Pause Bench Press (1-sec)", difficulty: "beginner", tempo: "2-1-0" },
+      { name: "Pause Bench Press (2-sec)", difficulty: "intermediate", tempo: "2-2-0" },
+      { name: "Pause Bench Press (3-sec)", difficulty: "advanced", tempo: "2-3-0" },
+      { name: "Tempo Bench Press (3-1-0)", difficulty: "intermediate", tempo: "3-1-0" },
+      { name: "Tempo Bench Press (4-2-0)", difficulty: "advanced", tempo: "4-2-0" },
       { name: "Close Grip Bench Press", difficulty: "intermediate" },
       { name: "Wide Grip Bench Press", difficulty: "intermediate" },
       { name: "Floor Press", difficulty: "intermediate" },
@@ -126,9 +126,9 @@ const EXERCISES = {
       { name: "Stiff Leg Deadlift", difficulty: "beginner" }
     ],
     variations: [
-      { name: "Pause Deadlift (1-sec)", difficulty: "intermediate", tempo: "2-1" },
-      { name: "Pause Deadlift (2-sec)", difficulty: "advanced", tempo: "2-2" },
-      { name: "Tempo Deadlift (3-1)", difficulty: "intermediate", tempo: "3-1" },
+      { name: "Pause Deadlift (1-sec)", difficulty: "intermediate", tempo: "2-1-0" },
+      { name: "Pause Deadlift (2-sec)", difficulty: "advanced", tempo: "2-2-0" },
+      { name: "Tempo Deadlift (3-1-0)", difficulty: "intermediate", tempo: "3-1-0" },
       { name: "Deficit Deadlift (1-inch)", difficulty: "intermediate" },
       { name: "Deficit Deadlift (2-inch)", difficulty: "advanced" },
       { name: "Deficit Deadlift (3-inch)", difficulty: "advanced" },
