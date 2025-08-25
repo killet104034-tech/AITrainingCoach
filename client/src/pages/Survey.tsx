@@ -1,4 +1,4 @@
-import SurveySection from "@/components/SurveySection";
+import AdvancedSurveySection from "@/components/AdvancedSurveySection";
 
 export default function Survey() {
   return (
@@ -25,7 +25,7 @@ export default function Survey() {
         </div>
       </nav>
 
-      <SurveySection />
+      <AdvancedSurveySection />
     </div>
   );
 }
