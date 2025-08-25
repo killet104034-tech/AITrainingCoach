@@ -94,6 +94,7 @@ export class PowerliftingProgramEngine {
     const weeklyIntensities = this.pickWeeks(canonical);     // [0.68,0.72,0.76,0.80,0.62,0.85,0.90]
     
     console.log('📊 프로그램 파라미터:', { volumeTargets, freqTargets, weekCount: weeklyIntensities.length });
+    console.log('🎯 주기화 패턴:', weeklyIntensities.map((w, i) => `${i+1}주: ${Math.round(w*100)}%`).join(', '));
     
     // 3. 주차×요일 스켈레톤 생성 (Heavy/Mod/Light)
     const trainingFrame = this.splitIntoDays(volumeTargets, freqTargets, weeklyIntensities.length);
@@ -376,7 +377,7 @@ export class PowerliftingProgramEngine {
   
   // 스킴 컴파일
   private compileScheme(params: any, scheme: any[]): any[] {
-    return scheme.map(s => ({
+    const compiled = scheme.map(s => ({
       exercise: this.translateVariation(params.variation),
       sets: s.sets.toString(),
       reps: s.reps.toString(),
@@ -384,6 +385,13 @@ export class PowerliftingProgramEngine {
       restMinutes: this.getRestTime(s.percentage * params.weekIntensity),
       rpe: s.rpe?.toString() || '7'
     }));
+    
+    console.log(`🏋️ ${params.lift.toUpperCase()} - Week ${params.week}, Day ${params.day} (${params.dayType}):`);
+    compiled.forEach(ex => {
+      console.log(`   ${ex.exercise}: ${ex.sets}sets x ${ex.reps}reps @ ${ex.weightPercent}% (RPE ${ex.rpe}, Rest ${ex.restMinutes}min)`);
+    });
+    
+    return compiled;
   }
   
   // 변형운동 번역
