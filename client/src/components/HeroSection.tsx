@@ -1,8 +1,6 @@
 export default function HeroSection() {
-  const scrollToSurvey = () => {
-    document.getElementById('survey')?.scrollIntoView({
-      behavior: 'smooth'
-    });
+  const openSurvey = () => {
+    window.open('/survey', '_blank');
   };
 
   const scrollToFeatures = () => {
@@ -12,12 +10,12 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative bg-gradient-to-r from-primary to-gray-800 text-white overflow-hidden">
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+    <section className="relative bg-gradient-to-r from-gray-900 to-black text-white overflow-hidden">
+      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
       <div className="absolute inset-0">
         <img 
-          src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080" 
-          alt="Powerlifter performing deadlift" 
+          src="/api/assets/generated_images/Dark_powerlifting_gym_background_7aee09a3.png" 
+          alt="Powerlifting gym interior" 
           className="w-full h-full object-cover" 
         />
       </div>
@@ -35,7 +33,7 @@ export default function HeroSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <button 
-              onClick={scrollToSurvey} 
+              onClick={openSurvey} 
               data-testid="button-hero-start"
               className="bg-accent hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
@@ -45,7 +43,7 @@ export default function HeroSection() {
             <button 
               onClick={scrollToFeatures} 
               data-testid="button-hero-learn"
-              className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300"
+              className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300"
             >
               <i className="fas fa-play mr-2"></i>
               작동 방식 보기

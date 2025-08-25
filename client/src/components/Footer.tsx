@@ -1,10 +1,10 @@
 export default function Footer() {
   return (
-    <footer className="bg-primary text-white py-12">
+    <footer className="bg-gray-800 text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">AI 파워리프팅</h3>
+            <h3 className="text-xl font-bold mb-4">Sinabro Strength</h3>
             <p className="text-gray-300 mb-4">인공지능 기반 개인 맞춤형 파워리프팅 훈련 프로그램으로 더 강해지세요.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">
@@ -45,7 +45,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 AI 파워리프팅. 모든 권리 보유.</p>
+          <p>&copy; 2024 Sinabro Strength. 모든 권리 보유.</p>
         </div>
       </div>
     </footer>

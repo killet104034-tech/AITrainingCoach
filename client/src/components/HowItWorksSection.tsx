@@ -21,13 +21,13 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 bg-white">
+    <section id="how-it-works" className="py-20 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             3단계로 시작하는 맞춤형 훈련
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             복잡한 과정 없이 간단한 설문만으로 전문가 수준의 파워리프팅 프로그램을 받아보세요.
           </p>
         </div>
@@ -39,13 +39,13 @@ export default function HowItWorksSection() {
                 <div className={`w-16 h-16 ${step.bgColor} text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6`}>
                   {step.number}
                 </div>
-                <h3 className="text-2xl font-semibold text-primary mb-4">{step.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{step.description}</p>
+                <h3 className="text-2xl font-semibold text-white mb-4">{step.title}</h3>
+                <p className="text-gray-300 leading-relaxed">{step.description}</p>
               </div>
               
               {index < steps.length - 1 && (
                 <div className="hidden md:flex items-center justify-center mt-8">
-                  <i className="fas fa-arrow-right text-3xl text-gray-300 absolute right-0 top-1/2 transform translate-x-6 -translate-y-1/2"></i>
+                  <i className="fas fa-arrow-right text-3xl text-gray-600 absolute right-0 top-1/2 transform translate-x-6 -translate-y-1/2"></i>
                 </div>
               )}
             </div>
