@@ -51,46 +51,105 @@ export interface TrainingProgram {
   safety_guidelines: string;
 }
 
-// 기본 운동 데이터베이스
+// 실제 파워리프팅 운동 데이터베이스 (영어명 + 전문 변형운동)
 const EXERCISES = {
   squat: {
     main: [
-      { name: "백 스쿼트", difficulty: "beginner" },
-      { name: "프론트 스쿼트", difficulty: "intermediate" },
-      { name: "하이바 스쿼트", difficulty: "beginner" },
-      { name: "로우바 스쿼트", difficulty: "intermediate" }
+      { name: "Back Squat (High Bar)", difficulty: "beginner" },
+      { name: "Back Squat (Low Bar)", difficulty: "intermediate" },
+      { name: "Front Squat", difficulty: "intermediate" },
+      { name: "Box Squat", difficulty: "advanced" },
+      { name: "Pin Squat", difficulty: "advanced" },
+      { name: "Anderson Squat", difficulty: "elite" }
+    ],
+    variations: [
+      { name: "Pause Squat (2-sec)", difficulty: "beginner", tempo: "2-2-1-0" },
+      { name: "Pause Squat (3-sec)", difficulty: "intermediate", tempo: "2-3-1-0" },
+      { name: "Tempo Squat (3-1-1-0)", difficulty: "intermediate", tempo: "3-1-1-0" },
+      { name: "Tempo Squat (4-2-1-0)", difficulty: "advanced", tempo: "4-2-1-0" },
+      { name: "Safety Bar Squat", difficulty: "intermediate" },
+      { name: "Wide Stance Squat", difficulty: "intermediate" },
+      { name: "Narrow Stance Squat", difficulty: "intermediate" },
+      { name: "Heels Elevated Squat", difficulty: "beginner" },
+      { name: "Belt Squat", difficulty: "advanced" },
+      { name: "Band-Assisted Squat", difficulty: "beginner" },
+      { name: "Chain Squat", difficulty: "advanced" }
     ],
     accessory: [
-      { name: "고블릿 스쿼트", difficulty: "beginner" },
-      { name: "불가리안 스플릿 스쿼트", difficulty: "intermediate" },
-      { name: "레그 프레스", difficulty: "beginner" },
-      { name: "런지", difficulty: "beginner" }
+      { name: "Goblet Squat", difficulty: "beginner" },
+      { name: "Bulgarian Split Squat", difficulty: "intermediate" },
+      { name: "Leg Press", difficulty: "beginner" },
+      { name: "Walking Lunges", difficulty: "beginner" },
+      { name: "Step-Ups", difficulty: "beginner" },
+      { name: "Single Leg RDL", difficulty: "intermediate" }
     ]
   },
   bench: {
     main: [
-      { name: "바벨 벤치프레스", difficulty: "beginner" },
-      { name: "인클라인 벤치프레스", difficulty: "intermediate" },
-      { name: "덤벨 벤치프레스", difficulty: "beginner" }
+      { name: "Bench Press", difficulty: "beginner" },
+      { name: "Incline Bench Press", difficulty: "intermediate" },
+      { name: "Decline Bench Press", difficulty: "intermediate" },
+      { name: "Dumbbell Bench Press", difficulty: "beginner" }
+    ],
+    variations: [
+      { name: "Pause Bench Press (1-sec)", difficulty: "beginner", tempo: "2-1-1-0" },
+      { name: "Pause Bench Press (2-sec)", difficulty: "intermediate", tempo: "2-2-1-0" },
+      { name: "Pause Bench Press (3-sec)", difficulty: "advanced", tempo: "2-3-1-0" },
+      { name: "Tempo Bench Press (3-1-1-0)", difficulty: "intermediate", tempo: "3-1-1-0" },
+      { name: "Tempo Bench Press (4-2-1-0)", difficulty: "advanced", tempo: "4-2-1-0" },
+      { name: "Close Grip Bench Press", difficulty: "intermediate" },
+      { name: "Wide Grip Bench Press", difficulty: "intermediate" },
+      { name: "Floor Press", difficulty: "intermediate" },
+      { name: "Pin Press", difficulty: "advanced" },
+      { name: "Board Press (1-board)", difficulty: "advanced" },
+      { name: "Board Press (2-board)", difficulty: "advanced" },
+      { name: "Board Press (3-board)", difficulty: "advanced" },
+      { name: "Feet-Up Bench Press", difficulty: "intermediate" },
+      { name: "Band-Assisted Bench Press", difficulty: "beginner" },
+      { name: "Chain Bench Press", difficulty: "advanced" },
+      { name: "Slingshot Bench Press", difficulty: "elite" }
     ],
     accessory: [
-      { name: "덤벨 플라이", difficulty: "beginner" },
-      { name: "딥스", difficulty: "intermediate" },
-      { name: "오버헤드 프레스", difficulty: "intermediate" },
-      { name: "푸시업", difficulty: "beginner" }
+      { name: "Dumbbell Flyes", difficulty: "beginner" },
+      { name: "Dips", difficulty: "intermediate" },
+      { name: "Overhead Press", difficulty: "intermediate" },
+      { name: "Push-Ups", difficulty: "beginner" },
+      { name: "Incline Dumbbell Press", difficulty: "beginner" },
+      { name: "Tricep Close Grip Press", difficulty: "intermediate" }
     ]
   },
   deadlift: {
     main: [
-      { name: "컨벤셔널 데드리프트", difficulty: "beginner" },
-      { name: "수모 데드리프트", difficulty: "intermediate" },
-      { name: "루마니안 데드리프트", difficulty: "beginner" }
+      { name: "Conventional Deadlift", difficulty: "beginner" },
+      { name: "Sumo Deadlift", difficulty: "intermediate" },
+      { name: "Romanian Deadlift (RDL)", difficulty: "beginner" },
+      { name: "Stiff Leg Deadlift", difficulty: "beginner" }
+    ],
+    variations: [
+      { name: "Pause Deadlift (1-sec)", difficulty: "intermediate", tempo: "2-1-1-0" },
+      { name: "Pause Deadlift (2-sec)", difficulty: "advanced", tempo: "2-2-1-0" },
+      { name: "Tempo Deadlift (3-1-1-0)", difficulty: "intermediate", tempo: "3-1-1-0" },
+      { name: "Deficit Deadlift (1-inch)", difficulty: "intermediate" },
+      { name: "Deficit Deadlift (2-inch)", difficulty: "advanced" },
+      { name: "Deficit Deadlift (3-inch)", difficulty: "advanced" },
+      { name: "Block Pull (2-inch)", difficulty: "intermediate" },
+      { name: "Block Pull (4-inch)", difficulty: "intermediate" },
+      { name: "Block Pull (6-inch)", difficulty: "beginner" },
+      { name: "Rack Pull (knee height)", difficulty: "beginner" },
+      { name: "Rack Pull (mid-shin)", difficulty: "intermediate" },
+      { name: "Pin Pull", difficulty: "advanced" },
+      { name: "Snatch Grip Deadlift", difficulty: "advanced" },
+      { name: "Trap Bar Deadlift", difficulty: "beginner" },
+      { name: "Band-Assisted Deadlift", difficulty: "beginner" },
+      { name: "Chain Deadlift", difficulty: "advanced" }
     ],
     accessory: [
-      { name: "굿모닝", difficulty: "intermediate" },
-      { name: "힙 쓰러스트", difficulty: "beginner" },
-      { name: "바벨 로우", difficulty: "intermediate" },
-      { name: "백 익스텐션", difficulty: "beginner" }
+      { name: "Good Mornings", difficulty: "intermediate" },
+      { name: "Hip Thrust", difficulty: "beginner" },
+      { name: "Barbell Rows", difficulty: "intermediate" },
+      { name: "Back Extensions", difficulty: "beginner" },
+      { name: "Glute Ham Raises", difficulty: "advanced" },
+      { name: "Reverse Hyperextensions", difficulty: "intermediate" }
     ]
   }
 };

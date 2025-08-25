@@ -88,31 +88,97 @@ export const EXPERT_INSIGHTS = {
     }
   },
 
-  // 변형운동 퍼센티지 가이드 (전문가 데이터 기반)
+  // 실제 파워리프팅 변형운동 퍼센티지 가이드 (전문가 데이터 기반)
   VARIATION_PERCENTAGES: {
     squat: {
-      pause_squat: { min: 85, max: 95, typical: 90 },
-      tempo_squat: { min: 75, max: 85, typical: 80 },
+      // 메인 변형들
+      pause_squat_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-1-0" },
+      pause_squat_3sec: { min: 80, max: 90, typical: 85, tempo: "2-3-1-0" },
+      tempo_squat_3110: { min: 75, max: 85, typical: 80, tempo: "3-1-1-0" },
+      tempo_squat_4210: { min: 70, max: 80, typical: 75, tempo: "4-2-1-0" },
       box_squat: { min: 80, max: 90, typical: 85 },
+      pin_squat: { min: 85, max: 100, typical: 92 },
+      anderson_squat: { min: 90, max: 110, typical: 100 },
+      
+      // 스타일 변형들
       front_squat: { min: 70, max: 85, typical: 75 },
-      safety_bar: { min: 85, max: 95, typical: 90 },
-      high_bar: { min: 90, max: 105, typical: 95 }
+      safety_bar_squat: { min: 85, max: 95, typical: 90 },
+      high_bar_squat: { min: 90, max: 105, typical: 95 },
+      low_bar_squat: { min: 95, max: 110, typical: 102 },
+      wide_stance_squat: { min: 85, max: 100, typical: 92 },
+      narrow_stance_squat: { min: 80, max: 95, typical: 87 },
+      heels_elevated_squat: { min: 70, max: 85, typical: 78 },
+      
+      // 가변저항 훈련
+      band_assisted_squat: { min: 50, max: 70, typical: 60, notes: "+ 25% band tension" },
+      chain_squat: { min: 70, max: 85, typical: 77, notes: "+ 15-20% chain weight" },
+      belt_squat: { min: 60, max: 80, typical: 70, notes: "different loading pattern" }
     },
+    
     bench: {
-      pause_bench: { min: 85, max: 95, typical: 90 },
-      tempo_bench: { min: 75, max: 85, typical: 80 },
-      close_grip: { min: 80, max: 90, typical: 85 },
+      // 메인 변형들
+      pause_bench_1sec: { min: 90, max: 100, typical: 95, tempo: "2-1-1-0" },
+      pause_bench_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-1-0" },
+      pause_bench_3sec: { min: 80, max: 90, typical: 85, tempo: "2-3-1-0" },
+      tempo_bench_3110: { min: 75, max: 85, typical: 80, tempo: "3-1-1-0" },
+      tempo_bench_4210: { min: 70, max: 80, typical: 75, tempo: "4-2-1-0" },
+      
+      // 그립 변형들
+      close_grip_bench: { min: 80, max: 90, typical: 85 },
+      wide_grip_bench: { min: 85, max: 95, typical: 90 },
+      
+      // 각도 변형들
       incline_bench: { min: 75, max: 85, typical: 80 },
+      decline_bench: { min: 90, max: 105, typical: 97 },
+      
+      // ROM 변형들
       floor_press: { min: 85, max: 95, typical: 90 },
-      pin_press: { min: 90, max: 110, typical: 100 }
+      pin_press: { min: 90, max: 110, typical: 100 },
+      board_press_1board: { min: 95, max: 110, typical: 102 },
+      board_press_2board: { min: 100, max: 115, typical: 107 },
+      board_press_3board: { min: 105, max: 120, typical: 112 },
+      
+      // 특수 변형들
+      feet_up_bench: { min: 80, max: 90, typical: 85 },
+      
+      // 가변저항 훈련
+      band_assisted_bench: { min: 50, max: 70, typical: 60, notes: "+ 25% band tension" },
+      chain_bench: { min: 75, max: 90, typical: 82, notes: "+ 15-20% chain weight" },
+      slingshot_bench: { min: 100, max: 120, typical: 110, notes: "competition gear" }
     },
+    
     deadlift: {
-      pause_deadlift: { min: 85, max: 95, typical: 90 },
-      deficit_deadlift: { min: 80, max: 90, typical: 85 },
-      block_pull: { min: 105, max: 115, typical: 110 },
-      rack_pull: { min: 110, max: 120, typical: 115 },
+      // 메인 변형들
+      pause_deadlift_1sec: { min: 90, max: 100, typical: 95, tempo: "2-1-1-0" },
+      pause_deadlift_2sec: { min: 85, max: 95, typical: 90, tempo: "2-2-1-0" },
+      tempo_deadlift_3110: { min: 80, max: 90, typical: 85, tempo: "3-1-1-0" },
+      
+      // 데피싯 변형들
+      deficit_deadlift_1inch: { min: 85, max: 95, typical: 90 },
+      deficit_deadlift_2inch: { min: 80, max: 90, typical: 85 },
+      deficit_deadlift_3inch: { min: 75, max: 85, typical: 80 },
+      
+      // 블럭/랙 변형들
+      block_pull_2inch: { min: 100, max: 110, typical: 105 },
+      block_pull_4inch: { min: 105, max: 115, typical: 110 },
+      block_pull_6inch: { min: 110, max: 120, typical: 115 },
+      rack_pull_knee: { min: 110, max: 125, typical: 118 },
+      rack_pull_mid_shin: { min: 105, max: 115, typical: 110 },
+      pin_pull: { min: 95, max: 110, typical: 102 },
+      
+      // 스타일 변형들
+      sumo_deadlift: { min: 85, max: 105, typical: 95, notes: "individual variation" },
+      conventional_deadlift: { min: 90, max: 110, typical: 100, notes: "baseline" },
+      snatch_grip_deadlift: { min: 70, max: 85, typical: 77 },
+      trap_bar_deadlift: { min: 85, max: 100, typical: 92 },
+      
+      // 보조 변형들
       romanian_deadlift: { min: 70, max: 85, typical: 75 },
-      stiff_leg: { min: 65, max: 80, typical: 70 }
+      stiff_leg_deadlift: { min: 65, max: 80, typical: 70 },
+      
+      // 가변저항 훈련
+      band_assisted_deadlift: { min: 50, max: 70, typical: 60, notes: "+ 25% band tension" },
+      chain_deadlift: { min: 75, max: 90, typical: 82, notes: "+ 15-20% chain weight" }
     }
   },
 
@@ -429,17 +495,58 @@ function selectSquatVariations(techniqueIssues) {
   const selected = [];
   
   if (techniqueIssues?.includes('depth')) {
-    selected.push({ name: '박스 스쿼트', percentage: variations.box_squat.typical });
-    selected.push({ name: '포즈 스쿼트', percentage: variations.pause_squat.typical });
+    selected.push({ 
+      name: 'Box Squat', 
+      percentage: variations.box_squat.typical,
+      notes: 'Depth control training'
+    });
+    selected.push({ 
+      name: 'Pause Squat (3-sec)', 
+      percentage: variations.pause_squat_3sec.typical,
+      tempo: variations.pause_squat_3sec.tempo,
+      notes: 'Bottom position strength'
+    });
   }
   
   if (techniqueIssues?.includes('speed')) {
-    selected.push({ name: '템포 스쿼트', percentage: variations.tempo_squat.typical });
+    selected.push({ 
+      name: 'Tempo Squat (3-1-1-0)', 
+      percentage: variations.tempo_squat_3110.typical,
+      tempo: variations.tempo_squat_3110.tempo,
+      notes: 'Control and timing development'
+    });
+    selected.push({ 
+      name: 'Band-Assisted Squat', 
+      percentage: variations.band_assisted_squat.typical,
+      notes: variations.band_assisted_squat.notes
+    });
+  }
+  
+  if (techniqueIssues?.includes('weakness')) {
+    selected.push({ 
+      name: 'Pin Squat', 
+      percentage: variations.pin_squat.typical,
+      notes: 'Sticking point training'
+    });
+    selected.push({ 
+      name: 'Chain Squat', 
+      percentage: variations.chain_squat.typical,
+      notes: variations.chain_squat.notes
+    });
   }
   
   // 기본 변형운동
   if (selected.length === 0) {
-    selected.push({ name: '프론트 스쿼트', percentage: variations.front_squat.typical });
+    selected.push({ 
+      name: 'Front Squat', 
+      percentage: variations.front_squat.typical,
+      notes: 'Core and quad emphasis'
+    });
+    selected.push({ 
+      name: 'Safety Bar Squat', 
+      percentage: variations.safety_bar_squat.typical,
+      notes: 'Upper back development'
+    });
   }
   
   return selected;
@@ -450,18 +557,81 @@ function selectBenchVariations(techniqueIssues) {
   const selected = [];
   
   if (techniqueIssues?.includes('lockout')) {
-    selected.push({ name: '핀프레스', percentage: variations.pin_press.typical });
-    selected.push({ name: '클로즈그립 벤치', percentage: variations.close_grip.typical });
+    selected.push({ 
+      name: 'Pin Press', 
+      percentage: variations.pin_press.typical,
+      notes: 'Lockout strength development'
+    });
+    selected.push({ 
+      name: 'Close Grip Bench Press', 
+      percentage: variations.close_grip_bench.typical,
+      notes: 'Tricep emphasis for lockout'
+    });
+    selected.push({ 
+      name: 'Board Press (2-board)', 
+      percentage: variations.board_press_2board.typical,
+      notes: 'Partial ROM lockout training'
+    });
   }
   
   if (techniqueIssues?.includes('arch')) {
-    selected.push({ name: '포즈 벤치', percentage: variations.pause_bench.typical });
-    selected.push({ name: '플로어 프레스', percentage: variations.floor_press.typical });
+    selected.push({ 
+      name: 'Pause Bench Press (2-sec)', 
+      percentage: variations.pause_bench_2sec.typical,
+      tempo: variations.pause_bench_2sec.tempo,
+      notes: 'Chest control and stability'
+    });
+    selected.push({ 
+      name: 'Floor Press', 
+      percentage: variations.floor_press.typical,
+      notes: 'Natural arch limitation'
+    });
+    selected.push({ 
+      name: 'Feet-Up Bench Press', 
+      percentage: variations.feet_up_bench.typical,
+      notes: 'Core stability emphasis'
+    });
+  }
+  
+  if (techniqueIssues?.includes('speed')) {
+    selected.push({ 
+      name: 'Tempo Bench Press (3-1-1-0)', 
+      percentage: variations.tempo_bench_3110.typical,
+      tempo: variations.tempo_bench_3110.tempo,
+      notes: 'Control and timing'
+    });
+    selected.push({ 
+      name: 'Band-Assisted Bench Press', 
+      percentage: variations.band_assisted_bench.typical,
+      notes: variations.band_assisted_bench.notes
+    });
+  }
+  
+  if (techniqueIssues?.includes('weakness')) {
+    selected.push({ 
+      name: 'Chain Bench Press', 
+      percentage: variations.chain_bench.typical,
+      notes: variations.chain_bench.notes
+    });
+    selected.push({ 
+      name: 'Slingshot Bench Press', 
+      percentage: variations.slingshot_bench.typical,
+      notes: variations.slingshot_bench.notes
+    });
   }
   
   // 기본 변형운동
   if (selected.length === 0) {
-    selected.push({ name: '인클라인 벤치', percentage: variations.incline_bench.typical });
+    selected.push({ 
+      name: 'Incline Bench Press', 
+      percentage: variations.incline_bench.typical,
+      notes: 'Upper chest development'
+    });
+    selected.push({ 
+      name: 'Wide Grip Bench Press', 
+      percentage: variations.wide_grip_bench.typical,
+      notes: 'Chest emphasis'
+    });
   }
   
   return selected;
@@ -472,17 +642,76 @@ function selectDeadliftVariations(techniqueIssues) {
   const selected = [];
   
   if (techniqueIssues?.includes('lockout')) {
-    selected.push({ name: '블럭 풀', percentage: variations.block_pull.typical });
-    selected.push({ name: '랙 풀', percentage: variations.rack_pull.typical });
+    selected.push({ 
+      name: 'Block Pull (4-inch)', 
+      percentage: variations.block_pull_4inch.typical,
+      notes: 'Lockout strength from knee height'
+    });
+    selected.push({ 
+      name: 'Rack Pull (knee height)', 
+      percentage: variations.rack_pull_knee.typical,
+      notes: 'Heavy lockout overload'
+    });
+    selected.push({ 
+      name: 'Pin Pull', 
+      percentage: variations.pin_pull.typical,
+      notes: 'Dead stop lockout training'
+    });
   }
   
   if (techniqueIssues?.includes('speed')) {
-    selected.push({ name: '데피싯 데드리프트', percentage: variations.deficit_deadlift.typical });
+    selected.push({ 
+      name: 'Deficit Deadlift (2-inch)', 
+      percentage: variations.deficit_deadlift_2inch.typical,
+      notes: 'Extended ROM for speed development'
+    });
+    selected.push({ 
+      name: 'Tempo Deadlift (3-1-1-0)', 
+      percentage: variations.tempo_deadlift_3110.typical,
+      tempo: variations.tempo_deadlift_3110.tempo,
+      notes: 'Control and acceleration'
+    });
+  }
+  
+  if (techniqueIssues?.includes('off_floor')) {
+    selected.push({ 
+      name: 'Deficit Deadlift (1-inch)', 
+      percentage: variations.deficit_deadlift_1inch.typical,
+      notes: 'Floor position strength'
+    });
+    selected.push({ 
+      name: 'Pause Deadlift (1-sec)', 
+      percentage: variations.pause_deadlift_1sec.typical,
+      tempo: variations.pause_deadlift_1sec.tempo,
+      notes: 'Off-floor control'
+    });
+  }
+  
+  if (techniqueIssues?.includes('weakness')) {
+    selected.push({ 
+      name: 'Chain Deadlift', 
+      percentage: variations.chain_deadlift.typical,
+      notes: variations.chain_deadlift.notes
+    });
+    selected.push({ 
+      name: 'Band-Assisted Deadlift', 
+      percentage: variations.band_assisted_deadlift.typical,
+      notes: variations.band_assisted_deadlift.notes
+    });
   }
   
   // 기본 변형운동
   if (selected.length === 0) {
-    selected.push({ name: '루마니안 데드리프트', percentage: variations.romanian_deadlift.typical });
+    selected.push({ 
+      name: 'Romanian Deadlift (RDL)', 
+      percentage: variations.romanian_deadlift.typical,
+      notes: 'Hamstring and hip hinge development'
+    });
+    selected.push({ 
+      name: 'Snatch Grip Deadlift', 
+      percentage: variations.snatch_grip_deadlift.typical,
+      notes: 'Upper back and grip strength'
+    });
   }
   
   return selected;
@@ -493,17 +722,47 @@ function generateExpertRecommendations(surveyData) {
   
   // 약점 기반 권장사항
   if (surveyData.weakestLift === 'bench') {
-    recommendations.push("벤치프레스 주간 빈도를 4-5회로 증가시켜 약점을 집중 보강하세요.");
+    recommendations.push("벤치프레스 주간 빈도를 4-5회로 증가시켜 약점을 집중 보강하세요. Close Grip Bench Press와 Pin Press를 활용하세요.");
+  }
+  
+  if (surveyData.weakestLift === 'squat') {
+    recommendations.push("스쿼트 빈도 증가와 함께 Front Squat, Safety Bar Squat 변형운동을 추가하세요.");
+  }
+  
+  if (surveyData.weakestLift === 'deadlift') {
+    recommendations.push("데드리프트 보강을 위해 Deficit Deadlift와 Block Pulls를 활용한 단계별 접근을 추천합니다.");
   }
   
   // 볼륨 견딤력 기반
   if (surveyData.volumeTolerance === 'high') {
-    recommendations.push("높은 볼륨 견딤력을 활용해 Ascending Back-off Sets을 적용하세요.");
+    recommendations.push("높은 볼륨 견딤력을 활용해 Ascending Back-off Sets과 Chain/Band Training을 적용하세요.");
+  }
+  
+  if (surveyData.volumeTolerance === 'low') {
+    recommendations.push("낮은 볼륨 견딤력에 맞춰 고강도 단시간 훈련과 Pin Movements를 활용하세요.");
   }
   
   // 경험 수준 기반
   if (surveyData.experience === 'advanced') {
-    recommendations.push("고급자로서 Wave Loading 전략을 활용한 피리어다이제이션을 권장합니다.");
+    recommendations.push("고급자로서 Wave Loading 전략과 Tempo Training (3-1-1-0, 4-2-1-0)을 활용한 피리어다이제이션을 권장합니다.");
+  }
+  
+  if (surveyData.experience === 'elite') {
+    recommendations.push("엘리트 수준으로 Board Press, Slingshot, Anderson Squat 등 전문 장비 훈련을 통합하세요.");
+  }
+  
+  // 기술 문제 기반
+  if (surveyData.techniqueIssues?.includes('speed')) {
+    recommendations.push("속도 개선을 위해 Band-Assisted Movements와 Explosive Tempo Training을 적용하세요.");
+  }
+  
+  if (surveyData.techniqueIssues?.includes('lockout')) {
+    recommendations.push("락아웃 강화를 위해 Pin Press, Board Press, Block Pulls 등 부분 ROM 훈련을 집중 적용하세요.");
+  }
+  
+  // 빈도 기반 권장사항
+  if (parseInt(surveyData.frequency) >= 5) {
+    recommendations.push("고빈도 훈련자로서 RPE 기반 Autoregulation과 다양한 Variation Training을 활용하세요.");
   }
   
   return recommendations;
