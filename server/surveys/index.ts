@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { type CanonicalSurvey, validateCanonicalSurvey } from '../domain/index';
+import { crossfitSurveyV1Schema, crossfitToCanonical, detectCrossfitConflicts } from './crossfitSurvey';
 
 // 🔍 설문 종류별 레지스트리
 export interface SurveyTypeDefinition {
@@ -197,6 +198,14 @@ export const SURVEY_REGISTRY: Record<string, SurveyTypeDefinition> = {
     toCanonical: powerliftingToCanonical,
     detectConflicts: detectPowerliftingConflicts,
   },
+  // 🏋️ 새로운 크로스핏 설문 타입 (1줄 등록!)
+  'crossfit-survey-v1': {
+    kind: 'crossfit-survey',
+    version: 'v1.0',
+    schema: crossfitSurveyV1Schema,
+    toCanonical: crossfitToCanonical,
+    detectConflicts: detectCrossfitConflicts,
+  },
 };
 
 // 🔍 설문 처리 메인 함수
@@ -233,6 +242,13 @@ export function processSurvey(surveyKind: string, rawData: any): {
 // 🎯 설문 타입 추론
 export function inferSurveyType(rawData: any): string {
   // 간단한 휴리스틱으로 설문 타입 추론
+  
+  // 크로스핏 설문 감지
+  if (rawData.crossfitExperience || rawData.wodPreference || rawData.boxMembership) {
+    return 'crossfit-survey-v1';
+  }
+  
+  // 파워리프팅 설문 감지
   if (rawData.squatMax && rawData.benchMax && rawData.deadliftMax) {
     return 'powerlifting-survey-v2';
   }

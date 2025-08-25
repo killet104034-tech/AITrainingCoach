@@ -7,7 +7,7 @@ import { generateTrainingProgram } from "../services/programGenerator";
 import { sendTrainingProgram } from "../services/email";
 import { createWorkoutSheet } from "../sheets/sheetsService";
 import { operationalGuardMiddleware, operationalGuardCleanup, type GuardedRequest } from "../ops/operationalGuardMiddleware";
-import { operationalGuard, ErrorCategory } from "../ops/operationalGuard";
+import { operationalGuard, OperationalError, ErrorCategory } from "../ops/operationalGuard";
 import { processSurvey, inferSurveyType } from "../surveys/index";
 import { createEngine } from "../engine/index";
 
