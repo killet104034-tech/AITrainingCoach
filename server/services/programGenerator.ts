@@ -89,31 +89,78 @@ const EXERCISES = {
   }
 };
 
-// 프로그램 템플릿
+// 훈련 블럭 정의
+const TRAINING_BLOCKS = {
+  block1_adaptation: {
+    name: "블럭 1: 적응기",
+    focus: "기본기 습득 및 움직임 패턴 완성",
+    duration_weeks: [4, 5, 6], // 수준에 따라 선택
+    intensity_range: [60, 75],
+    volume: "high",
+    main_goals: ["기술습득", "근지구력", "기본근력"]
+  },
+  block2_development: {
+    name: "블럭 2: 발전기", 
+    focus: "근력 증가 및 볼륨 향상",
+    duration_weeks: [5, 6, 7, 8],
+    intensity_range: [70, 85],
+    volume: "moderate-high",
+    main_goals: ["근력증가", "근비대", "기술향상"]
+  },
+  block3_intensification: {
+    name: "블럭 3: 강화기",
+    focus: "최대 강도 훈련 및 신경계 적응", 
+    duration_weeks: [4, 5, 6],
+    intensity_range: [80, 95],
+    volume: "moderate",
+    main_goals: ["최대근력", "신경계적응", "기술완성"]
+  },
+  block4_peaking: {
+    name: "블럭 4: 피킹기",
+    focus: "대회 준비 및 최대 능력 발휘",
+    duration_weeks: [2, 3, 4],
+    intensity_range: [85, 100],
+    volume: "low",
+    main_goals: ["최대발휘", "회복", "기술정교화"]
+  }
+};
+
+// 프로그램 템플릿 (블럭 기반)
 const PROGRAM_TEMPLATES = {
   beginner_2day: {
     title: "초보자 2일 기초 프로그램",
     overview: "파워리프팅 3대 운동의 기본기를 다지는 초보자용 프로그램입니다.",
-    weeks: 4,
-    workouts_per_week: 2
+    workouts_per_week: 2,
+    blocks: ["block1_adaptation", "block2_development"],
+    block_duration: [6, 6] // 각 블럭별 주차
   },
   beginner_3day: {
     title: "초보자 3일 성장 프로그램", 
     overview: "주 3회 훈련으로 근력과 기술을 동시에 향상시키는 프로그램입니다.",
-    weeks: 6,
-    workouts_per_week: 3
+    workouts_per_week: 3,
+    blocks: ["block1_adaptation", "block2_development"],
+    block_duration: [5, 7]
   },
   intermediate_4day: {
     title: "중급자 4일 강화 프로그램",
     overview: "중급자를 위한 체계적인 강도 증가와 볼륨 조절 프로그램입니다.",
-    weeks: 8,
-    workouts_per_week: 4
+    workouts_per_week: 4,
+    blocks: ["block1_adaptation", "block2_development", "block3_intensification"],
+    block_duration: [4, 6, 5]
   },
   advanced_5day: {
     title: "고급자 5일 전문 프로그램",
     overview: "고급자를 위한 전문적인 피킹과 강도 조절 프로그램입니다.",
-    weeks: 12,
-    workouts_per_week: 5
+    workouts_per_week: 5,
+    blocks: ["block1_adaptation", "block2_development", "block3_intensification", "block4_peaking"],
+    block_duration: [4, 6, 4, 3]
+  },
+  competition_prep: {
+    title: "대회 준비 특화 프로그램",
+    overview: "대회 출전을 목표로 하는 선수들을 위한 전문 프로그램입니다.",
+    workouts_per_week: 6,
+    blocks: ["block2_development", "block3_intensification", "block4_peaking"],
+    block_duration: [8, 6, 4]
   }
 };
 
@@ -163,8 +210,14 @@ function analyzeSurveyData(data: SurveyData) {
 }
 
 function selectProgramTemplate(analysis: any) {
-  const { frequency, strengthLevel } = analysis;
+  const { frequency, strengthLevel, goals } = analysis;
   
+  // 대회 준비 목표가 있는 경우
+  if (goals.includes("competition") || goals.includes("대회")) {
+    return PROGRAM_TEMPLATES.competition_prep;
+  }
+  
+  // 수준과 빈도에 따른 템플릿 선택
   if (strengthLevel === "beginner") {
     return frequency <= 2 ? PROGRAM_TEMPLATES.beginner_2day : PROGRAM_TEMPLATES.beginner_3day;
   } else if (strengthLevel === "intermediate") {
@@ -176,30 +229,50 @@ function selectProgramTemplate(analysis: any) {
 
 function createPersonalizedProgram(analysis: any, template: any, surveyData: SurveyData): TrainingProgram {
   const weeks: TrainingWeek[] = [];
+  let currentWeek = 1;
   
-  // 주차별 프로그램 생성
-  for (let week = 1; week <= template.weeks; week++) {
-    const weeklyFocus = getWeeklyFocus(week, template.weeks);
-    const workouts: Workout[] = [];
+  // 블럭별 프로그램 생성
+  for (let blockIndex = 0; blockIndex < template.blocks.length; blockIndex++) {
+    const blockType = template.blocks[blockIndex];
+    const blockDuration = template.block_duration[blockIndex];
+    const blockInfo = TRAINING_BLOCKS[blockType as keyof typeof TRAINING_BLOCKS];
     
-    // 주간 운동 일정 생성
-    for (let day = 1; day <= template.workouts_per_week; day++) {
-      const workout = createWorkout(day, analysis, week, template.weeks);
-      workouts.push(workout);
+    // 각 블럭 내 주차별 프로그램 생성
+    for (let blockWeek = 1; blockWeek <= blockDuration; blockWeek++) {
+      const weeklyFocus = `${blockInfo.name} - ${blockInfo.focus}`;
+      const workouts: Workout[] = [];
+      
+      // 블럭 내 진행도 계산 (0.0 ~ 1.0)
+      const blockProgress = blockWeek / blockDuration;
+      
+      // 주간 운동 일정 생성
+      for (let day = 1; day <= template.workouts_per_week; day++) {
+        const workout = createBlockWorkout(
+          day, 
+          analysis, 
+          blockInfo, 
+          blockProgress, 
+          currentWeek,
+          blockWeek
+        );
+        workouts.push(workout);
+      }
+      
+      weeks.push({
+        week: currentWeek,
+        focus: weeklyFocus,
+        workouts
+      });
+      
+      currentWeek++;
     }
-    
-    weeks.push({
-      week,
-      focus: weeklyFocus,
-      workouts
-    });
   }
   
   return {
     program_title: template.title,
-    overview: template.overview,
+    overview: `${template.overview} 총 ${template.blocks.length}개 블럭, ${currentWeek - 1}주 프로그램입니다.`,
     training_weeks: weeks,
-    progression_notes: getProgressionNotes(analysis),
+    progression_notes: getProgressionNotes(analysis, template),
     warmup_protocol: getWarmupProtocol(),
     cooldown_protocol: getCooldownProtocol(),
     nutrition_guidelines: getNutritionGuidelines(analysis),
@@ -217,7 +290,14 @@ function getWeeklyFocus(week: number, totalWeeks: number): string {
   return "완성기 - 기술 완성";
 }
 
-function createWorkout(day: number, analysis: any, week: number, totalWeeks: number): Workout {
+function createBlockWorkout(
+  day: number, 
+  analysis: any, 
+  blockInfo: any, 
+  blockProgress: number, 
+  currentWeek: number,
+  blockWeek: number
+): Workout {
   const { strengthLevel } = analysis;
   const exercises: Exercise[] = [];
   
@@ -243,21 +323,21 @@ function createWorkout(day: number, analysis: any, week: number, totalWeeks: num
   }
   
   // 메인 운동 추가
-  const mainExercise = getMainExercise(mainLift, strengthLevel);
-  const intensity = getIntensity(week, totalWeeks);
+  const mainExercise = getMainExercise(mainLift, analysis.strengthLevel);
+  const intensity = getBlockIntensity(blockInfo, blockProgress);
   
   exercises.push({
     exercise: mainExercise,
-    sets: strengthLevel === "beginner" ? 3 : 4,
+    sets: analysis.strengthLevel === "beginner" ? 3 : 4,
     reps: intensity.reps,
     weight_percent: intensity.percentage,
     rest_minutes: 3,
     rpe: intensity.rpe,
-    notes: getExerciseNotes(mainExercise, strengthLevel)
+    notes: getExerciseNotes(mainExercise, analysis.strengthLevel, blockInfo)
   });
   
   // 보조 운동 추가
-  const accessoryExercises = getAccessoryExercises(mainLift, strengthLevel);
+  const accessoryExercises = getAccessoryExercises(mainLift, analysis.strengthLevel, blockInfo);
   exercises.push(...accessoryExercises);
   
   return {
@@ -272,21 +352,36 @@ function getMainExercise(liftType: string, strengthLevel: string): string {
   return exercises.find(ex => ex.difficulty === strengthLevel)?.name || exercises[0].name;
 }
 
-function getIntensity(week: number, totalWeeks: number) {
-  const progress = week / totalWeeks;
+function getBlockIntensity(blockInfo: any, blockProgress: number) {
+  // 블럭 타입에 따른 기본 강도 범위
+  const [minIntensity, maxIntensity] = blockInfo.intensity_range;
   
-  if (progress <= 0.3) {
-    return { reps: "8-10", percentage: "65-70%", rpe: "6-7" };
-  } else if (progress <= 0.6) {
-    return { reps: "5-6", percentage: "75-80%", rpe: "7-8" };
-  } else if (progress <= 0.8) {
-    return { reps: "3-5", percentage: "80-85%", rpe: "8-9" };
+  // 블럭 내 진행도에 따른 강도 조절
+  const currentIntensity = Math.round(minIntensity + (maxIntensity - minIntensity) * blockProgress);
+  
+  let percentage = `${currentIntensity}%`;
+  let reps = "5";
+  let rpe = "7-8";
+  
+  // 강도에 따른 세트/랩 조절
+  if (currentIntensity <= 70) {
+    reps = "6-8";
+    rpe = "6-7";
+  } else if (currentIntensity <= 80) {
+    reps = "5";
+    rpe = "7-8";
+  } else if (currentIntensity <= 90) {
+    reps = "3-5";
+    rpe = "8-9";
   } else {
-    return { reps: "1-3", percentage: "85-90%", rpe: "9" };
+    reps = "1-3";
+    rpe = "9+";
   }
+  
+  return { reps, percentage, rpe };
 }
 
-function getAccessoryExercises(mainLift: string, strengthLevel: string): Exercise[] {
+function getAccessoryExercises(mainLift: string, strengthLevel: string, blockInfo?: any): Exercise[] {
   const accessories = EXERCISES[mainLift as keyof typeof EXERCISES].accessory;
   const selectedExercises = accessories.slice(0, strengthLevel === "beginner" ? 2 : 3);
   
@@ -301,22 +396,49 @@ function getAccessoryExercises(mainLift: string, strengthLevel: string): Exercis
   }));
 }
 
-function getExerciseNotes(exercise: string, strengthLevel: string): string {
-  const notes = {
-    beginner: "정확한 자세를 우선으로 하며, 무리하지 말고 점진적으로 중량을 증가시키세요.",
-    intermediate: "안정적인 자세를 유지하며 목표 강도에 맞춰 훈련하세요.",
-    advanced: "최적의 기술과 집중력으로 최대 효과를 얻으세요."
-  };
+function getExerciseNotes(exercise: string, strengthLevel: string, blockInfo?: any): string {
+  let baseNote = "";
   
-  return notes[strengthLevel as keyof typeof notes] || notes.beginner;
+  if (strengthLevel === "beginner") {
+    baseNote = "정확한 자세를 우선으로 하며, 무리하지 말고 점진적으로 중량을 증가시키세요.";
+  } else if (strengthLevel === "intermediate") {
+    baseNote = "안정적인 자세를 유지하며 목표 강도에 맞춰 훈련하세요.";
+  } else {
+    baseNote = "최적의 기술과 집중력으로 최대 효과를 얻으세요.";
+  }
+  
+  // 블럭별 추가 노트
+  if (blockInfo?.name.includes("적응기")) {
+    baseNote += " | 기본기 습득이 우선입니다";
+  } else if (blockInfo?.name.includes("강화기")) {
+    baseNote += " | 고강도 집중 훈련";
+  } else if (blockInfo?.name.includes("피킹기")) {
+    baseNote += " | 대회 준비 - 최대 발휘";
+  }
+  
+  return baseNote;
 }
 
-function getProgressionNotes(analysis: any): string {
-  return `주차별로 점진적으로 강도를 증가시킵니다. 
-첫 2주는 적응기로 가벼운 중량으로 시작하며, 
-중간 단계에서는 강도를 높이고, 
-마지막 단계에서는 최대 중량에 도전합니다.
-목표 RPE를 유지하며 안전하게 진행하세요.`;
+function getProgressionNotes(analysis: any, template?: any): string {
+  let notes = "";
+  
+  if (template?.blocks) {
+    notes += `총 ${template.blocks.length}개 블럭 구성:\n`;
+    template.blocks.forEach((block: string, index: number) => {
+      const blockName = TRAINING_BLOCKS[block as keyof typeof TRAINING_BLOCKS]?.name || block;
+      const duration = template.block_duration[index];
+      notes += `- ${blockName}: ${duration}주\n`;
+    });
+    notes += "\n";
+  }
+  
+  notes += `중량 진행 방법:
+- 목표 반복수를 모두 완료하면 다음 주에 2.5-5kg 증가
+- RPE 9를 넘지 않도록 주의
+- 기술이 무너지면 중량을 낮추고 폼 교정
+- 블럭 전환 시 디로드 주간 적용`;
+  
+  return notes;
 }
 
 function getWarmupProtocol(): string {
