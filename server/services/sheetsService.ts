@@ -45,39 +45,30 @@ export interface WorkoutProgram {
 
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
-    console.log('구글 스프레드시트 생성 시작...');
-    console.log('서비스 계정:', process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL);
+    console.log('🔥 템플릿 복사 방식으로 스프레드시트 생성 시작...');
+    console.log('🔐 서비스 계정:', process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL);
 
     // 인증 테스트
     const authClient = await auth.getClient();
-    console.log('인증 성공!');
+    console.log('✅ 인증 성공!');
 
-    // 1. 새 스프레드시트 생성
-    const createResponse = await sheets.spreadsheets.create({
+    // 1. 우선 간단한 방법: 기본 스프레드시트를 생성하고 바로 공유
+    console.log('📋 기본 스프레드시트 생성 중...');
+    
+    // 2. Drive API로 직접 스프레드시트 파일 생성 (더 안정적)
+    const createResponse = await drive.files.create({
       requestBody: {
-        properties: {
-          title: `${programData.program_title} - ${new Date().toLocaleDateString('ko-KR')}`
-        },
-        sheets: [
-          {
-            properties: {
-              title: '프로그램 정보',
-              gridProperties: {
-                rowCount: 50,
-                columnCount: 10
-              }
-            }
-          }
-        ]
+        name: `${programData.program_title} - ${new Date().toLocaleDateString('ko-KR')}`,
+        mimeType: 'application/vnd.google-apps.spreadsheet'
       }
     });
 
-    const spreadsheetId = createResponse.data.spreadsheetId;
+    const spreadsheetId = createResponse.data.id;
     if (!spreadsheetId) {
       throw new Error('스프레드시트 ID를 받을 수 없습니다.');
     }
 
-    console.log('스프레드시트 생성 완료:', spreadsheetId);
+    console.log('✅ 스프레드시트 생성 완료! ID:', spreadsheetId);
 
     // 2. 프로그램 정보 시트에 데이터 추가
     const infoData = [
