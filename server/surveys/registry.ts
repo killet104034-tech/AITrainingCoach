@@ -57,7 +57,7 @@ export const advancedSurveyV1Schema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
   email: z.string().email('유효한 이메일을 입력해주세요'),
   age: z.string().optional().transform(val => val ? parseInt(val) : undefined),
-  gender: z.enum(['male', 'female', 'other']).optional(),
+  gender: z.enum(['male', 'female', 'other']).optional().or(z.literal('')),
   bodyFatPercent: z.string().optional().transform(val => val ? parseInt(val) : undefined),
   occupation: z.enum(['desk_job', 'active_job', 'physical_job', 'student']).optional(),
   workHours: z.enum(['part_time', 'full_time', 'overtime']).optional(),
@@ -74,7 +74,7 @@ export const advancedSurveyV1Schema = z.object({
   hipFlexibility: z.enum(['poor', 'average', 'good']).optional(),
   
   // ===== 3단계: 경험 수준 =====
-  experience: z.enum(['beginner', 'intermediate', 'advanced']),
+  experience: z.enum(['beginner', 'intermediate', 'advanced', 'elite', 'unknown']).or(z.literal('')),
   trainingYears: z.string().optional().transform(val => val ? parseInt(val) : undefined),
   powerliftingYears: z.string().optional().transform(val => val ? parseInt(val) : undefined),
   competitionExperience: z.enum(['none', 'local', 'national', 'international']).optional(),
@@ -105,7 +105,7 @@ export const advancedSurveyV1Schema = z.object({
   targetCompetitionDate: z.string().optional(),
   
   // ===== 7단계: 훈련 빈도 & 스케줄 =====
-  frequency: z.string().transform(val => parseInt(val)),
+  frequency: z.string().transform(val => val ? parseInt(val) : 0),
   sessionLength: z.enum(['60', '90', '120', '150']).optional(),
   preferredDays: z.array(z.string()).optional(),
   timeOfDay: z.enum(['morning', 'afternoon', 'evening']).optional(),
@@ -125,7 +125,7 @@ export const advancedSurveyV1Schema = z.object({
   hasCoach: z.enum(['yes', 'no', 'sometimes']).optional(),
   
   // ===== 10단계: 부상 이력 =====
-  injuries: z.enum(['none', 'minor', 'specific']),
+  injuries: z.enum(['none', 'minor', 'specific']).or(z.literal('')),
   injuryDetails: z.string().optional(),
   currentPain: z.array(z.string()).optional(),
   medicalClearance: z.enum(['yes', 'no', 'partial']).optional(),
