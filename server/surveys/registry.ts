@@ -3,10 +3,11 @@ import { z, type ZodSchema } from 'zod';
 import type { CanonicalInput } from '../domain/canonical';
 
 export interface SurveySchema {
-  version: string;     // "1.0.0"
-  zod: ZodSchema<any>; // 입력 검증
-  toCanonical: (raw: any) => CanonicalInput; // 변환기
-  conflicts: (raw: any) => Conflict[];      // 사전 충돌 검사
+  kind: string;           // 'basic_v1' | 'coach_v2' | …
+  version: string;        // '1.2.0'
+  zod: ZodSchema<any>;    // 입력 검증
+  toCanonical: (raw: any) => CanonicalInput;               // 표준 모델로 변환
+  conflicts: (raw: any) => Conflict[];                     // 사전 충돌 검사
 }
 
 // 충돌/경고 타입
@@ -283,6 +284,7 @@ function rehabV1Conflicts(raw: any): Conflict[] {
 // 📋 Survey Registry
 export const SurveyRegistry: Record<string, SurveySchema> = {
   basic_v1: {
+    kind: 'basic_v1',
     version: '1.0.0',
     zod: basicV1Schema,
     toCanonical: basicV1ToCanonical,
@@ -290,6 +292,7 @@ export const SurveyRegistry: Record<string, SurveySchema> = {
   },
   
   coach_v2: {
+    kind: 'coach_v2',
     version: '2.0.0',
     zod: coachV2Schema,
     toCanonical: coachV2ToCanonical,
@@ -297,11 +300,13 @@ export const SurveyRegistry: Record<string, SurveySchema> = {
   },
   
   rehab_v1: {
+    kind: 'rehab_v1',
     version: '1.0.0',
     zod: rehabV1Schema,
     toCanonical: rehabV1ToCanonical,
     conflicts: rehabV1Conflicts
   }
+  /* 이후 계속 추가 */
 };
 
 // 🔍 Registry 유틸리티 함수들
