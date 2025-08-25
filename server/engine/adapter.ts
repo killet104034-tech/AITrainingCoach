@@ -220,22 +220,212 @@ function getBaseIntensity(goal: string, week: number, totalWeeks: number): Inten
   }
 }
 
-// 🔮 나중에 구현할 planFromTables() 로 스위치할 예정
-export async function planFromTables(input: CanonicalInput): Promise<ProgramPlan> {
+// 🎯 엔진 설정 타입
+export interface Cfg {
+  volume: any;              // config/rules/volume.json
+  frequency: any;           // config/rules/frequency.json  
+  weeks: any;               // config/rules/weeks.json
+  variationWeights: any;    // config/rules/variationWeights.json
+  dayTypes: any;            // config/rules/dayTypes.json
+  guards: any;              // config/rules/guards.json
+}
+
+// 🚀 엔진은 "데이터화" 핵심기
+export function planFromTables(input: CanonicalInput, cfg: Cfg): ProgramPlan {
+  // 1) 기본 타깃(주당 세트/빈도/주차%) 계산
+  const setsWeek = chooseSets(cfg.volume, input.experience, input.goal, input.volumes);
+  const freq     = chooseFrequency(cfg.frequency, input);
+  const weekPct  = chooseWeekPct(cfg.weeks, input.planning?.mesoWeeks, input.planning?.blocks, input.goal);
+
+  // 2) 오버라이드 머지(planning.*)
+  applyPerLiftFrequency(freq, input.planning?.perLiftFrequency);
+  
+  // 3) 세션 분배 & 변형 선택(가중치)
+  const skeleton = splitIntoDays(setsWeek, freq, cfg.guards);
+  const blocks   = attachVariationsAndIntensities(skeleton, weekPct, cfg.variationWeights, cfg.dayTypes, input);
+
+  // 4) 안전 가드레일(클램프)
+  const safe = enforceGuards(blocks, cfg.guards);
+
+  return { 
+    meta: { 
+      mesoWeeks: weekPct.length, 
+      engineVersion: 'rules-v3', 
+      createdAt: new Date().toISOString() 
+    }, 
+    blocks: safe 
+  };
+}
+
+// 📊 1) 주당 세트 선택
+function chooseSets(volumeRules: any, experience: string, goal: string, volumes?: any): { SQ: number; BP: number; DL: number } {
+  const baseSets = {
+    SQ: volumeRules.SQ[experience] ? Math.round((volumeRules.SQ[experience][0] + volumeRules.SQ[experience][1]) / 2) : 15,
+    BP: volumeRules.BP[experience] ? Math.round((volumeRules.BP[experience][0] + volumeRules.BP[experience][1]) / 2) : 18,
+    DL: volumeRules.DL[experience] ? Math.round((volumeRules.DL[experience][0] + volumeRules.DL[experience][1]) / 2) : 9
+  };
+  
+  // 목표별 조정
+  const goalMultiplier = 
+    goal === 'hypertrophy' ? 1.2 :
+    goal === 'strength' ? 1.0 :
+    goal === 'peaking' ? 0.8 : 1.0;
+  
+  // 볼륨 성향 조정
+  const volumeMultiplier = 
+    volumes?.tolerance === 'high' ? 1.15 :
+    volumes?.tolerance === 'low' ? 0.85 : 1.0;
+  
+  return {
+    SQ: Math.round(baseSets.SQ * goalMultiplier * volumeMultiplier),
+    BP: Math.round(baseSets.BP * goalMultiplier * volumeMultiplier),
+    DL: Math.round(baseSets.DL * goalMultiplier * volumeMultiplier)
+  };
+}
+
+// 🗓️ 2) 빈도 선택
+function chooseFrequency(frequencyRules: any, input: CanonicalInput): { SQ: number; BP: number; DL: number } {
+  const baseFreq = input.frequency.total;
+  
+  // 경험별 기본 배분
+  const distribution = 
+    input.experience === 'beginner' ? { SQ: 0.3, BP: 0.5, DL: 0.2 } :
+    input.experience === 'intermediate' ? { SQ: 0.35, BP: 0.45, DL: 0.2 } :
+    { SQ: 0.4, BP: 0.4, DL: 0.2 };
+  
+  return {
+    SQ: Math.max(1, Math.round(baseFreq * distribution.SQ)),
+    BP: Math.max(1, Math.round(baseFreq * distribution.BP)),
+    DL: Math.max(1, Math.round(baseFreq * distribution.DL))
+  };
+}
+
+// 📅 3) 주차별 강도 패턴 선택
+function chooseWeekPct(weeksRules: any, mesoWeeks?: number, blocks?: string[], goal?: string): number[] {
+  // mesoWeeks 우선, 없으면 goal 기반
+  if (mesoWeeks === 3) {
+    return weeksRules.meso3 || [0.70, 0.76, 0.62];
+  }
+  
+  if (goal === 'peaking') {
+    return weeksRules.peaking || [0.72, 0.78, 0.84, 0.64];
+  }
+  
+  return weeksRules.default || [0.68, 0.72, 0.76, 0.62];
+}
+
+// ⚙️ 4) 운동별 빈도 오버라이드 적용
+function applyPerLiftFrequency(freq: { SQ: number; BP: number; DL: number }, overrides?: { SQ?: number; BP?: number; DL?: number }): void {
+  if (!overrides) return;
+  
+  if (overrides.SQ !== undefined) freq.SQ = overrides.SQ;
+  if (overrides.BP !== undefined) freq.BP = overrides.BP;
+  if (overrides.DL !== undefined) freq.DL = overrides.DL;
+}
+
+// 🏗️ 5) 세션 분배 (스켈레톤 생성)
+function splitIntoDays(setsWeek: { SQ: number; BP: number; DL: number }, freq: { SQ: number; BP: number; DL: number }, guards: any): Array<{ week: number; day: number; lift: 'SQ'|'BP'|'DL'; sets: number }> {
+  const skeleton: Array<{ week: number; day: number; lift: 'SQ'|'BP'|'DL'; sets: number }> = [];
+  const totalWeeks = 4; // 기본값
+  const daysPerWeek = Math.max(freq.SQ, freq.BP, freq.DL);
+  
+  for (let week = 1; week <= totalWeeks; week++) {
+    // 각 운동을 빈도에 맞게 분배
+    let sqDaysLeft = freq.SQ;
+    let bpDaysLeft = freq.BP;
+    let dlDaysLeft = freq.DL;
+    
+    for (let day = 1; day <= daysPerWeek; day++) {
+      const liftsToday: Array<'SQ'|'BP'|'DL'> = [];
+      
+      // 라운드로빈 방식으로 분배
+      if (sqDaysLeft > 0) { liftsToday.push('SQ'); sqDaysLeft--; }
+      if (bpDaysLeft > 0) { liftsToday.push('BP'); bpDaysLeft--; }
+      if (dlDaysLeft > 0 && day <= freq.DL) { liftsToday.push('DL'); dlDaysLeft--; }
+      
+      liftsToday.forEach(lift => {
+        const liftSets = 
+          lift === 'SQ' ? Math.round(setsWeek.SQ / freq.SQ) :
+          lift === 'BP' ? Math.round(setsWeek.BP / freq.BP) :
+          Math.round(setsWeek.DL / freq.DL);
+        
+        skeleton.push({ week, day, lift, sets: liftSets });
+      });
+    }
+  }
+  
+  return skeleton;
+}
+
+// 🎨 6) 변형운동 & 강도 부착
+function attachVariationsAndIntensities(
+  skeleton: Array<{ week: number; day: number; lift: 'SQ'|'BP'|'DL'; sets: number }>, 
+  weekPct: number[], 
+  variationWeights: any, 
+  dayTypes: any, 
+  input: CanonicalInput
+): Block[] {
+  return skeleton.map(item => {
+    const weekIntensity = weekPct[Math.min(item.week - 1, weekPct.length - 1)] * 100; // 0.68 → 68%
+    
+    const block: Block = {
+      week: item.week,
+      day: item.day,
+      lift: item.lift,
+      sets: item.sets,
+      reps: getRepsByGoal(input.goal),
+      intensity: { type: '%1RM', value: weekIntensity },
+      notes: `${input.goal} 프로그램`
+    };
+    
+    return block;
+  });
+}
+
+// 🛡️ 7) 안전 가드레일 적용
+function enforceGuards(blocks: Block[], guards: any): Block[] {
+  return blocks.map(block => {
+    // 강도 제한
+    if (block.intensity.type === '%1RM') {
+      const maxPercent = guards.intensity_limits?.max_percent_1rm?.[block.lift] || 90;
+      block.intensity.value = Math.min(block.intensity.value, maxPercent);
+    }
+    
+    // 세트수 제한
+    const maxSets = guards.volume_caps?.max_daily_sets || 20;
+    block.sets = Math.min(block.sets, maxSets);
+    
+    return block;
+  });
+}
+
+// 📋 목표별 반복수
+function getRepsByGoal(goal: string): number {
+  switch (goal) {
+    case 'strength': return 5;
+    case 'hypertrophy': return 8;
+    case 'peaking': return 3;
+    default: return 6;
+  }
+}
+
+// 🔄 레거시 호환용 async 래퍼
+export async function planFromTablesAsync(input: CanonicalInput): Promise<ProgramPlan> {
   try {
     console.log('📊 planFromTables() 시작: 규칙 테이블 기반 프로그램 생성');
     
-    // 1. 메조사이클 길이에 따른 강도 패턴 로드
-    const intensityPattern = await loadIntensityPattern(input);
+    // 규칙 로드
+    const cfg: Cfg = {
+      volume: await loadRuleData('volume.json', { "SQ": { "beginner":[10,14], "intermediate":[12,18], "advanced":[14,22] }, "BP": { "beginner":[12,18], "intermediate":[14,22], "advanced":[16,26] }, "DL": { "beginner":[6,10], "intermediate":[8,12], "advanced":[10,14] } }),
+      frequency: await loadRuleData('frequency.json', {}),
+      weeks: await loadRuleData('weeks.json', { "default": [0.68, 0.72, 0.76, 0.62], "meso3": [0.70, 0.76, 0.62], "peaking": [0.72, 0.78, 0.84, 0.64] }),
+      variationWeights: await loadRuleData('variationWeights.json', {}),
+      dayTypes: await loadRuleData('dayTypes.json', { "recovery": { "setsDelta": -2, "pctDelta": -0.08, "rpeCap": 7.5 }, "technique": { "pctDelta": -0.05, "rpeCap": 7.0 }, "overload": { "pctDelta": +0.03, "rpeCap": 8.5, "setsDelta": +1 } }),
+      guards: await loadRuleData('guards.json', {})
+    };
     
-    // 2. 블록 패턴 결정
-    const blockPattern = determineBlockPattern(input);
-    
-    // 3. 운동별 빈도 적용
-    const liftFrequencies = await getLiftFrequencies(input);
-    
-    // 4. ProgramPlan 생성
-    const programPlan = generateFromRules(input, intensityPattern, blockPattern, liftFrequencies);
+    // 새로운 엔진 호출
+    const programPlan = planFromTables(input, cfg);
     
     console.log('✅ planFromTables() 완료: 규칙 기반 ProgramPlan 생성');
     return programPlan;
