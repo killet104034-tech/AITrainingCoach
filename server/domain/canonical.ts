@@ -32,7 +32,7 @@ export type CanonicalInput = {
   planning?: {
     mesoWeeks?: number;                    // 3주, 4주, 6주 등
     blocks?: string[];                     // ['hypertrophy','strength','peaking','taper'] 등
-    perliftFrequency?: { 
+    perLiftFrequency?: { 
       SQ?: number; 
       BP?: number; 
       DL?: number 
