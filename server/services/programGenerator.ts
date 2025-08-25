@@ -231,7 +231,7 @@ const PROGRAM_TEMPLATES = {
 
 import { EXPERT_INSIGHTS, generateExpertProgram } from "../knowledge/expertInsights.js";
 
-export function generateTrainingProgram(surveyData: SurveyData): string {
+export function generateTrainingProgram(surveyData: SurveyData): any {
   // 🧠 1. 전문가 지식 기반 분석
   const expertAnalysis = generateExpertProgram(surveyData);
   
@@ -244,7 +244,7 @@ export function generateTrainingProgram(surveyData: SurveyData): string {
   // 4. 전문가 지식 통합 개인화 프로그램 생성
   const program = createExpertPersonalizedProgram(analysis, template, surveyData, expertAnalysis);
   
-  return JSON.stringify(program, null, 2);
+  return program;
 }
 
 function analyzeSurveyData(data: SurveyData) {

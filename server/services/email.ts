@@ -22,10 +22,11 @@ const transporter = nodemailer.createTransport({
 export async function sendTrainingProgram(
   email: string, 
   name: string | undefined, 
-  program: string
+  program: any
 ): Promise<void> {
   try {
-    const parsedProgram = JSON.parse(program);
+    // 객체든 문자열이든 처리 가능
+    const parsedProgram = typeof program === 'string' ? JSON.parse(program) : program;
     
     // 구글 스프레드시트 생성
     let spreadsheetUrl = '#';

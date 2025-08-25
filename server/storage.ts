@@ -50,10 +50,11 @@ export class MemStorage implements IStorage {
     return surveyResponse;
   }
 
-  async updateSurveyResponseProgram(id: string, program: string): Promise<SurveyResponse | undefined> {
+  async updateSurveyResponseProgram(id: string, program: any): Promise<SurveyResponse | undefined> {
     const surveyResponse = this.surveyResponses.get(id);
     if (surveyResponse) {
-      surveyResponse.trainingProgram = program;
+      // 객체를 문자열로 변환해서 저장
+      surveyResponse.trainingProgram = typeof program === 'string' ? program : JSON.stringify(program, null, 2);
       this.surveyResponses.set(id, surveyResponse);
     }
     return surveyResponse;
