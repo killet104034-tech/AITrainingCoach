@@ -50,6 +50,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const trainingProgram = await generateTrainingProgram(programData);
       
+      // Form 시트용 설문 데이터 추가
+      trainingProgram.survey_data = {
+        timestamp: new Date().toISOString(),
+        name: validatedData.name,
+        email: validatedData.email,
+        sex: validatedData.sex,
+        age: validatedData.age,
+        height: validatedData.height,
+        weight: validatedData.weight,
+        goal: Array.isArray(validatedData.goals) ? validatedData.goals.join(', ') : validatedData.goals,
+        experience: validatedData.experience,
+        daysPerWeek: validatedData.frequency
+      };
+      
       // Update survey response with generated program
       await storage.updateSurveyResponseProgram(surveyResponse.id, trainingProgram);
       

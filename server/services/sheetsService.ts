@@ -31,6 +31,19 @@ export interface WorkoutProgram {
       }>;
     }>;
   }>;
+  // 설문 데이터 추가
+  survey_data?: {
+    timestamp?: string;
+    name?: string;
+    email?: string;
+    sex?: string;
+    age?: number;
+    height?: number;
+    weight?: number;
+    goal?: string;
+    experience?: string;
+    daysPerWeek?: number;
+  };
 }
 
 // 템플릿 스프레드시트 ID (환경변수로 설정 가능)
@@ -83,7 +96,20 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       program_title: programData.program_title
     });
     
-    await createProPowerliftingSheets(spreadsheetId, programData);
+    try {
+      await createProPowerliftingSheets(spreadsheetId, programData);
+    } catch (error) {
+      console.log('⚠️ 프로급 시트 생성 중 오류 (계속 진행):', error);
+    }
+    
+    // 📝 Form 시트 추가 및 설문 데이터 저장
+    console.log('🎯 Form 시트 생성 시작...');
+    try {
+      await createFormSheet(spreadsheetId, programData);
+      console.log('🎯 Form 시트 생성 완료!');
+    } catch (error) {
+      console.log('❌ Form 시트 생성 실패:', error);
+    }
 
     // 공개 권한 설정
     try {
@@ -390,6 +416,71 @@ async function formatBlockSheet(spreadsheetId: string, sheetId: number, totalRow
     spreadsheetId,
     requestBody: { requests }
   });
+}
+
+// 📝 Form 시트 생성 및 설문 데이터 저장
+async function createFormSheet(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  try {
+    console.log('📝 Form 시트 생성 중...');
+
+    // 1. Form 시트 생성
+    const newSheet = await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [{
+          addSheet: {
+            properties: {
+              title: 'Form',
+              gridProperties: {
+                rowCount: 100,
+                columnCount: 15
+              }
+            }
+          }
+        }]
+      }
+    });
+
+    // 2. 헤더 및 설문 데이터 구성
+    const timestamp = new Date().toISOString();
+    const surveyData = programData.survey_data || {};
+    
+    const headers = [
+      'Timestamp', 'Name', 'Email', 'Sex', 'Age', 'Height', 'Weight', 
+      'Squat1RM', 'Bench1RM', 'Deadlift1RM', 'Goal', 'Experience', 'DaysPerWeek'
+    ];
+    
+    const dataRow = [
+      timestamp,
+      surveyData.name || '',
+      surveyData.email || '',
+      surveyData.sex || '',
+      surveyData.age || '',
+      surveyData.height || '',
+      surveyData.weight || '',
+      programData.user_maxes.squat,
+      programData.user_maxes.bench,
+      programData.user_maxes.deadlift,
+      surveyData.goal || '',
+      surveyData.experience || '',
+      surveyData.daysPerWeek || ''
+    ];
+
+    // 3. 데이터 입력 (A1: 헤더, A2: 데이터)
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'Form!A1:M2',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [headers, dataRow]
+      }
+    });
+
+    console.log('✅ Form 시트 생성 및 데이터 저장 완료!');
+    
+  } catch (error) {
+    console.log('❌ Form 시트 생성 실패:', (error as any)?.message);
+  }
 }
 
 // 기본 시트 생성 함수 (템플릿이 없는 경우)
