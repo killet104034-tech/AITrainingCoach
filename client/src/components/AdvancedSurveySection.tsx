@@ -29,147 +29,101 @@ export function AdvancedSurveySection({
   onSubmit, 
   isSubmitting 
 }: AdvancedSurveySectionProps) {
-  const totalSteps = 20; // 완전한 20단계 전문가 시스템 (40-50개 질문)
+  const totalSteps = 50; // 한 창에 질문 하나씩! (50개 질문)
 
-  // 1단계: 기본 정보
+  // 1단계: 이름
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-light text-white mb-3">기본 정보</h2>
-        <p className="text-gray-400">파워리프팅 맞춤 프로그램을 위한 기본 정보를 입력해주세요</p>
+        <h2 className="text-4xl font-light text-white mb-3">이름을 알려주세요</h2>
+        <p className="text-gray-400">맞춤형 프로그램 제작을 위해 필요합니다</p>
       </div>
       
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="name" className="text-white">이름 *</Label>
-            <Input
-              id="name"
-              data-testid="input-name"
-              {...form.register("name")}
-              placeholder="김파워"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-          <div>
-            <Label htmlFor="email" className="text-white">이메일 *</Label>
-            <Input
-              id="email"
-              data-testid="input-email"
-              {...form.register("email")}
-              placeholder="example@email.com"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="age" className="text-white">나이 *</Label>
-            <Input
-              id="age"
-              data-testid="input-age"
-              {...form.register("age")}
-              placeholder="25"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-          <div>
-            <Label className="text-white">성별 *</Label>
-            <RadioGroup 
-              value={form.watch("gender")} 
-              onValueChange={(value) => form.setValue("gender", value)}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="male" id="male" />
-                <label htmlFor="male" className="text-gray-300">남성</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="female" id="female" />
-                <label htmlFor="female" className="text-gray-300">여성</label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="weight" className="text-white">현재 체중 (kg) *</Label>
-            <Input
-              id="weight"
-              data-testid="input-weight"
-              {...form.register("bodyweight")}
-              placeholder="70"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-          <div>
-            <Label htmlFor="bodyFat" className="text-white">체지방률 (%, 대략적으로)</Label>
-            <Input
-              id="bodyFat"
-              data-testid="input-body-fat"
-              {...form.register("bodyFatPercent")}
-              placeholder="15"
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label className="text-white">주요 직업군</Label>
-            <RadioGroup 
-              value={form.watch("occupation")} 
-              onValueChange={(value) => form.setValue("occupation", value)}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="desk_job" id="desk-job" />
-                <label htmlFor="desk-job" className="text-gray-300">사무직 (하루 8시간+ 앉아서)</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="active_job" id="active-job" />
-                <label htmlFor="active-job" className="text-gray-300">활동적 직업 (서서 일하거나 걸어다님)</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="physical_job" id="physical-job" />
-                <label htmlFor="physical-job" className="text-gray-300">육체적 직업 (무거운 것 들거나 힘쓰는 일)</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="student" id="student" />
-                <label htmlFor="student" className="text-gray-300">학생</label>
-              </div>
-            </RadioGroup>
-          </div>
-          <div>
-            <Label className="text-white">일주일 근무시간</Label>
-            <RadioGroup 
-              value={form.watch("workHours")} 
-              onValueChange={(value) => form.setValue("workHours", value)}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="part_time" id="part-time" />
-                <label htmlFor="part-time" className="text-gray-300">30시간 미만</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="full_time" id="full-time" />
-                <label htmlFor="full-time" className="text-gray-300">40-50시간</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="overtime" id="overtime" />
-                <label htmlFor="overtime" className="text-gray-300">50시간 이상</label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
+      <div className="max-w-md mx-auto">
+        <Label htmlFor="name" className="text-white text-lg block mb-4">이름 *</Label>
+        <Input
+          id="name"
+          data-testid="input-name"
+          {...form.register("name")}
+          placeholder="김파워"
+          className="bg-gray-800 border-gray-600 text-white text-lg p-4 text-center"
+        />
       </div>
     </div>
   );
 
-  // 2단계: 🚀 신체 특성 분석 (Distance Traveled Programming)
+  // 2단계: 이메일
   const renderStep2 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-4xl font-light text-white mb-3">이메일 주소</h2>
+        <p className="text-gray-400">완성된 프로그램을 이메일로 보내드려요</p>
+      </div>
+      
+      <div className="max-w-md mx-auto">
+        <Label htmlFor="email" className="text-white text-lg block mb-4">이메일 *</Label>
+        <Input
+          id="email"
+          data-testid="input-email"
+          {...form.register("email")}
+          placeholder="example@email.com"
+          className="bg-gray-800 border-gray-600 text-white text-lg p-4 text-center"
+        />
+      </div>
+    </div>
+  );
+
+  // 3단계: 나이
+  const renderStep3 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-4xl font-light text-white mb-3">나이</h2>
+        <p className="text-gray-400">연령에 맞는 훈련 강도 조절을 위해 필요해요</p>
+      </div>
+      
+      <div className="max-w-md mx-auto">
+        <Label htmlFor="age" className="text-white text-lg block mb-4">나이 *</Label>
+        <Input
+          id="age"
+          data-testid="input-age"
+          {...form.register("age")}
+          placeholder="25"
+          className="bg-gray-800 border-gray-600 text-white text-lg p-4 text-center"
+        />
+      </div>
+    </div>
+  );
+
+  // 4단계: 성별
+  const renderStep4 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-4xl font-light text-white mb-3">성별</h2>
+        <p className="text-gray-400">성별에 따른 훈련 특성을 고려해요</p>
+      </div>
+      
+      <div className="max-w-md mx-auto">
+        <Label className="text-white text-lg block mb-6">성별 *</Label>
+        <RadioGroup 
+          value={form.watch("gender")} 
+          onValueChange={(value) => form.setValue("gender", value)}
+          className="space-y-4"
+        >
+          <div className="flex items-center space-x-3 p-4 border border-gray-600 rounded-lg hover:border-gray-400 transition-colors">
+            <RadioGroupItem value="male" id="male" />
+            <label htmlFor="male" className="text-gray-300 text-lg cursor-pointer">남성</label>
+          </div>
+          <div className="flex items-center space-x-3 p-4 border border-gray-600 rounded-lg hover:border-gray-400 transition-colors">
+            <RadioGroupItem value="female" id="female" />
+            <label htmlFor="female" className="text-gray-300 text-lg cursor-pointer">여성</label>
+          </div>
+        </RadioGroup>
+      </div>
+    </div>
+  );
+
+  // 5단계: 🚀 신체 특성 분석 (Distance Traveled Programming)
+  const renderStep5 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🚀 신체 특성 분석</h2>
@@ -321,8 +275,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 3단계: 🧠 심리적 성향 분석 (Lifter Psychology)
-  const renderStep3 = () => (
+  // 6단계: 🧠 심리적 성향 분석 (Lifter Psychology)
+  const renderStep6 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🧠 심리적 성향 분석</h2>
@@ -413,7 +367,7 @@ export function AdvancedSurveySection({
   );
 
   // 4단계: ⚡ 볼륨 내성 테스트 (Magic Bullets)
-  const renderStep4 = () => (
+  const renderStep7 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">💪 볼륨 내성 테스트</h2>
@@ -464,7 +418,7 @@ export function AdvancedSurveySection({
   );
 
   // 5단계: 현재 수준
-  const renderStep5 = () => (
+  const renderStep8 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">현재 수준</h2>
@@ -580,8 +534,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 6단계: 목표 설정
-  const renderStep6 = () => (
+  // 9단계: 목표 설정
+  const renderStep9 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🎯 목표 설정</h2>
@@ -2300,26 +2254,26 @@ export function AdvancedSurveySection({
 
   const renderCurrentStep = () => {
     switch (currentStep) {
-      case 1: return renderStep1();
-      case 2: return renderStep2();  // 🚀 신체 특성 분석 
-      case 3: return renderStep3();  // 🧠 심리적 성향 분석 
-      case 4: return renderStep4();  // ⚡ 볼륨 내성 테스트 
-      case 5: return renderStep5();  // 현재 수준
-      case 6: return renderStep6();  // 목표 설정
-      case 7: return renderStep7();
-      case 8: return renderStep8();
-      case 9: return renderStep9();
+      case 1: return renderStep1();   // 이름
+      case 2: return renderStep2();   // 이메일
+      case 3: return renderStep3();   // 나이
+      case 4: return renderStep4();   // 성별
+      case 5: return renderStep5();   // 🚀 신체 특성 분석 
+      case 6: return renderStep6();   // 🧠 심리적 성향 분석 
+      case 7: return renderStep7();   // ⚡ 볼륨 내성 테스트 
+      case 8: return renderStep8();   // 현재 수준
+      case 9: return renderStep9();   // 목표 설정
       case 10: return renderStep10();
       case 11: return renderStep11();
       case 12: return renderStep12();
       case 13: return renderStep13();
       case 14: return renderStep14();
       case 15: return renderStep15();
-      case 16: return renderStep16();  // 😴 수면 및 회복 패턴
-      case 17: return renderStep17();  // 🥗 영양 및 보충제
-      case 18: return renderStep18();  // ⚙️ 프로그램 선호도
-      case 19: return renderStep19();  // 🏃 추가 운동 및 활동
-      case 20: return renderStep20();  // 🎯 최종 정보 및 목표
+      case 16: return renderStep16();
+      case 17: return renderStep17();
+      case 18: return renderStep18();
+      case 19: return renderStep19();
+      case 20: return renderStep20();
       default: return <div>단계 {currentStep} 준비중...</div>;
     }
   };
