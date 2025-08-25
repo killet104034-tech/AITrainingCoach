@@ -4,7 +4,7 @@ import express from "express";
 import path from "path";
 import { storage } from "./storage";
 import { insertSurveyResponseSchema } from "@shared/schema";
-import { generateTrainingProgram } from "./services/openai";
+import { generateTrainingProgram } from "./services/programGenerator";
 import { sendTrainingProgram } from "./services/email";
 
 export async function registerRoutes(app: Express): Promise<Server> {
