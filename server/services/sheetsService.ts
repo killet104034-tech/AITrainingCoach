@@ -55,11 +55,12 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     // 1. 우선 간단한 방법: 기본 스프레드시트를 생성하고 바로 공유
     console.log('📋 기본 스프레드시트 생성 중...');
     
-    // 2. Drive API로 직접 스프레드시트 파일 생성 (더 안정적)
+    // 2. 서비스 계정의 드라이브에 스프레드시트 생성 후 공유
     const createResponse = await drive.files.create({
       requestBody: {
         name: `${programData.program_title} - ${new Date().toLocaleDateString('ko-KR')}`,
-        mimeType: 'application/vnd.google-apps.spreadsheet'
+        mimeType: 'application/vnd.google-apps.spreadsheet',
+        parents: [] // 서비스 계정의 루트 폴더에 생성
       }
     });
 
