@@ -46,7 +46,7 @@ export function AdvancedSurveySection({
           data-testid="input-name"
           {...form.register("name")}
           placeholder="김파워"
-          className="bg-gray-800 border-gray-600 text-white text-lg p-4 text-center"
+          className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm text-lg p-4 text-center rounded-lg focus:border-white/50 transition-colors duration-200"
         />
       </div>
     </div>
@@ -67,7 +67,7 @@ export function AdvancedSurveySection({
           data-testid="input-email"
           {...form.register("email")}
           placeholder="example@email.com"
-          className="bg-gray-800 border-gray-600 text-white text-lg p-4 text-center"
+          className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm text-lg p-4 text-center rounded-lg focus:border-white/50 transition-colors duration-200"
         />
       </div>
     </div>
@@ -88,7 +88,7 @@ export function AdvancedSurveySection({
           data-testid="input-age"
           {...form.register("age")}
           placeholder="25"
-          className="bg-gray-800 border-gray-600 text-white text-lg p-4 text-center"
+          className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm text-lg p-4 text-center rounded-lg focus:border-white/50 transition-colors duration-200"
         />
       </div>
     </div>
@@ -109,11 +109,11 @@ export function AdvancedSurveySection({
           onValueChange={(value) => form.setValue("gender", value)}
           className="space-y-4"
         >
-          <div className="flex items-center space-x-3 p-4 border border-gray-600 rounded-lg hover:border-gray-400 transition-colors">
+          <div className="flex items-center space-x-3 p-4 border border-gray-600/50 rounded-xl hover:border-white/50 transition-all duration-200 backdrop-blur-sm hover:bg-white/5">
             <RadioGroupItem value="male" id="male" />
             <label htmlFor="male" className="text-gray-300 text-lg cursor-pointer">남성</label>
           </div>
-          <div className="flex items-center space-x-3 p-4 border border-gray-600 rounded-lg hover:border-gray-400 transition-colors">
+          <div className="flex items-center space-x-3 p-4 border border-gray-600/50 rounded-xl hover:border-white/50 transition-all duration-200 backdrop-blur-sm hover:bg-white/5">
             <RadioGroupItem value="female" id="female" />
             <label htmlFor="female" className="text-gray-300 text-lg cursor-pointer">여성</label>
           </div>
@@ -133,7 +133,7 @@ export function AdvancedSurveySection({
       
       <div className="space-y-8">
         {/* 스쿼트 분석 */}
-        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
+        <div className="bg-blue-900/30 border border-blue-400/30 rounded-xl p-6 backdrop-blur-sm">
           <h3 className="text-xl text-blue-300 mb-4">🦵 스쿼트 패턴</h3>
           
           <div className="space-y-4">
@@ -188,7 +188,7 @@ export function AdvancedSurveySection({
         </div>
 
         {/* 벤치프레스 분석 */}
-        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
+        <div className="bg-red-900/30 border border-red-400/30 rounded-xl p-6 backdrop-blur-sm">
           <h3 className="text-xl text-red-300 mb-4">💪 벤치프레스 패턴</h3>
           
           <div className="space-y-4">
@@ -243,7 +243,7 @@ export function AdvancedSurveySection({
         </div>
 
         {/* 데드리프트 분석 */}
-        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-6">
+        <div className="bg-green-900/30 border border-green-400/30 rounded-xl p-6 backdrop-blur-sm">
           <h3 className="text-xl text-green-300 mb-4">🏋️ 데드리프트 패턴</h3>
           
           <div className="space-y-4">
@@ -401,7 +401,7 @@ export function AdvancedSurveySection({
       </div>
       
       <div className="space-y-6">
-        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
+        <div className="bg-blue-900/30 border border-blue-400/30 rounded-xl p-6 backdrop-blur-sm">
           <h3 className="text-xl text-blue-300 mb-4">🎯 70% 1RM 테스트</h3>
           <p className="text-gray-300 mb-4">각 운동별로 70% 1RM으로 최대한 많은 반복을 수행해보세요.</p>
           
@@ -413,7 +413,7 @@ export function AdvancedSurveySection({
                 data-testid="input-squat-reps-70"
                 {...form.register("squatReps70")}
                 placeholder="예: 12"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
               />
             </div>
             <div>
@@ -423,7 +423,7 @@ export function AdvancedSurveySection({
                 data-testid="input-bench-reps-70"
                 {...form.register("benchReps70")}
                 placeholder="예: 10"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
               />
             </div>
             <div>
@@ -433,7 +433,7 @@ export function AdvancedSurveySection({
                 data-testid="input-deadlift-reps-70"
                 {...form.register("deadliftReps70")}
                 placeholder="예: 8"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
               />
             </div>
           </div>
@@ -489,7 +489,7 @@ export function AdvancedSurveySection({
               data-testid="input-squat-max"
               {...form.register("squatMax")}
               placeholder="100"
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
             />
           </div>
           <div>
@@ -499,7 +499,7 @@ export function AdvancedSurveySection({
               data-testid="input-bench-max"
               {...form.register("benchMax")}
               placeholder="80"
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
             />
           </div>
           <div>
@@ -509,7 +509,7 @@ export function AdvancedSurveySection({
               data-testid="input-deadlift-max"
               {...form.register("deadliftMax")}
               placeholder="120"
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
             />
           </div>
         </div>
@@ -522,7 +522,7 @@ export function AdvancedSurveySection({
               data-testid="input-bodyweight"
               {...form.register("bodyweight")}
               placeholder="70"
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
             />
           </div>
           <div>
@@ -636,7 +636,7 @@ export function AdvancedSurveySection({
             id="nextCompetition"
             {...form.register("nextCompetition")}
             placeholder="2025년 전국 파워리프팅 대회"
-            className="bg-gray-800 border-gray-600 text-white"
+            className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
           />
         </div>
       </div>
@@ -681,7 +681,7 @@ export function AdvancedSurveySection({
         <div>
           <Label className="text-white">한 번 훈련 시간</Label>
           <Select value={form.watch("trainingDuration")} onValueChange={(value) => form.setValue("trainingDuration", value)}>
-            <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+            <SelectTrigger className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200">
               <SelectValue placeholder="훈련 시간을 선택하세요" />
             </SelectTrigger>
             <SelectContent>
@@ -723,7 +723,7 @@ export function AdvancedSurveySection({
           <div>
             <Label className="text-white">스쿼트 빈도 (주간)</Label>
             <Select value={form.watch("squatFrequency")} onValueChange={(value) => form.setValue("squatFrequency", value)}>
-              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+              <SelectTrigger className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200">
                 <SelectValue placeholder="빈도" />
               </SelectTrigger>
               <SelectContent>
@@ -737,7 +737,7 @@ export function AdvancedSurveySection({
           <div>
             <Label className="text-white">벤치 빈도 (주간)</Label>
             <Select value={form.watch("benchFrequency")} onValueChange={(value) => form.setValue("benchFrequency", value)}>
-              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+              <SelectTrigger className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200">
                 <SelectValue placeholder="빈도" />
               </SelectTrigger>
               <SelectContent>
@@ -752,7 +752,7 @@ export function AdvancedSurveySection({
           <div>
             <Label className="text-white">데드리프트 빈도 (주간)</Label>
             <Select value={form.watch("deadliftFrequency")} onValueChange={(value) => form.setValue("deadliftFrequency", value)}>
-              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+              <SelectTrigger className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200">
                 <SelectValue placeholder="빈도" />
               </SelectTrigger>
               <SelectContent>
@@ -1224,7 +1224,7 @@ export function AdvancedSurveySection({
             id="injuryDetails"
             {...form.register("injuryDetails")}
             placeholder="예: 2023년 허리 디스크, 어깨 충돌 증후군 등"
-            className="bg-gray-800 border-gray-600 text-white"
+            className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
           />
         </div>
 
@@ -1275,7 +1275,7 @@ export function AdvancedSurveySection({
         <div>
           <Label className="text-white">평균 수면 시간</Label>
           <Select value={form.watch("sleepHours")} onValueChange={(value) => form.setValue("sleepHours", value)}>
-            <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+            <SelectTrigger className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200">
               <SelectValue placeholder="수면 시간을 선택하세요" />
             </SelectTrigger>
             <SelectContent>
@@ -1656,7 +1656,7 @@ export function AdvancedSurveySection({
               data-testid="input-sleep-hours"
               {...form.register("sleepHours")}
               placeholder="7.5"
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
             />
           </div>
           <div>
@@ -1804,7 +1804,7 @@ export function AdvancedSurveySection({
               data-testid="input-daily-protein"
               {...form.register("dailyProteinGrams")}
               placeholder="120"
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
             />
           </div>
         </div>
@@ -2186,7 +2186,7 @@ export function AdvancedSurveySection({
                 data-testid="input-squat-goal"
                 {...form.register("squatGoal")}
                 placeholder="120"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
               />
             </div>
             <div>
@@ -2196,7 +2196,7 @@ export function AdvancedSurveySection({
                 data-testid="input-bench-goal"
                 {...form.register("benchGoal")}
                 placeholder="100"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
               />
             </div>
             <div>
@@ -2206,7 +2206,7 @@ export function AdvancedSurveySection({
                 data-testid="input-deadlift-goal"
                 {...form.register("deadliftGoal")}
                 placeholder="150"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
               />
             </div>
           </div>
@@ -2219,7 +2219,7 @@ export function AdvancedSurveySection({
             data-testid="input-target-date"
             {...form.register("targetCompetitionDate")}
             placeholder="2025년 12월"
-            className="bg-gray-800 border-gray-600 text-white"
+            className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200"
           />
         </div>
 
@@ -2244,7 +2244,7 @@ export function AdvancedSurveySection({
         variant="outline"
         onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
         disabled={currentStep === 1}
-        className="border-gray-600 text-gray-300 hover:bg-gray-700"
+        className="border-gray-600/50 text-gray-300 hover:bg-white/10 hover:border-white/30 transition-all duration-200 rounded-lg backdrop-blur-sm"
         data-testid="button-previous"
       >
         이전
@@ -2258,7 +2258,7 @@ export function AdvancedSurveySection({
         <Button
           type="button"
           onClick={() => setCurrentStep(currentStep + 1)}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-white text-black px-8 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-200"
           data-testid="button-next"
         >
           다음
@@ -2268,7 +2268,7 @@ export function AdvancedSurveySection({
           type="button"
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="bg-green-600 hover:bg-green-700 text-white"
+          className="bg-white text-black px-8 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-200 disabled:opacity-50"
           data-testid="button-submit"
         >
           {isSubmitting ? '생성 중...' : '프로그램 생성'}
@@ -2305,8 +2305,9 @@ export function AdvancedSurveySection({
 
   if (currentStep === 21) {
     return (
-      <div className="max-w-4xl mx-auto px-8 py-16">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="max-w-4xl mx-auto px-8 py-16">
+          <div className="text-center bg-black/50 backdrop-blur-sm rounded-2xl p-12 border border-gray-700/50 shadow-2xl">
           <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-6" />
           <h2 className="text-3xl font-light text-white mb-4">프로그램 생성 완료!</h2>
           <p className="text-gray-400 mb-8">
@@ -2315,18 +2316,20 @@ export function AdvancedSurveySection({
           </p>
           <Button 
             onClick={() => window.location.href = '/'}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-white text-black px-8 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-200"
           >
             홈으로 돌아가기
           </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-8 py-16">
-      <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
+    <div className="min-h-screen bg-gray-900">
+      <div className="max-w-4xl mx-auto px-8 py-16">
+        <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 shadow-2xl">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm text-gray-400">
@@ -2336,9 +2339,9 @@ export function AdvancedSurveySection({
               {Math.round((currentStep / totalSteps) * 100)}% 완료
             </span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-800 rounded-full h-2 backdrop-blur-sm">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-white h-2 rounded-full transition-all duration-300 shadow-lg"
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             />
           </div>
@@ -2346,6 +2349,7 @@ export function AdvancedSurveySection({
 
         {renderCurrentStep()}
         {renderNavigation()}
+        </div>
       </div>
     </div>
   );
