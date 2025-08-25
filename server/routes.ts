@@ -50,8 +50,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const trainingProgram = await generateTrainingProgram(programData);
       
-      // Form 시트용 설문 데이터 추가
+      // Form 시트용 설문 데이터 추가 (56개 필드 전체 매핑)
       trainingProgram.survey_data = {
+        // 기본 정보
         timestamp: new Date().toISOString(),
         name: validatedData.name,
         email: validatedData.email,
@@ -59,9 +60,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         age: validatedData.age,
         height: validatedData.height,
         weight: validatedData.weight,
+        
+        // 목표 & 경험
         goal: Array.isArray(validatedData.goals) ? validatedData.goals.join(', ') : validatedData.goals,
         experience: validatedData.experience,
-        daysPerWeek: validatedData.frequency
+        daysPerWeek: validatedData.frequency,
+        
+        // 장비 접근성
+        equipment: Array.isArray(validatedData.equipment) ? validatedData.equipment.join(', ') : validatedData.equipment,
+        
+        // 부상 관련
+        injuries: validatedData.injuries,
+        injuryDetails: validatedData.injuryDetails,
+        
+        // 실제 스키마 필드들을 가능한 한 매핑
+        bodyweight: validatedData.bodyweight,
+        competitionExperience: validatedData.competitionExperience,
+        primaryGoal: validatedData.primaryGoal,
+        timeframe: validatedData.timeframe,
+        sessionsPerWeek: validatedData.sessionsPerWeek,
+        trainingDuration: validatedData.trainingDuration,
+        squatFrequency: validatedData.squatFrequency,
+        benchFrequency: validatedData.benchFrequency,
+        deadliftFrequency: validatedData.deadliftFrequency,
+        squatStyle: validatedData.squatStyle,
+        benchStyle: validatedData.benchStyle,
+        deadliftStyle: validatedData.deadliftStyle,
+        weakestLift: validatedData.weakestLift,
+        strongestLift: validatedData.strongestLift,
+        homeGym: validatedData.homeGym,
+        sleepHours: validatedData.sleepHours,
+        stressLevel: validatedData.stressLevel,
+        nutrition: validatedData.nutrition,
+        volumeTolerance: validatedData.volumeTolerance,
+        intensityPreference: validatedData.intensityPreference,
+        motivation: validatedData.motivation,
+        periodization: validatedData.periodization,
+        autoregulation: validatedData.autoregulation
       };
       
       // Update survey response with generated program

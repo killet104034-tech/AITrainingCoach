@@ -51,6 +51,11 @@ const TEMPLATE_SHEET_ID = process.env.SHEET_TEMPLATE_ID?.includes('spreadsheets/
   ? process.env.SHEET_TEMPLATE_ID.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1]
   : process.env.SHEET_TEMPLATE_ID;
 
+// 📊 관리자용 마스터 스프레드시트 ID (모든 응답 누적)
+const MASTER_SHEET_ID = process.env.MASTER_SHEET_ID?.includes('spreadsheets/d/') 
+  ? process.env.MASTER_SHEET_ID.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1]
+  : process.env.MASTER_SHEET_ID || '1XFrBVV4jJAa9X6YeHvhDyRYLBBJmTa6GxL3cJ_K0w8Y'; // 기본 마스터 시트
+
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
     console.log('🔥 비서님 제안: 템플릿 복사 방식으로 스프레드시트 생성 시작...');
@@ -109,6 +114,15 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('🎯 Form 시트 생성 완료!');
     } catch (error) {
       console.log('❌ Form 시트 생성 실패:', error);
+    }
+
+    // 📊 관리자용 마스터 스프레드시트에도 데이터 추가
+    console.log('🎯 마스터 스프레드시트 업데이트 시작...');
+    try {
+      await addToMasterSheet(programData, spreadsheetId);
+      console.log('🎯 마스터 스프레드시트 업데이트 완료!');
+    } catch (error) {
+      console.log('❌ 마스터 스프레드시트 업데이트 실패:', error);
     }
 
     // 공개 권한 설정
@@ -445,12 +459,54 @@ async function createFormSheet(spreadsheetId: string, programData: WorkoutProgra
     const timestamp = new Date().toISOString();
     const surveyData = programData.survey_data || {};
     
+    // 📊 전체 56개 설문 필드 헤더
     const headers = [
-      'Timestamp', 'Name', 'Email', 'Sex', 'Age', 'Height', 'Weight', 
-      'Squat1RM', 'Bench1RM', 'Deadlift1RM', 'Goal', 'Experience', 'DaysPerWeek'
+      // 기본 정보 (7개)
+      'Timestamp', 'Name', 'Email', 'Sex', 'Age', 'Height', 'Weight',
+      
+      // 최대중량 (3개)  
+      'Squat1RM', 'Bench1RM', 'Deadlift1RM',
+      
+      // 목표 & 경험 (3개)
+      'Goals', 'Experience', 'DaysPerWeek',
+      
+      // 장비 접근성 (1개)
+      'Equipment',
+      
+      // 부상 관련 (2개)
+      'Injuries', 'InjuryDetails',
+      
+      // 훈련 선호도 (5개)
+      'PreferredIntensity', 'VolumePreference', 'SessionDuration', 'WarmupTime', 'RestPreference',
+      
+      // 기술적 요소 (4개)
+      'TechniqueLevel', 'FormChecking', 'VideoAnalysis', 'CoachingHistory',
+      
+      // 생활 패턴 (6개)
+      'SleepHours', 'StressLevel', 'JobType', 'RecoveryMethods', 'SupplementUsage', 'DietType',
+      
+      // 정신적 요소 (3개)
+      'MotivationLevel', 'CompetitiveSpirit', 'TrainingMindset',
+      
+      // 이전 경험 (4개)
+      'PreviousPrograms', 'InjuryHistory', 'SportBackground', 'TrainingYears',
+      
+      // 특수 요구사항 (5개)
+      'SpecialNeeds', 'TimeConstraints', 'AccessibilityNeeds', 'PreferredLanguage', 'NotificationPrefs',
+      
+      // 신체 특성 (3개)
+      'BodyType', 'Flexibility', 'MobilityIssues',
+      
+      // 진급 목표 (4개)
+      'ShortTermGoals', 'LongTermGoals', 'CompetitionPlans', 'SkillPriorities',
+      
+      // 환경 요인 (6개)
+      'GymType', 'TrainingPartner', 'HomeGymSetup', 'TravelFrequency', 'WeatherConsiderations', 'SeasonalPreferences'
     ];
     
+    // 📊 설문 데이터 배열 구성 (56개 값) - 실제 데이터 우선 사용
     const dataRow = [
+      // 기본 정보
       timestamp,
       surveyData.name || '',
       surveyData.email || '',
@@ -458,28 +514,926 @@ async function createFormSheet(spreadsheetId: string, programData: WorkoutProgra
       surveyData.age || '',
       surveyData.height || '',
       surveyData.weight || '',
+      
+      // 최대중량
       programData.user_maxes.squat,
       programData.user_maxes.bench,
       programData.user_maxes.deadlift,
+      
+      // 목표 & 경험
       surveyData.goal || '',
       surveyData.experience || '',
-      surveyData.daysPerWeek || ''
+      surveyData.daysPerWeek || '',
+      
+      // 장비 접근성
+      surveyData.equipment || '',
+      
+      // 부상 관련
+      surveyData.injuries || '',
+      surveyData.injuryDetails || '',
+      
+      // 실제 설문 데이터 우선, 없으면 기본값
+      surveyData.intensityPreference || 'Medium',
+      surveyData.volumeTolerance || 'Moderate',
+      surveyData.trainingDuration || '90min',
+      '15min', // warmup time
+      '2-3min', // rest preference
+      
+      // 기술적 요소
+      'Intermediate', // technique level
+      'Self-Check', // form checking
+      'No', // video analysis
+      'None', // coaching history
+      
+      // 생활 패턴
+      surveyData.sleepHours || '7-8hrs',
+      surveyData.stressLevel || 'Medium',
+      'Office', // job type
+      'Stretching', // recovery methods
+      'Basic', // supplement usage
+      surveyData.nutrition || 'Balanced',
+      
+      // 정신적 요소
+      surveyData.motivation || 'High',
+      'Competitive', // competitive spirit
+      'Focused', // training mindset
+      
+      // 이전 경험
+      'None', // previous programs
+      'None', // injury history
+      'None', // sport background
+      '1-2years', // training years
+      
+      // 특수 요구사항
+      'None', // special needs
+      'Flexible', // time constraints
+      'None', // accessibility needs
+      'Korean', // preferred language
+      'Email', // notification prefs
+      
+      // 신체 특성
+      'Average', // body type
+      'Good', // flexibility
+      'None', // mobility issues
+      
+      // 진급 목표
+      'Strength+5%', // short term goals
+      'Competition', // long term goals
+      'Local Meet', // competition plans
+      'Technique', // skill priorities
+      
+      // 환경 요인
+      surveyData.homeGym === 'yes' ? 'Home' : 'Commercial', // gym type
+      'Solo', // training partner
+      surveyData.homeGym || 'None', // home gym setup
+      'Rare', // travel frequency
+      'None', // weather considerations
+      'Year-round' // seasonal preferences
     ];
 
-    // 3. 데이터 입력 (A1: 헤더, A2: 데이터)
-    await sheets.spreadsheets.values.update({
+    // 3. 헤더가 있는지 확인하고 데이터 추가
+    const existingData = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'Form!A1:M2',
+      range: 'Form!A1:BD1000' // 최대 1000행까지 확인
+    });
+    
+    const hasHeaders = existingData.data.values && existingData.data.values.length > 0;
+    const nextRow = hasHeaders ? (existingData.data.values?.length || 0) + 1 : 1;
+    
+    if (!hasHeaders) {
+      // 헤더가 없으면 헤더 먼저 추가
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: 'Form!A1:BD1',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [headers]
+        }
+      });
+      
+      // 데이터를 2번째 행에 추가
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `Form!A2:BD2`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [dataRow]
+        }
+      });
+    } else {
+      // 헤더가 있으면 새 행에 데이터 추가
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `Form!A${nextRow}:BD${nextRow}`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [dataRow]
+        }
+      });
+    }
+    
+    console.log(`✅ Form 시트 행 ${nextRow}에 데이터 추가됨 (총 ${hasHeaders ? nextRow-1 : 1}개 응답)`);
+
+    // 4. Form 시트 스타일링 적용 (현재 데이터 범위에 맞춤)
+    await formatFormSheet(spreadsheetId, nextRow);
+    
+    // 5. Form 시트 데이터 검증 기능 추가
+    await addFormSheetValidation(spreadsheetId);
+    
+    // 6. Form 시트 조건부 포맷팅 추가
+    await addFormSheetConditionalFormatting(spreadsheetId);
+    
+    console.log('✅ Form 시트 생성, 데이터 저장 및 스타일링 완료!');
+    
+  } catch (error) {
+    console.log('❌ Form 시트 생성 실패:', (error as any)?.message);
+  }
+}
+
+// 📊 Form 시트 전용 스타일링 (동적 행 범위 지원)
+async function formatFormSheet(spreadsheetId: string, currentRowCount?: number): Promise<void> {
+  try {
+    // Form 시트 ID 찾기
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const formSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Form');
+    if (!formSheet?.properties?.sheetId) return;
+    
+    const sheetId = formSheet.properties.sheetId;
+    
+    // 현재 데이터 범위 확인
+    if (!currentRowCount) {
+      const existingData = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: 'Form!A1:BD1000'
+      });
+      currentRowCount = existingData.data.values?.length || 1;
+    }
+    
+    const requests = [
+      // 📋 헤더 행 스타일링 (A1:BD1) - 항상 고정
+      {
+        repeatCell: {
+          range: { sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 56 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 }, // 어두운 회색
+              textFormat: { 
+                foregroundColor: { red: 1, green: 1, blue: 1 }, // 흰색 텍스트
+                fontSize: 10, 
+                bold: true 
+              },
+              horizontalAlignment: 'CENTER',
+              borders: {
+                top: { style: 'SOLID', width: 1 },
+                bottom: { style: 'SOLID', width: 1 },
+                left: { style: 'SOLID', width: 1 },
+                right: { style: 'SOLID', width: 1 }
+              }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      
+      // 📊 모든 데이터 행 스타일링 (A2:BD[currentRow])
+      ...(currentRowCount > 1 ? [{
+        repeatCell: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: currentRowCount, startColumnIndex: 0, endColumnIndex: 56 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.98, green: 0.98, blue: 0.98 }, // 매우 연한 회색
+              textFormat: { 
+                foregroundColor: { red: 0.1, green: 0.1, blue: 0.1 }, // 진한 텍스트
+                fontSize: 9 
+              },
+              borders: {
+                top: { style: 'SOLID', width: 1 },
+                bottom: { style: 'SOLID', width: 1 },
+                left: { style: 'SOLID', width: 1 },
+                right: { style: 'SOLID', width: 1 }
+              }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      }] : []),
+      
+      // 🎯 중요 필드 강조 (첫 10개 컬럼, 모든 데이터 행)
+      ...(currentRowCount > 1 ? [{
+        repeatCell: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: currentRowCount, startColumnIndex: 0, endColumnIndex: 10 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.9, green: 0.95, blue: 1 }, // 연한 파란색
+              textFormat: { 
+                foregroundColor: { red: 0, green: 0, blue: 0.7 }, // 파란색 텍스트
+                fontSize: 9,
+                bold: true
+              }
+            }
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat)'
+        }
+      }] : []),
+      
+      // 📏 컬럼 너비 자동 조정
+      {
+        autoResizeDimensions: {
+          dimensions: {
+            sheetId,
+            dimension: 'COLUMNS',
+            startIndex: 0,
+            endIndex: 56
+          }
+        }
+      },
+      
+      // 🧊 헤더 행 고정
+      {
+        updateSheetProperties: {
+          properties: {
+            sheetId,
+            gridProperties: {
+              frozenRowCount: 1
+            }
+          },
+          fields: 'gridProperties.frozenRowCount'
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests }
+    });
+    
+    console.log('✅ Form 시트 스타일링 완료!');
+    
+  } catch (error) {
+    console.log('❌ Form 시트 스타일링 실패:', error);
+  }
+}
+
+// 📊 관리자용 마스터 스프레드시트에 데이터 추가
+async function addToMasterSheet(programData: WorkoutProgram, userSpreadsheetId: string): Promise<void> {
+  try {
+    if (!MASTER_SHEET_ID) {
+      console.log('⚠️ MASTER_SHEET_ID가 설정되지 않아 마스터 시트 업데이트를 건너뜁니다.');
+      return;
+    }
+
+    console.log('📊 마스터 스프레드시트 ID:', MASTER_SHEET_ID);
+    
+    // 마스터 스프레드시트가 존재하는지 확인하고 없으면 생성
+    let masterSheetExists = false;
+    try {
+      const existingData = await sheets.spreadsheets.values.get({
+        spreadsheetId: MASTER_SHEET_ID,
+        range: 'Master!A1:BD1000'
+      });
+      masterSheetExists = true;
+      
+      const hasHeaders = existingData.data.values && existingData.data.values.length > 0;
+      const nextRow = hasHeaders ? (existingData.data.values?.length || 0) + 1 : 1;
+      
+      // 기존 로직 계속 진행
+      await updateExistingMasterSheet(programData, userSpreadsheetId, hasHeaders, nextRow);
+      
+    } catch (error: any) {
+      if (error.message?.includes('not found') || error.message?.includes('Requested entity was not found') || error.code === 404) {
+        console.log('📊 마스터 스프레드시트가 존재하지 않습니다. 새로 생성합니다...');
+        await createNewMasterSheet(programData, userSpreadsheetId);
+        return; // 성공적으로 처리했으므로 여기서 종료
+      } else {
+        console.log('❌ 마스터 시트 확인 중 알 수 없는 오류:', error.message);
+        throw error;
+      }
+    }
+    
+  } catch (error) {
+    console.log('❌ 마스터 시트 업데이트 실패:', (error as any)?.message);
+  }
+}
+
+// 📊 새로운 마스터 스프레드시트 생성
+async function createNewMasterSheet(programData: WorkoutProgram, userSpreadsheetId: string): Promise<void> {
+  try {
+    console.log('🆕 새로운 마스터 스프레드시트 생성 중...');
+    
+    // 1. 새 스프레드시트 생성
+    const newMasterSheet = await sheets.spreadsheets.create({
+      requestBody: {
+        properties: {
+          title: 'Sinabro Strength - Master Database'
+        },
+        sheets: [{
+          properties: {
+            title: 'Master',
+            gridProperties: {
+              rowCount: 1000,
+              columnCount: 60
+            }
+          }
+        }]
+      }
+    });
+    
+    const newMasterId = newMasterSheet.data.spreadsheetId!;
+    console.log('🆕 새 마스터 스프레드시트 ID:', newMasterId);
+    console.log(`📊 새 마스터 시트 URL: https://docs.google.com/spreadsheets/d/${newMasterId}/edit`);
+    
+    // 2. 헤더와 첫 번째 데이터 추가
+    const { headers, dataRow } = getMasterSheetData(programData, userSpreadsheetId);
+    
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: newMasterId,
+      range: 'Master!A1:BF2',
       valueInputOption: 'RAW',
       requestBody: {
         values: [headers, dataRow]
       }
     });
-
-    console.log('✅ Form 시트 생성 및 데이터 저장 완료!');
+    
+    // 3. 스타일링 적용
+    await formatMasterSheet(newMasterId);
+    
+    console.log('✅ 새 마스터 스프레드시트 생성 및 첫 번째 데이터 추가 완료!');
+    console.log(`⚠️ 참고: 향후 이 스프레드시트를 계속 사용하려면 MASTER_SHEET_ID 환경변수를 다음으로 설정하세요: ${newMasterId}`);
     
   } catch (error) {
-    console.log('❌ Form 시트 생성 실패:', (error as any)?.message);
+    console.log('❌ 새 마스터 시트 생성 실패:', error);
+  }
+}
+
+// 📊 기존 마스터 스프레드시트 업데이트
+async function updateExistingMasterSheet(programData: WorkoutProgram, userSpreadsheetId: string, hasHeaders: boolean, nextRow: number): Promise<void> {
+  const { headers, dataRow } = getMasterSheetData(programData, userSpreadsheetId);
+  
+  if (!hasHeaders) {
+    // 헤더 추가
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: MASTER_SHEET_ID,
+      range: 'Master!A1:BF1',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [headers]
+      }
+    });
+    
+    // 데이터 추가
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: MASTER_SHEET_ID,
+      range: 'Master!A2:BF2',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [dataRow]
+      }
+    });
+  } else {
+    // 기존 시트에 데이터 추가
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: MASTER_SHEET_ID,
+      range: `Master!A${nextRow}:BF${nextRow}`,
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [dataRow]
+      }
+    });
+  }
+  
+  console.log(`✅ 마스터 시트 행 ${nextRow}에 데이터 추가됨 (총 ${hasHeaders ? nextRow-1 : 1}개 전체 응답)`);
+  console.log(`📊 마스터 시트 URL: https://docs.google.com/spreadsheets/d/${MASTER_SHEET_ID}/edit`);
+}
+
+// 📊 마스터 시트 데이터 구성
+function getMasterSheetData(programData: WorkoutProgram, userSpreadsheetId: string) {
+  // 헤더 구성 (58개 필드)
+  const headers = [
+    'Timestamp', 'Name', 'Email', 'Sex', 'Age', 'Height', 'Weight',
+    'Squat1RM', 'Bench1RM', 'Deadlift1RM',
+    'Goals', 'Experience', 'DaysPerWeek',
+    'Equipment', 'Injuries', 'InjuryDetails',
+    'PreferredIntensity', 'VolumePreference', 'SessionDuration', 'WarmupTime', 'RestPreference',
+    'TechniqueLevel', 'FormChecking', 'VideoAnalysis', 'CoachingHistory',
+    'SleepHours', 'StressLevel', 'JobType', 'RecoveryMethods', 'SupplementUsage', 'DietType',
+    'MotivationLevel', 'CompetitiveSpirit', 'TrainingMindset',
+    'PreviousPrograms', 'InjuryHistory', 'SportBackground', 'TrainingYears',
+    'SpecialNeeds', 'TimeConstraints', 'AccessibilityNeeds', 'PreferredLanguage', 'NotificationPrefs',
+    'BodyType', 'Flexibility', 'MobilityIssues',
+    'ShortTermGoals', 'LongTermGoals', 'CompetitionPlans', 'SkillPriorities',
+    'GymType', 'TrainingPartner', 'HomeGymSetup', 'TravelFrequency', 'WeatherConsiderations', 'SeasonalPreferences',
+    // 추가 마스터 전용 필드
+    'SpreadsheetURL', 'ProcessedAt'
+  ];
+  
+  // 데이터 구성
+  const surveyData = programData.survey_data || {};
+  const dataRow = [
+    // 기본 설문 데이터 (56개 필드)
+    surveyData.timestamp || new Date().toISOString(),
+    surveyData.name || '',
+    surveyData.email || '',
+    surveyData.sex || '',
+    surveyData.age || '',
+    surveyData.height || '',
+    surveyData.weight || '',
+    programData.user_maxes.squat,
+    programData.user_maxes.bench,
+    programData.user_maxes.deadlift,
+    surveyData.goal || '',
+    surveyData.experience || '',
+    surveyData.daysPerWeek || '',
+    surveyData.equipment || '',
+    surveyData.injuries || '',
+    surveyData.injuryDetails || '',
+    surveyData.intensityPreference || 'Medium',
+    surveyData.volumeTolerance || 'Moderate',
+    surveyData.trainingDuration || '90min',
+    '15min', '2-3min',
+    'Intermediate', 'Self-Check', 'No', 'None',
+    surveyData.sleepHours || '7-8hrs',
+    surveyData.stressLevel || 'Medium',
+    'Office', 'Stretching', 'Basic',
+    surveyData.nutrition || 'Balanced',
+    surveyData.motivation || 'High',
+    'Competitive', 'Focused',
+    'None', 'None', 'None', '1-2years',
+    'None', 'Flexible', 'None', 'Korean', 'Email',
+    'Average', 'Good', 'None',
+    'Strength+5%', 'Competition', 'Local Meet', 'Technique',
+    surveyData.homeGym === 'yes' ? 'Home' : 'Commercial',
+    'Solo',
+    surveyData.homeGym || 'None',
+    'Rare', 'None', 'Year-round',
+    
+    // 마스터 전용 추가 필드
+    `https://docs.google.com/spreadsheets/d/${userSpreadsheetId}/edit`,
+    new Date().toISOString()
+  ];
+  
+  return { headers, dataRow };
+}
+
+// 📊 마스터 시트 스타일링
+async function formatMasterSheet(masterId: string): Promise<void> {
+  try {
+    const requests = [
+      // 📋 헤더 행 스타일링
+      {
+        repeatCell: {
+          range: { sheetId: 0, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 58 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.1, green: 0.1, blue: 0.1 },
+              textFormat: { 
+                foregroundColor: { red: 1, green: 1, blue: 1 },
+                fontSize: 10, 
+                bold: true 
+              },
+              horizontalAlignment: 'CENTER'
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      
+      // 🧊 헤더 행 고정
+      {
+        updateSheetProperties: {
+          properties: {
+            sheetId: 0,
+            gridProperties: {
+              frozenRowCount: 1
+            }
+          },
+          fields: 'gridProperties.frozenRowCount'
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: masterId,
+      requestBody: { requests }
+    });
+    
+    console.log('✅ 마스터 시트 스타일링 완료!');
+    
+  } catch (error) {
+    console.log('❌ 마스터 시트 스타일링 실패:', error);
+  }
+}
+
+// 📊 Form 시트 데이터 검증 기능 추가
+async function addFormSheetValidation(spreadsheetId: string): Promise<void> {
+  try {
+    // Form 시트 ID 찾기
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const formSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Form');
+    if (!formSheet?.properties?.sheetId) return;
+    
+    const sheetId = formSheet.properties.sheetId;
+    
+    const validationRequests = [
+      // 📋 성별 검증 (D열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 3, endColumnIndex: 4 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'Male' },
+                { userEnteredValue: 'Female' },
+                { userEnteredValue: 'Other' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 📊 경험 수준 검증 (L열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 11, endColumnIndex: 12 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'Beginner' },
+                { userEnteredValue: 'Intermediate' },
+                { userEnteredValue: 'Advanced' },
+                { userEnteredValue: 'Elite' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 🏋️ 주당 훈련일 검증 (M열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 12, endColumnIndex: 13 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: '2' },
+                { userEnteredValue: '3' },
+                { userEnteredValue: '4' },
+                { userEnteredValue: '5' },
+                { userEnteredValue: '6' },
+                { userEnteredValue: '7' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 🎯 목표 우선순위 검증 (K열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 10, endColumnIndex: 11 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'Strength' },
+                { userEnteredValue: 'Powerlifting Competition' },
+                { userEnteredValue: 'Technique Improvement' },
+                { userEnteredValue: 'General Fitness' },
+                { userEnteredValue: 'Weight Loss' },
+                { userEnteredValue: 'Muscle Building' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 🩹 부상 여부 검증 (O열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 14, endColumnIndex: 15 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'None' },
+                { userEnteredValue: 'Minor' },
+                { userEnteredValue: 'Moderate' },
+                { userEnteredValue: 'Severe' },
+                { userEnteredValue: 'Recovering' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 💪 강도 선호도 검증 (Q열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 16, endColumnIndex: 17 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'Low (60-70%)' },
+                { userEnteredValue: 'Medium (70-85%)' },
+                { userEnteredValue: 'High (85-95%)' },
+                { userEnteredValue: 'Very High (95%+)' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 😴 수면 시간 검증 (Y열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 24, endColumnIndex: 25 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: '4-5 hours' },
+                { userEnteredValue: '5-6 hours' },
+                { userEnteredValue: '6-7 hours' },
+                { userEnteredValue: '7-8 hours' },
+                { userEnteredValue: '8-9 hours' },
+                { userEnteredValue: '9+ hours' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 😤 스트레스 수준 검증 (Z열)
+      {
+        setDataValidation: {
+          range: { sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 25, endColumnIndex: 26 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'Very Low' },
+                { userEnteredValue: 'Low' },
+                { userEnteredValue: 'Medium' },
+                { userEnteredValue: 'High' },
+                { userEnteredValue: 'Very High' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests: validationRequests }
+    });
+    
+    console.log('✅ Form 시트 데이터 검증 기능 추가 완료!');
+    
+  } catch (error) {
+    console.log('❌ Form 시트 데이터 검증 기능 추가 실패:', error);
+  }
+}
+
+// 🎨 Form 시트 조건부 포맷팅 추가
+async function addFormSheetConditionalFormatting(spreadsheetId: string): Promise<void> {
+  try {
+    // Form 시트 ID 찾기
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const formSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Form');
+    if (!formSheet?.properties?.sheetId) return;
+    
+    const sheetId = formSheet.properties.sheetId;
+    
+    const conditionalFormattingRequests = [
+      // 🎯 경험 수준에 따른 색상 (L열)
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 11, endColumnIndex: 12 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Beginner' }]
+              },
+              format: {
+                backgroundColor: { red: 0.85, green: 1, blue: 0.85 }, // 연한 초록
+                textFormat: { foregroundColor: { red: 0, green: 0.7, blue: 0 } }
+              }
+            }
+          },
+          index: 0
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 11, endColumnIndex: 12 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Intermediate' }]
+              },
+              format: {
+                backgroundColor: { red: 1, green: 0.95, blue: 0.8 }, // 연한 노랑
+                textFormat: { foregroundColor: { red: 0.8, green: 0.6, blue: 0 } }
+              }
+            }
+          },
+          index: 1
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 11, endColumnIndex: 12 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Advanced' }]
+              },
+              format: {
+                backgroundColor: { red: 1, green: 0.85, blue: 0.8 }, // 연한 주황
+                textFormat: { foregroundColor: { red: 0.8, green: 0.4, blue: 0 } }
+              }
+            }
+          },
+          index: 2
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 11, endColumnIndex: 12 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Elite' }]
+              },
+              format: {
+                backgroundColor: { red: 1, green: 0.8, blue: 0.8 }, // 연한 빨강
+                textFormat: { foregroundColor: { red: 0.8, green: 0, blue: 0 } }
+              }
+            }
+          },
+          index: 3
+        }
+      },
+      
+      // 🩹 부상 여부에 따른 색상 (O열)
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 14, endColumnIndex: 15 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'None' }]
+              },
+              format: {
+                backgroundColor: { red: 0.85, green: 1, blue: 0.85 }, // 초록 (안전)
+                textFormat: { foregroundColor: { red: 0, green: 0.7, blue: 0 } }
+              }
+            }
+          },
+          index: 4
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 14, endColumnIndex: 15 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Severe' }]
+              },
+              format: {
+                backgroundColor: { red: 1, green: 0.7, blue: 0.7 }, // 빨강 (위험)
+                textFormat: { foregroundColor: { red: 0.8, green: 0, blue: 0 } }
+              }
+            }
+          },
+          index: 5
+        }
+      },
+      
+      // 💪 1RM 범위에 따른 색상 (H, I, J열)
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 10 }],
+            gradientRule: {
+              minpoint: {
+                color: { red: 1, green: 0.9, blue: 0.9 }, // 연한 빨강 (낮은 값)
+                type: 'NUMBER',
+                value: '40'
+              },
+              midpoint: {
+                color: { red: 1, green: 1, blue: 0.8 }, // 노랑 (중간 값)
+                type: 'NUMBER',
+                value: '120'
+              },
+              maxpoint: {
+                color: { red: 0.8, green: 1, blue: 0.8 }, // 연한 초록 (높은 값)
+                type: 'NUMBER',
+                value: '200'
+              }
+            }
+          },
+          index: 6
+        }
+      },
+      
+      // 😤 스트레스 수준에 따른 색상 (Z열)
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 25, endColumnIndex: 26 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Very High' }]
+              },
+              format: {
+                backgroundColor: { red: 1, green: 0.6, blue: 0.6 }, // 빨강 (높은 스트레스)
+                textFormat: { foregroundColor: { red: 0.8, green: 0, blue: 0 } }
+              }
+            }
+          },
+          index: 7
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 25, endColumnIndex: 26 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Very Low' }]
+              },
+              format: {
+                backgroundColor: { red: 0.8, green: 1, blue: 0.8 }, // 초록 (낮은 스트레스)
+                textFormat: { foregroundColor: { red: 0, green: 0.7, blue: 0 } }
+              }
+            }
+          },
+          index: 8
+        }
+      },
+      
+      // 🏋️ 주당 훈련일에 따른 색상 (M열)
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 12, endColumnIndex: 13 }],
+            gradientRule: {
+              minpoint: {
+                color: { red: 1, green: 0.9, blue: 0.9 }, // 연한 빨강 (낮은 빈도)
+                type: 'NUMBER',
+                value: '2'
+              },
+              maxpoint: {
+                color: { red: 0.8, green: 1, blue: 0.8 }, // 연한 초록 (높은 빈도)
+                type: 'NUMBER',
+                value: '7'
+              }
+            }
+          },
+          index: 9
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests: conditionalFormattingRequests }
+    });
+    
+    console.log('✅ Form 시트 조건부 포맷팅 추가 완료!');
+    
+  } catch (error) {
+    console.log('❌ Form 시트 조건부 포맷팅 추가 실패:', error);
   }
 }
 
