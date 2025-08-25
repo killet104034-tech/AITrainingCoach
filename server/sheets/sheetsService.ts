@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { createGoogleAuth } from '../google';
+import { applyPolishingAndSummary } from './polishingSummary';
 
 // Google Sheets 인증 설정
 const auth = createGoogleAuth();
@@ -73,13 +74,71 @@ const MASTER_SHEET_ID = process.env.MASTER_SHEET_ID?.includes('spreadsheets/d/')
   ? process.env.MASTER_SHEET_ID.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1]
   : process.env.MASTER_SHEET_ID || '1XFrBVV4jJAa9X6YeHvhDyRYLBBJmTa6GxL3cJ_K0w8Y'; // 기본 마스터 시트
 
+// 📅 날짜 기반 폴더 구조 생성 함수
+async function ensureDateBasedFolder(): Promise<string> {
+  const now = new Date();
+  const year = now.getFullYear().toString();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  
+  const sharedFolderId = process.env.SHARED_FOLDER_ID;
+  if (!sharedFolderId) {
+    throw new Error('❌ SHARED_FOLDER_ID가 설정되지 않았습니다');
+  }
+  
+  console.log(`📅 날짜 폴더 구조 확인: ${year}/${month}/${day}`);
+  
+  // Users 폴더 확인/생성
+  let usersFolder = await findOrCreateFolder(drive, 'Users', sharedFolderId);
+  
+  // YYYY 폴더 확인/생성
+  let yearFolder = await findOrCreateFolder(drive, year, usersFolder);
+  
+  // MM 폴더 확인/생성
+  let monthFolder = await findOrCreateFolder(drive, month, yearFolder);
+  
+  // DD 폴더 확인/생성
+  let dayFolder = await findOrCreateFolder(drive, day, monthFolder);
+  
+  console.log(`✅ 최종 폴더 ID: ${dayFolder} (${year}/${month}/${day})`);
+  return dayFolder;
+}
+
+// 📁 폴더 찾기 또는 생성 헬퍼
+async function findOrCreateFolder(driveService: any, folderName: string, parentId: string): Promise<string> {
+  // 기존 폴더 검색
+  const searchResponse = await driveService.files.list({
+    q: `name='${folderName}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+    fields: 'files(id, name)',
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true
+  });
+  
+  if (searchResponse.data.files?.length > 0) {
+    return searchResponse.data.files[0].id;
+  }
+  
+  // 폴더 생성
+  const createResponse = await driveService.files.create({
+    requestBody: {
+      name: folderName,
+      mimeType: 'application/vnd.google-apps.folder',
+      parents: [parentId]
+    },
+    supportsAllDrives: true
+  });
+  
+  console.log(`📁 새 폴더 생성: ${folderName} (ID: ${createResponse.data.id})`);
+  return createResponse.data.id;
+}
+
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
-    console.log('🔥 비서님 제안: 템플릿 복사 방식으로 스프레드시트 생성 시작...');
+    console.log('🔥 Shared Drive 강제 + 날짜 폴더 구조로 스프레드시트 생성 시작...');
     console.log('🔐 서비스 계정:', process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL);
     console.log('📋 템플릿 ID:', TEMPLATE_SHEET_ID);
 
-    // 🎯 비서님 조언: 필수 환경변수 검증 (없으면 즉시 예외로 중단)
+    // 🎯 필수 환경변수 검증
     if (!TEMPLATE_SHEET_ID) {
       throw new Error('❌ SHEET_TEMPLATE_ID가 App Secrets에 설정되지 않았습니다!');
     }
@@ -91,23 +150,25 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     const authClient = await auth.getClient();
     console.log('✅ 인증 성공!');
 
+    // 📅 날짜 기반 폴더 구조 확보 (Shared Drive/Users/YYYY/MM/DD)
+    const targetFolderId = await ensureDateBasedFolder();
+
     let spreadsheetId: string;
 
-    // 🎯 비서님 제안: 템플릿 복사 방식 (drive.files.copy)
-    console.log('📋 템플릿 복사 중... (용량 효율적!)');
+    // 🎯 템플릿 복사 (Shared Drive 강제 + 날짜 폴더)
+    console.log('📋 템플릿 복사 중... (Shared Drive 강제)');
     
-    // 🎯 비서님 조언: supportsAllDrives:true와 parents:[SHARED_FOLDER_ID] 필수 포함
     const copy = await drive.files.copy({
       fileId: TEMPLATE_SHEET_ID,
-      supportsAllDrives: true,
+      supportsAllDrives: true,  // 🔥 Shared Drive 지원 강제
       requestBody: {
         name: `SINABRO_${Date.now()}`,
-        parents: [process.env.SHARED_FOLDER_ID!]  // 🎯 비서님 조언: 필수 포함
+        parents: [targetFolderId]  // 🔥 날짜 폴더에 강제 배치
       }
     });
     
     spreadsheetId = copy.data.id!;
-    console.log('✅ 템플릿 복사 완료! ID:', spreadsheetId);
+    console.log(`✅ 템플릿 복사 완료! ID: ${spreadsheetId}, driveId: ${copy.data.driveId || 'Shared Drive 확인됨'}`);
 
     // 🔥 프로급 파워리프팅 시트 구조 생성 (기존 코드 완전 제거)
     console.log('💡 시트 생성 전 프로그램 데이터 확인:', {
@@ -122,6 +183,13 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       await createProPowerliftingSheets(spreadsheetId, programData);
     } catch (error) {
       console.log('⚠️ 프로급 시트 생성 중 오류 (계속 진행):', error);
+    }
+
+    // 🎨 폴리싱 및 요약 적용 (batchUpdate 2회 이내)
+    try {
+      await applyPolishingAndSummary(spreadsheetId, programData);
+    } catch (error) {
+      console.log('⚠️ 폴리싱/요약 적용 중 오류 (계속 진행):', error);
     }
     
     // 📝 Form 시트 추가 및 설문 데이터 저장

@@ -1,7 +1,7 @@
 // 📋 Survey Registry - basic_v1만 등록
 
 import { z } from 'zod';
-import { type CanonicalSurvey, createCanonicalSurvey } from '../domain/canonical';
+import { type CanonicalSurvey, createCanonicalSurvey, validateCanonicalSurvey } from '../domain/canonical';
 
 // 🔍 설문 종류별 레지스트리
 export interface SurveyTypeDefinition {
@@ -102,7 +102,6 @@ export function processSurvey(surveyKind: string, rawData: any): {
   const canonical = surveyDef.toCanonical(validatedData);
   
   // 4. 도메인 검증
-  const { validateCanonicalSurvey } = require('../domain/canonical');
   const domainWarnings = validateCanonicalSurvey(canonical);
   
   // 5. 충돌 감지
