@@ -236,14 +236,19 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       }
     });
 
-    // 5. 스프레드시트를 공개로 설정
-    await drive.permissions.create({
-      fileId: spreadsheetId,
-      requestBody: {
-        role: 'writer',
-        type: 'anyone'
-      }
-    });
+    // 5. 스프레드시트를 공개로 설정 (권한 문제 시 스킵)
+    try {
+      await drive.permissions.create({
+        fileId: spreadsheetId,
+        requestBody: {
+          role: 'writer',
+          type: 'anyone'
+        }
+      });
+      console.log('공개 권한 설정 완료');
+    } catch (permError) {
+      console.log('공개 권한 설정 실패 (스킵):', (permError as any)?.message);
+    }
 
     const spreadsheetUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit#gid=0`;
     console.log('최종 스프레드시트 URL:', spreadsheetUrl);
