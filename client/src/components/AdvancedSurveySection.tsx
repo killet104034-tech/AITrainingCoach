@@ -2278,6 +2278,11 @@ export function AdvancedSurveySection({
       case 13: return renderStep13();
       case 14: return renderStep14();
       case 15: return renderStep15();
+      case 16: return renderStep16();  // 😴 수면 및 회복 패턴
+      case 17: return renderStep17();  // 🥗 영양 및 보충제
+      case 18: return renderStep18();  // ⚙️ 프로그램 선호도
+      case 19: return renderStep19();  // 🏃 추가 운동 및 활동
+      case 20: return renderStep20();  // 🎯 최종 정보 및 목표
       default: return <div>단계 {currentStep} 준비중...</div>;
     }
   };
