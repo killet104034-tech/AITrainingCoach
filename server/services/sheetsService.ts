@@ -103,11 +103,18 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     
     console.log('✅ 템플릿 데이터 업데이트 완료!');
 
+    // 🎨 먼저 디자인부터 적용! (가장 중요)
+    console.log('🔥 스프레드시트 디자인 우선 적용!');
+    try {
+      await formatWorkoutSheet(spreadsheetId, 100);
+      console.log('✅ 스프레드시트 디자인 적용 완료!');
+    } catch (formatError) {
+      console.log('❌ 디자인 적용 실패:', formatError);
+    }
+
     // 🔥 실제 훈련 프로그램 데이터를 스프레드시트에 추가!
     try {
       console.log('📊 훈련 프로그램 스케줄 추가 중...');
-      console.log('🔍 프로그램 데이터 구조:', Object.keys(programData));
-      console.log('🔍 프로그램 데이터 전체:', JSON.stringify(programData, null, 2));
     
     // A8부터 실제 훈련 프로그램 시작
     let currentRow = 8;
@@ -169,14 +176,19 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
         }
       });
       console.log('✅ 훈련 프로그램 스케줄 추가 완료!');
-      
-      // 🎨 스프레드시트 포맷팅 적용 (프로페셔널한 디자인)
-      console.log('🎨 스프레드시트 디자인 적용 중...');
-      await formatWorkoutSheet(spreadsheetId, programScheduleData.length + currentRow);
-      console.log('✅ 스프레드시트 디자인 완료!');
     }
+    
     } catch (scheduleError) {
       console.log('❌ 훈련 프로그램 스케줄 추가 실패:', scheduleError);
+    }
+
+    // 🎨 스프레드시트 포맷팅 적용 (프로페셔널한 디자인) - 별도 실행
+    try {
+      console.log('🎨 스프레드시트 디자인 적용 중...');
+      await formatWorkoutSheet(spreadsheetId, 100); // 충분한 행 수로 설정
+      console.log('✅ 스프레드시트 디자인 완료!');
+    } catch (formatError) {
+      console.log('❌ 스프레드시트 디자인 적용 실패:', formatError);
     }
 
     // 공개 권한 설정
