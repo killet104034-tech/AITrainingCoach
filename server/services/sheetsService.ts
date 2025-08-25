@@ -43,7 +43,9 @@ export interface WorkoutProgram {
 }
 
 // 템플릿 스프레드시트 ID (환경변수로 설정 가능)
-const TEMPLATE_SHEET_ID = process.env.SHEET_TEMPLATE_ID;
+const TEMPLATE_SHEET_ID = process.env.SHEET_TEMPLATE_ID?.includes('spreadsheets/d/') 
+  ? process.env.SHEET_TEMPLATE_ID.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1]
+  : process.env.SHEET_TEMPLATE_ID;
 
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
