@@ -12,9 +12,20 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  // 🔑 Idempotency-Key 자동 생성 (운영 가드 요구사항)
+  const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  const headers: Record<string, string> = {
+    "Idempotency-Key": idempotencyKey,
+  };
+  
+  if (data) {
+    headers["Content-Type"] = "application/json";
+  }
+  
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
