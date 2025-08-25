@@ -958,8 +958,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 10단계: 약점 및 강점 분석
-  const renderStep10 = () => (
+  // 13단계: 약점 및 강점 분석
+  const renderStep13 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">📊 약점 및 강점 분석</h2>
@@ -1074,8 +1074,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 11단계: 장비 및 환경
-  const renderStep11 = () => (
+  // 14단계: 장비 및 환경
+  const renderStep14 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🏋️ 장비 및 환경</h2>
@@ -1238,8 +1238,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 13단계: 회복 및 라이프스타일
-  const renderStep13 = () => (
+  // 15단계: 회복 및 라이프스타일
+  const renderStep15 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">😴 회복 및 라이프스타일</h2>
@@ -1344,8 +1344,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 14단계: 과거 프로그램 경험
-  const renderStep14 = () => (
+  // 16단계: 과거 프로그램 경험
+  const renderStep16 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">📈 과거 프로그램 경험</h2>
@@ -1458,8 +1458,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 15단계: 멘탈 및 고급 설정
-  const renderStep15 = () => (
+  // 17단계: 멘탈 및 고급 설정
+  const renderStep17 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🧠 멘탈 및 고급 설정</h2>
@@ -1614,8 +1614,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 16단계: 수면 및 회복 패턴
-  const renderStep16 = () => (
+  // 18단계: 수면 및 회복 패턴
+  const renderStep18 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">😴 수면 및 회복 패턴</h2>

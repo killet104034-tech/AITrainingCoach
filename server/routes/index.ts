@@ -24,9 +24,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/program/:id", async (req, res) => {
     try {
       const programId = req.params.id;
-      const surveyResponse = await storage.getSurveyResponse(programId);
+      const surveyResponse = await storage.getSurveyResponseById(programId);
       
-      if (!surveyResponse?.program) {
+      if (!surveyResponse?.trainingProgram) {
         return res.status(404).json({
           success: false,
           error: "프로그램을 찾을 수 없습니다"
@@ -35,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         success: true,
-        program: surveyResponse.program
+        program: surveyResponse.trainingProgram
       });
     } catch (error) {
       console.error("Program retrieval error:", error);
