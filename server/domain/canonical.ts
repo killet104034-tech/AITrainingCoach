@@ -1,5 +1,4 @@
 // 📋 Canonical 모델 (전체 단일 입력)
-import type { SurveyKind } from '../surveys/registry';
 import type { ProgramPlan } from './program';
 
 export type CanonicalInput = {

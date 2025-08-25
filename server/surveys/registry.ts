@@ -2,11 +2,8 @@
 import { z, type ZodSchema } from 'zod';
 import type { CanonicalInput } from '../domain/canonical';
 
-export type SurveyKind = 'basic_v1' | 'coach_v2' | 'rehab_v1';
-
 export interface SurveySchema {
-  kind: SurveyKind;
-  version: string;     // "1.0.3"
+  version: string;     // "1.0.0"
   zod: ZodSchema<any>; // 입력 검증
   toCanonical: (raw: any) => CanonicalInput; // 변환기
   conflicts: (raw: any) => Conflict[];      // 사전 충돌 검사
@@ -284,9 +281,8 @@ function rehabV1Conflicts(raw: any): Conflict[] {
 }
 
 // 📋 Survey Registry
-export const SurveyRegistry: Record<SurveyKind, SurveySchema> = {
+export const SurveyRegistry: Record<string, SurveySchema> = {
   basic_v1: {
-    kind: 'basic_v1',
     version: '1.0.0',
     zod: basicV1Schema,
     toCanonical: basicV1ToCanonical,
@@ -294,7 +290,6 @@ export const SurveyRegistry: Record<SurveyKind, SurveySchema> = {
   },
   
   coach_v2: {
-    kind: 'coach_v2',
     version: '2.0.0',
     zod: coachV2Schema,
     toCanonical: coachV2ToCanonical,
@@ -302,7 +297,6 @@ export const SurveyRegistry: Record<SurveyKind, SurveySchema> = {
   },
   
   rehab_v1: {
-    kind: 'rehab_v1',
     version: '1.0.0',
     zod: rehabV1Schema,
     toCanonical: rehabV1ToCanonical,
@@ -311,7 +305,7 @@ export const SurveyRegistry: Record<SurveyKind, SurveySchema> = {
 };
 
 // 🔍 Registry 유틸리티 함수들
-export function getSurveySchema(kind: SurveyKind): SurveySchema {
+export function getSurveySchema(kind: string): SurveySchema {
   const schema = SurveyRegistry[kind];
   if (!schema) {
     throw new Error(`Unknown survey kind: ${kind}`);
@@ -319,7 +313,7 @@ export function getSurveySchema(kind: SurveyKind): SurveySchema {
   return schema;
 }
 
-export function validateSurvey(kind: SurveyKind, rawData: any): {
+export function validateSurvey(kind: string, rawData: any): {
   success: boolean;
   data?: any;
   errors?: string[];
@@ -359,7 +353,7 @@ export function validateSurvey(kind: SurveyKind, rawData: any): {
   }
 }
 
-export function processToCanonical(kind: SurveyKind, rawData: any): CanonicalInput {
+export function processToCanonical(kind: string, rawData: any): CanonicalInput {
   const schema = getSurveySchema(kind);
   return schema.toCanonical(rawData);
 }
