@@ -132,6 +132,57 @@ export interface CanonicalSurvey {
   sleepHours?: number;
   stressLevel?: 'low' | 'medium' | 'high';
   nutrition?: 'poor' | 'average' | 'good' | 'excellent';
+  
+  // ===== 추가 고급 필드들 =====
+  age?: number;
+  gender?: 'male' | 'female' | 'other';
+  height?: number;
+  armSpan?: number;
+  legLength?: number;
+  torsoLength?: number;
+  trainingYears?: number;
+  powerliftingYears?: number;
+  competitionExperience?: 'none' | 'local' | 'national' | 'international';
+  nextCompetition?: string;
+  squatReps70?: number;
+  benchReps70?: number;
+  deadliftReps70?: number;
+  targetCompetitionDate?: string;
+  strengthGoals?: {
+    squatGoal?: number;
+    benchGoal?: number;
+    deadliftGoal?: number;
+  };
+  sessionLength?: '60' | '90' | '120' | '150';
+  preferredDays?: string[];
+  timeOfDay?: 'morning' | 'afternoon' | 'evening';
+  liftingStyle?: 'raw' | 'equipped' | 'hybrid';
+  techniqueLevel?: {
+    squatTechnique?: 'beginner' | 'intermediate' | 'advanced';
+    benchTechnique?: 'beginner' | 'intermediate' | 'advanced';
+    deadliftTechnique?: 'beginner' | 'intermediate' | 'advanced';
+  };
+  weakPoints?: string[];
+  gymType?: 'commercial' | 'powerlifting' | 'home';
+  hasCoach?: 'yes' | 'no' | 'sometimes';
+  medicalClearance?: 'yes' | 'no' | 'partial';
+  sleepQuality?: 'poor' | 'fair' | 'good' | 'excellent';
+  recoveryMethods?: string[];
+  nutritionKnowledge?: 'beginner' | 'intermediate' | 'advanced';
+  dietaryRestrictions?: string[];
+  supplementUsage?: string[];
+  pastPrograms?: string[];
+  programPreferences?: {
+    autoregulation?: 'none' | 'rpe' | 'percentage';
+    variationFrequency?: 'low' | 'moderate' | 'high';
+    periodizationStyle?: 'linear' | 'conjugate' | 'daily_undulating';
+  };
+  otherSports?: string[];
+  cardioPreference?: 'none' | 'light' | 'moderate' | 'high';
+  mobilityWork?: 'none' | 'light' | 'moderate' | 'high';
+  additionalInfo?: string;
+  programLength?: '8' | '12' | '16' | '20';
+  communicationPreference?: 'email' | 'detailed' | 'simple';
   previousPrograms?: string[];
   volumeTolerance?: 'low' | 'medium' | 'high';
   intensityPreference?: 'low' | 'medium' | 'high';

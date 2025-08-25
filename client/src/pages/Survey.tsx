@@ -11,7 +11,7 @@ export default function Survey() {
   const { toast } = useToast();
 
   const submitSurvey = useMutation({
-    mutationFn: (data) => apiRequest("POST", "/api/surveys?kind=basic_v1", data),
+    mutationFn: (data) => apiRequest("POST", "/api/surveys?kind=advanced_v1", data),
     onSuccess: (response) => {
       toast({
         title: "🔥 파워리프팅 프로그램 생성 완료!",
