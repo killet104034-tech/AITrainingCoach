@@ -53,65 +53,55 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     console.log('🔐 서비스 계정:', process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL);
     console.log('📋 템플릿 ID:', TEMPLATE_SHEET_ID);
 
+    // 🎯 비서님 조언: 필수 환경변수 검증 (없으면 즉시 예외로 중단)
+    if (!TEMPLATE_SHEET_ID) {
+      throw new Error('❌ SHEET_TEMPLATE_ID가 App Secrets에 설정되지 않았습니다!');
+    }
+    if (!process.env.SHARED_FOLDER_ID) {
+      throw new Error('❌ SHARED_FOLDER_ID가 App Secrets에 설정되지 않았습니다!');
+    }
+
     // 인증 테스트
     const authClient = await auth.getClient();
     console.log('✅ 인증 성공!');
 
     let spreadsheetId: string;
 
-    if (TEMPLATE_SHEET_ID) {
-      // 🎯 비서님 제안: 템플릿 복사 방식 (drive.files.copy)
-      console.log('📋 템플릿 복사 중... (용량 효율적!)');
-      
-      const copy = await drive.files.copy({
-        fileId: TEMPLATE_SHEET_ID,
-        supportsAllDrives: true,
-        requestBody: {
-          name: `SINABRO_${Date.now()}`,
-          parents: [process.env.SHARED_FOLDER_ID || 'root']  // 🎯 비서님 제안: Shared Drive 필수
-        }
-      });
-      
-      spreadsheetId = copy.data.id!;
-      console.log('✅ 템플릿 복사 완료! ID:', spreadsheetId);
+    // 🎯 비서님 제안: 템플릿 복사 방식 (drive.files.copy)
+    console.log('📋 템플릿 복사 중... (용량 효율적!)');
+    
+    // 🎯 비서님 조언: supportsAllDrives:true와 parents:[SHARED_FOLDER_ID] 필수 포함
+    const copy = await drive.files.copy({
+      fileId: TEMPLATE_SHEET_ID,
+      supportsAllDrives: true,
+      requestBody: {
+        name: `SINABRO_${Date.now()}`,
+        parents: [process.env.SHARED_FOLDER_ID!]  // 🎯 비서님 조언: 필수 포함
+      }
+    });
+    
+    spreadsheetId = copy.data.id!;
+    console.log('✅ 템플릿 복사 완료! ID:', spreadsheetId);
 
-      // 핵심 데이터만 업데이트 (빠르고 효율적)
-      const updateData = [
-        ['Squat 1RM', programData.user_maxes.squat],
-        ['Bench 1RM', programData.user_maxes.bench],  
-        ['Deadlift 1RM', programData.user_maxes.deadlift],
-        ['프로그램명', programData.program_title],
-        ['생성일', new Date().toLocaleDateString('ko-KR')]
-      ];
-      
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: 'A1:B5', // 기본 시트의 첫 번째 영역
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: updateData
-        }
-      });
-      
-      console.log('✅ 템플릿 데이터 업데이트 완료!');
-      
-    } else {
-      // 기존 방식: 새로 생성 (템플릿이 없는 경우)
-      console.log('📋 기본 스프레드시트 생성 중...');
-      
-      const createResponse = await drive.files.create({
-        requestBody: {
-          name: `${programData.program_title} - ${new Date().toLocaleDateString('ko-KR')}`,
-          mimeType: 'application/vnd.google-apps.spreadsheet',
-        }
-      });
-
-      spreadsheetId = createResponse.data.id!;
-      console.log('✅ 스프레드시트 생성 완료! ID:', spreadsheetId);
-
-      // 기본 시트 생성
-      await createBasicSheets(spreadsheetId, programData);
-    }
+    // 핵심 데이터만 업데이트 (빠르고 효율적)
+    const updateData = [
+      ['Squat 1RM', programData.user_maxes.squat],
+      ['Bench 1RM', programData.user_maxes.bench],  
+      ['Deadlift 1RM', programData.user_maxes.deadlift],
+      ['프로그램명', programData.program_title],
+      ['생성일', new Date().toLocaleDateString('ko-KR')]
+    ];
+    
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'A1:B5', // 기본 시트의 첫 번째 영역
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: updateData
+      }
+    });
+    
+    console.log('✅ 템플릿 데이터 업데이트 완료!');
 
     // 공개 권한 설정
     try {
