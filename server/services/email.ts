@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { createWorkoutSpreadsheet, type WorkoutProgramData } from './googleSheets.js';
+import { createWorkoutSheet, type WorkoutProgram } from './sheetsService';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -27,9 +27,16 @@ export async function sendTrainingProgram(
   try {
     const parsedProgram = JSON.parse(program);
     
-    // 임시로 구글 스프레드시트 기능 비활성화 (설정 완료 시 활성화 예정)
+    // 구글 스프레드시트 생성
     let spreadsheetUrl = '#';
-    console.log('구글 스프레드시트 기능은 현재 설정 중입니다. 이메일에 표 형태로 프로그램을 제공합니다.');
+    try {
+      console.log('구글 스프레드시트 생성 시작...');
+      spreadsheetUrl = await createWorkoutSheet(parsedProgram);
+      console.log('✅ 구글 스프레드시트 생성 성공:', spreadsheetUrl);
+    } catch (error) {
+      console.log('❌ 스프레드시트 생성 실패:', (error as Error)?.message);
+      // 실패해도 이메일은 보내기
+    }
     
     const htmlContent = `
     <!DOCTYPE html>
