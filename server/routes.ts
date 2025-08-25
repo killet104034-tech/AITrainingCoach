@@ -9,6 +9,15 @@ import { sendTrainingProgram } from "./services/email";
 import { createWorkoutSheet } from "./services/sheetsService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // 🔧 임시: 환경변수 디버깅 엔드포인트
+  app.get('/debug-env', (req, res) => {
+    res.json({
+      SHEET_TEMPLATE_ID: process.env.SHEET_TEMPLATE_ID || 'NOT_SET',
+      SHARED_FOLDER_ID: process.env.SHARED_FOLDER_ID || 'NOT_SET',
+      has_google_creds: !!(process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY)
+    });
+  });
+  
   // Serve attached assets (images, etc.) statically
   app.use('/api/assets', express.static(path.resolve(import.meta.dirname, '..', 'attached_assets')));
   // Survey submission endpoint
