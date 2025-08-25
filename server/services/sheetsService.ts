@@ -169,6 +169,11 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
         }
       });
       console.log('✅ 훈련 프로그램 스케줄 추가 완료!');
+      
+      // 🎨 스프레드시트 포맷팅 적용 (프로페셔널한 디자인)
+      console.log('🎨 스프레드시트 디자인 적용 중...');
+      await formatWorkoutSheet(spreadsheetId, programScheduleData.length + currentRow);
+      console.log('✅ 스프레드시트 디자인 완료!');
     }
     } catch (scheduleError) {
       console.log('❌ 훈련 프로그램 스케줄 추가 실패:', scheduleError);
@@ -196,6 +201,157 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
   } catch (error) {
     console.error('구글 스프레드시트 생성 실패:', error);
     throw new Error(`구글 스프레드시트 생성 실패: ${(error as any)?.message || 'Unknown error'}`);
+  }
+}
+
+// 🎨 프로페셔널한 스프레드시트 포맷팅 함수
+async function formatWorkoutSheet(spreadsheetId: string, totalRows: number): Promise<void> {
+  try {
+    const requests = [
+      // 전체 시트 기본 스타일
+      {
+        repeatCell: {
+          range: {
+            sheetId: 0,
+            startRowIndex: 0,
+            endRowIndex: totalRows,
+            startColumnIndex: 0,
+            endColumnIndex: 7
+          },
+          cell: {
+            userEnteredFormat: {
+              textFormat: {
+                fontFamily: 'Noto Sans KR',
+                fontSize: 10
+              },
+              borders: {
+                top: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+                bottom: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+                left: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+                right: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } }
+              }
+            }
+          },
+          fields: 'userEnteredFormat(textFormat,borders)'
+        }
+      },
+      
+      // 메인 헤더 (1-5행) 스타일
+      {
+        repeatCell: {
+          range: {
+            sheetId: 0,
+            startRowIndex: 0,
+            endRowIndex: 6,
+            startColumnIndex: 0,
+            endColumnIndex: 7
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.1, green: 0.1, blue: 0.1 },
+              textFormat: {
+                foregroundColor: { red: 1, green: 1, blue: 1 },
+                fontSize: 12,
+                bold: true
+              },
+              horizontalAlignment: 'LEFT',
+              verticalAlignment: 'MIDDLE'
+            }
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+        }
+      },
+      
+      // 훈련 프로그램 제목 헤더
+      {
+        repeatCell: {
+          range: {
+            sheetId: 0,
+            startRowIndex: 8,
+            endRowIndex: 10,
+            startColumnIndex: 0,
+            endColumnIndex: 7
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.2, green: 0.3, blue: 0.8 },
+              textFormat: {
+                foregroundColor: { red: 1, green: 1, blue: 1 },
+                fontSize: 14,
+                bold: true
+              },
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE'
+            }
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+        }
+      },
+      
+      // 컬럼 헤더 스타일 (운동, 세트, 렙수 등)
+      {
+        repeatCell: {
+          range: {
+            sheetId: 0,
+            startRowIndex: 11,
+            endRowIndex: 12,
+            startColumnIndex: 0,
+            endColumnIndex: 7
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.4, green: 0.4, blue: 0.4 },
+              textFormat: {
+                foregroundColor: { red: 1, green: 1, blue: 1 },
+                fontSize: 11,
+                bold: true
+              },
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE'
+            }
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+        }
+      },
+      
+      // 컬럼 너비 자동 조정
+      {
+        autoResizeDimensions: {
+          dimensions: {
+            sheetId: 0,
+            dimension: 'COLUMNS',
+            startIndex: 0,
+            endIndex: 7
+          }
+        }
+      },
+      
+      // 행 높이 조정
+      {
+        updateDimensionProperties: {
+          range: {
+            sheetId: 0,
+            dimension: 'ROWS',
+            startIndex: 0,
+            endIndex: totalRows
+          },
+          properties: {
+            pixelSize: 25
+          },
+          fields: 'pixelSize'
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests
+      }
+    });
+    
+  } catch (error) {
+    console.log('포맷팅 적용 실패 (스킵):', (error as any)?.message);
   }
 }
 
