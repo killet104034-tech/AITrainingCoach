@@ -584,13 +584,45 @@ export function AdvancedSurveySection({
   const renderStep6 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-light text-white mb-3">목표 설정</h2>
-        <p className="text-gray-400">훈련 기간과 목표를 설정해주세요</p>
+        <h2 className="text-3xl font-light text-white mb-3">🎯 목표 설정</h2>
+        <p className="text-gray-400">훈련 목표와 기간을 설정해주세요</p>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
-          <Label className="text-white">훈련 기간 목표 *</Label>
+          <Label className="text-white">훈련 목표 (복수 선택 가능) *</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {[
+              { value: "strength", label: "근력 향상" },
+              { value: "powerlifting", label: "파워리프팅 대회 준비" },
+              { value: "muscle", label: "근육량 증가" },
+              { value: "technique", label: "기술 개선" },
+              { value: "endurance", label: "지구력 향상" },
+              { value: "rehabilitation", label: "재활 및 부상 예방" },
+              { value: "weight_loss", label: "체중 감량" },
+              { value: "general_fitness", label: "전반적인 건강" }
+            ].map((goal) => (
+              <div key={goal.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`goal-${goal.value}`}
+                  checked={form.watch("goals")?.includes(goal.value) || false}
+                  onCheckedChange={(checked) => {
+                    const currentGoals = form.watch("goals") || [];
+                    if (checked) {
+                      form.setValue("goals", [...currentGoals, goal.value]);
+                    } else {
+                      form.setValue("goals", currentGoals.filter(g => g !== goal.value));
+                    }
+                  }}
+                />
+                <label htmlFor={`goal-${goal.value}`} className="text-gray-300">{goal.label}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-white">훈련 기간 목표</Label>
           <RadioGroup 
             value={form.watch("trainingDuration")} 
             onValueChange={(value) => form.setValue("trainingDuration", value)}
