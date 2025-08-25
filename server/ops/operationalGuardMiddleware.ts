@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { operationalGuard, generateCanonicalHash, generateUserKey, OperationalError, ErrorCategory } from '../services/operationalGuard';
+import { operationalGuard, generateCanonicalHash, generateUserKey, OperationalError, ErrorCategory } from './operationalGuard';
 import { z } from 'zod';
 
 // 🔒 운영 가드 미들웨어

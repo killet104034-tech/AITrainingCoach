@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { createWorkoutSheet, type WorkoutProgram } from './sheetsService';
+import { createWorkoutSheet, type WorkoutProgram } from '../sheets/sheetsService';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
