@@ -134,6 +134,15 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ 3단계 실패:', error);
     }
 
+    // 📋 4단계: 드롭다운 + 유효성 검증
+    console.log('🎯 4단계 시작: 드롭다운 + 유효성 검증...');
+    try {
+      await addAdvancedValidation(spreadsheetId);
+      console.log('🎯 4단계 완료: 드롭다운 + 유효성 검증 완료!');
+    } catch (error) {
+      console.log('❌ 4단계 실패:', error);
+    }
+
     // 📊 관리자용 마스터 스프레드시트에도 데이터 추가
     console.log('🎯 마스터 스프레드시트 업데이트 시작...');
     try {
@@ -1149,6 +1158,300 @@ async function applyAdvancedStyling(spreadsheetId: string): Promise<void> {
     
   } catch (error) {
     console.log('❌ 고급 스타일링 실패:', error);
+  }
+}
+
+// 📋 4단계: 드롭다운 + 유효성 검증
+async function addAdvancedValidation(spreadsheetId: string): Promise<void> {
+  try {
+    console.log('📋 고급 드롭다운 및 유효성 검증 추가 중...');
+    
+    // Form 시트와 Program 시트 정보 가져오기
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const formSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Form');
+    const programSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Program');
+    
+    if (!formSheet?.properties?.sheetId || !programSheet?.properties?.sheetId) {
+      console.log('❌ 시트를 찾을 수 없습니다');
+      return;
+    }
+    
+    const formSheetId = formSheet.properties.sheetId;
+    const programSheetId = programSheet.properties.sheetId;
+    
+    const validationRequests = [
+      // 📊 Form 시트 고급 검증
+      // 1. 나이 범위 검증 (C열)
+      {
+        setDataValidation: {
+          range: { sheetId: formSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 2, endColumnIndex: 3 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '15' },
+                { userEnteredValue: '80' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '나이는 15-80 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 2. 체중 범위 검증 (E열)
+      {
+        setDataValidation: {
+          range: { sheetId: formSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 4, endColumnIndex: 5 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '30' },
+                { userEnteredValue: '200' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '체중은 30-200kg 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 3. 신장 범위 검증 (F열)
+      {
+        setDataValidation: {
+          range: { sheetId: formSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 5, endColumnIndex: 6 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '140' },
+                { userEnteredValue: '220' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '신장은 140-220cm 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 4. 1RM 범위 검증 (H, I, J열 - Squat, Bench, Deadlift)
+      {
+        setDataValidation: {
+          range: { sheetId: formSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 10 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '20' },
+                { userEnteredValue: '400' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '1RM은 20-400kg 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 5. 훈련 경험 년수 검증 (G열)
+      {
+        setDataValidation: {
+          range: { sheetId: formSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 6, endColumnIndex: 7 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '0' },
+                { userEnteredValue: '50' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '훈련 경험은 0-50년 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 📊 Program 시트 고급 검증
+      // 1. 주차 범위 검증 (A열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 0, endColumnIndex: 1 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '1' },
+                { userEnteredValue: '18' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '주차는 1-18 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 2. 블록 검증 (B열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 1, endColumnIndex: 2 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'Block 1' },
+                { userEnteredValue: 'Block 2' },
+                { userEnteredValue: 'Block 3' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 3. 일차 검증 (C열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 2, endColumnIndex: 3 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: 'Day 1' },
+                { userEnteredValue: 'Day 2' },
+                { userEnteredValue: 'Day 3' },
+                { userEnteredValue: 'Day 4' },
+                { userEnteredValue: 'Day 5' },
+                { userEnteredValue: 'Day 6' },
+                { userEnteredValue: 'Day 7' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 4. 세트 수 검증 (E열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 4, endColumnIndex: 5 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '1' },
+                { userEnteredValue: '10' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '세트 수는 1-10 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 5. 반복 수 검증 (F열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 5, endColumnIndex: 6 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '1' },
+                { userEnteredValue: '20' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '반복 수는 1-20 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 6. 중량 퍼센트 검증 (G열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 6, endColumnIndex: 7 },
+          rule: {
+            condition: {
+              type: 'NUMBER_BETWEEN',
+              values: [
+                { userEnteredValue: '30' },
+                { userEnteredValue: '110' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true,
+            inputMessage: '중량 %는 30-110% 사이여야 합니다'
+          }
+        }
+      },
+      
+      // 7. RPE 검증 (H열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 7, endColumnIndex: 8 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: '6' },
+                { userEnteredValue: '6.5' },
+                { userEnteredValue: '7' },
+                { userEnteredValue: '7.5' },
+                { userEnteredValue: '8' },
+                { userEnteredValue: '8.5' },
+                { userEnteredValue: '9' },
+                { userEnteredValue: '9.5' },
+                { userEnteredValue: '10' },
+                { userEnteredValue: 'N/A' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      },
+      
+      // 8. 휴식 시간 검증 (I열)
+      {
+        setDataValidation: {
+          range: { sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 8, endColumnIndex: 9 },
+          rule: {
+            condition: {
+              type: 'ONE_OF_LIST',
+              values: [
+                { userEnteredValue: '1-2' },
+                { userEnteredValue: '2-3' },
+                { userEnteredValue: '3-4' },
+                { userEnteredValue: '4-5' },
+                { userEnteredValue: '5+' }
+              ]
+            },
+            showCustomUi: true,
+            strict: true
+          }
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests: validationRequests }
+    });
+    
+    console.log('✅ 고급 드롭다운 및 유효성 검증 완료!');
+    
+  } catch (error) {
+    console.log('❌ 고급 드롭다운 및 유효성 검증 실패:', error);
   }
 }
 
