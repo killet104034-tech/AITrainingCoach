@@ -125,6 +125,15 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ Program 시트 생성 실패:', error);
     }
 
+    // 🎨 3단계: 고급 스타일링 + 고정 기능
+    console.log('🎯 3단계 시작: 고급 스타일링 + 고정 기능...');
+    try {
+      await applyAdvancedStyling(spreadsheetId);
+      console.log('🎯 3단계 완료: 고급 스타일링 + 고정 기능 완료!');
+    } catch (error) {
+      console.log('❌ 3단계 실패:', error);
+    }
+
     // 📊 관리자용 마스터 스프레드시트에도 데이터 추가
     console.log('🎯 마스터 스프레드시트 업데이트 시작...');
     try {
@@ -890,6 +899,256 @@ async function formatProgramSheet(spreadsheetId: string): Promise<void> {
     
   } catch (error) {
     console.log('❌ Program 시트 스타일링 실패:', error);
+  }
+}
+
+// 🎨 3단계: 고급 스타일링 + 고정 기능
+async function applyAdvancedStyling(spreadsheetId: string): Promise<void> {
+  try {
+    console.log('🎨 고급 스타일링 적용 중...');
+    
+    // Form 시트와 Program 시트 정보 가져오기
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const formSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Form');
+    const programSheet = spreadsheet.data.sheets?.find(sheet => sheet.properties?.title === 'Program');
+    
+    if (!formSheet?.properties?.sheetId || !programSheet?.properties?.sheetId) {
+      console.log('❌ 시트를 찾을 수 없습니다');
+      return;
+    }
+    
+    const formSheetId = formSheet.properties.sheetId;
+    const programSheetId = programSheet.properties.sheetId;
+    
+    const requests = [
+      // 📌 Form 시트 고급 스타일링
+      // 1. 블록별 색상 구분 (중요 필드군)
+      {
+        repeatCell: {
+          range: { sheetId: formSheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 7 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.8, green: 0.2, blue: 0.2 }, // 개인정보 (빨강)
+              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      {
+        repeatCell: {
+          range: { sheetId: formSheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 7, endColumnIndex: 14 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.2, green: 0.4, blue: 0.8 }, // 운동정보 (파랑)
+              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      {
+        repeatCell: {
+          range: { sheetId: formSheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 14, endColumnIndex: 21 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 0.2, green: 0.7, blue: 0.3 }, // 목표/건강 (초록)
+              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+            }
+          },
+          fields: 'userEnteredFormat'
+        }
+      },
+      
+      // 2. Form 시트 교대 행 색상 (읽기 쉽게)
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId: formSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 0, endColumnIndex: 56 }],
+            booleanRule: {
+              condition: {
+                type: 'CUSTOM_FORMULA',
+                values: [{ userEnteredValue: '=MOD(ROW(),2)=0' }]
+              },
+              format: {
+                backgroundColor: { red: 0.97, green: 0.97, blue: 0.97 } // 연한 회색
+              }
+            }
+          },
+          index: 100
+        }
+      },
+      
+      // 📌 Program 시트 고급 스타일링
+      // 1. 블록별 구분선
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 0, endColumnIndex: 15 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Block 1' }]
+              },
+              format: {
+                backgroundColor: { red: 0.9, green: 0.95, blue: 1 } // 연한 파랑 (Block 1)
+              }
+            }
+          },
+          index: 200
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 0, endColumnIndex: 15 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Block 2' }]
+              },
+              format: {
+                backgroundColor: { red: 0.95, green: 1, blue: 0.9 } // 연한 초록 (Block 2)
+              }
+            }
+          },
+          index: 201
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 0, endColumnIndex: 15 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_EQ',
+                values: [{ userEnteredValue: 'Block 3' }]
+              },
+              format: {
+                backgroundColor: { red: 1, green: 0.95, blue: 0.9 } // 연한 주황 (Block 3)
+              }
+            }
+          },
+          index: 202
+        }
+      },
+      
+      // 2. 주요 파워리프팅 운동 강조
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 3, endColumnIndex: 4 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_CONTAINS',
+                values: [{ userEnteredValue: 'Squat' }]
+              },
+              format: {
+                backgroundColor: { red: 1, green: 0.8, blue: 0.8 }, // 연한 빨강 (스쿼트)
+                textFormat: { bold: true, foregroundColor: { red: 0.8, green: 0, blue: 0 } }
+              }
+            }
+          },
+          index: 203
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 3, endColumnIndex: 4 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_CONTAINS',
+                values: [{ userEnteredValue: 'Bench' }]
+              },
+              format: {
+                backgroundColor: { red: 0.8, green: 0.8, blue: 1 }, // 연한 파랑 (벤치)
+                textFormat: { bold: true, foregroundColor: { red: 0, green: 0, blue: 0.8 } }
+              }
+            }
+          },
+          index: 204
+        }
+      },
+      {
+        addConditionalFormatRule: {
+          rule: {
+            ranges: [{ sheetId: programSheetId, startRowIndex: 1, endRowIndex: 500, startColumnIndex: 3, endColumnIndex: 4 }],
+            booleanRule: {
+              condition: {
+                type: 'TEXT_CONTAINS',
+                values: [{ userEnteredValue: 'Deadlift' }]
+              },
+              format: {
+                backgroundColor: { red: 0.8, green: 1, blue: 0.8 }, // 연한 초록 (데드리프트)
+                textFormat: { bold: true, foregroundColor: { red: 0, green: 0.7, blue: 0 } }
+              }
+            }
+          },
+          index: 205
+        }
+      },
+      
+      // 📌 고급 고정 기능
+      // 1. Form 시트: 첫 번째 행과 첫 번째 열 고정
+      {
+        updateSheetProperties: {
+          properties: {
+            sheetId: formSheetId,
+            gridProperties: {
+              frozenRowCount: 1,
+              frozenColumnCount: 1
+            }
+          },
+          fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount'
+        }
+      },
+      
+      // 2. Program 시트: 첫 번째 행과 첫 3개 열 고정 (Week, Block, Day)
+      {
+        updateSheetProperties: {
+          properties: {
+            sheetId: programSheetId,
+            gridProperties: {
+              frozenRowCount: 1,
+              frozenColumnCount: 3
+            }
+          },
+          fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount'
+        }
+      },
+      
+      // 📌 추가 서식 개선
+      // 1. 모든 셀 테두리 추가
+      {
+        updateBorders: {
+          range: { sheetId: formSheetId, startRowIndex: 0, endRowIndex: 100, startColumnIndex: 0, endColumnIndex: 56 },
+          top: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+          bottom: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+          left: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+          right: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } }
+        }
+      },
+      {
+        updateBorders: {
+          range: { sheetId: programSheetId, startRowIndex: 0, endRowIndex: 200, startColumnIndex: 0, endColumnIndex: 15 },
+          top: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+          bottom: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+          left: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } },
+          right: { style: 'SOLID', width: 1, color: { red: 0.8, green: 0.8, blue: 0.8 } }
+        }
+      }
+    ];
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: { requests }
+    });
+    
+    console.log('✅ 고급 스타일링 완료!');
+    
+  } catch (error) {
+    console.log('❌ 고급 스타일링 실패:', error);
   }
 }
 
