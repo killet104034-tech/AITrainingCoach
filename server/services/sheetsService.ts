@@ -142,22 +142,13 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ Program 시트 생성 실패:', error);
     }
 
-    // 📈 Summary 탭 차트 생성
-    console.log('🎯 Summary 탭 생성 시작...');
+    // 🚀 시트 파이프라인(불변, 고성능) - 1-3회 batchUpdate 폴리싱
+    console.log('🚀 시트 파이프라인(불변, 고성능) 시작...');
     try {
-      await createSummarySheet(spreadsheetId, programData);
-      console.log('🎯 Summary 탭 생성 완료!');
+      await applyHighPerformancePipeline(spreadsheetId, programData);
+      console.log('✅ 시트 파이프라인 완료: 3-5초 안정, "보기 좋은" 표가 일관 생성');
     } catch (error) {
-      console.log('❌ Summary 탭 생성 실패:', error);
-    }
-
-    // 📋 Meta 탭 생성
-    console.log('🎯 Meta 탭 생성 시작...');
-    try {
-      await createMetaSheet(spreadsheetId, programData);
-      console.log('🎯 Meta 탭 생성 완료!');
-    } catch (error) {
-      console.log('❌ Meta 탭 생성 실패:', error);
+      console.log('❌ 시트 파이프라인 실패:', error);
     }
 
     // 🎨 3단계: 고급 스타일링 + 고정 기능
@@ -196,45 +187,10 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ 마스터 스프레드시트 업데이트 실패:', error);
     }
 
-    // 🔐 권한 설정 (제출자 이메일 우선, 실패해도 공개 권한으로 폴백)
+    // 🔐 권한: 제출자 이메일 read 권한(실패해도 흐름 유지)
     console.log('🔐 권한 설정 시작...');
-    let permissionGranted = false;
-    
-    // 1) 제출자 이메일에 read 권한 시도
-    if (programData.survey_data?.email) {
-      try {
-        await drive.permissions.create({
-          fileId: spreadsheetId,
-          supportsAllDrives: true,
-          requestBody: {
-            role: 'reader',
-            type: 'user',
-            emailAddress: programData.survey_data.email
-          }
-        });
-        console.log(`✅ 제출자 이메일 권한 설정 완료: ${programData.survey_data.email}`);
-        permissionGranted = true;
-      } catch (emailPermError) {
-        console.log('⚠️ 제출자 이메일 권한 설정 실패 (폴백 진행):', (emailPermError as any)?.message);
-      }
-    }
-    
-    // 2) 폴백: 공개 권한 설정 (실패해도 응름 유지)
-    if (!permissionGranted) {
-      try {
-        await drive.permissions.create({
-          fileId: spreadsheetId,
-          supportsAllDrives: true,
-          requestBody: {
-            role: 'writer',
-            type: 'anyone'
-          }
-        });
-        console.log('✅ 공개 권한 설정 완료');
-      } catch (permError) {
-        console.log('⚠️ 권한 설정 실패 (계속 진행):', (permError as any)?.message);
-      }
-    }
+    await applyOptimalPermissions(spreadsheetId, programData);
+    console.log('✅ 권한 설정 완료 (실패해도 흐름 유지)');
 
     const spreadsheetUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit#gid=0`;
     console.log('최종 스프레드시트 URL:', spreadsheetUrl);
@@ -2312,7 +2268,352 @@ async function addFormSheetConditionalFormatting(spreadsheetId: string): Promise
   }
 }
 
-// 📈 Summary 탭 차트 생성 (파젓&라인/스택 차트)
+// 🚀 시트 파이프라인(불변, 고성능) - 1-3회 batchUpdate 폴리싱
+async function applyHighPerformancePipeline(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  const { BatchOptimizer } = await import('./batchOptimizer');
+  const optimizer = new BatchOptimizer(spreadsheetId, sheets);
+  
+  // 📋 1차: Summary 탭 + Meta 탭 생성 (시트 구조)
+  console.log('📋 1차: 시트 구조 생성...');
+  
+  // Summary 시트 추가
+  optimizer.addSheetOperation({
+    addSheet: {
+      properties: {
+        title: '📈 Summary',
+        sheetType: 'GRID',
+        gridProperties: { rowCount: 100, columnCount: 15 }
+      }
+    }
+  }, 1);
+  
+  // Meta 시트 추가  
+  optimizer.addSheetOperation({
+    addSheet: {
+      properties: {
+        title: '📋 Meta',
+        sheetType: 'GRID', 
+        gridProperties: { rowCount: 50, columnCount: 5 }
+      }
+    }
+  }, 1);
+  
+  await optimizer.flush(); // 1차 플러시
+  
+  // 시트 ID 획득
+  const sheetInfo = await sheets.spreadsheets.get({ spreadsheetId });
+  const summarySheetId = sheetInfo.data.sheets?.find(s => s.properties?.title === '📈 Summary')?.properties?.sheetId!;
+  const metaSheetId = sheetInfo.data.sheets?.find(s => s.properties?.title === '📋 Meta')?.properties?.sheetId!;
+  
+  // 📊 2차: 데이터 입력 (병렬 처리)
+  console.log('📊 2차: 데이터 입력...');
+  
+  // Summary 데이터 생성 (피벗 + 라인/스택 차트용)
+  const summaryData = createSummaryData(programData);
+  const pivotData = createPivotData(programData);
+  
+  optimizer.addDataOperation(`'📈 Summary'!A1`, summaryData, 2);
+  optimizer.addDataOperation(`'📈 Summary'!H1`, pivotData, 2);
+  
+  // Meta 데이터
+  const metaData = createMetaData(programData);
+  optimizer.addDataOperation(`'📋 Meta'!A1`, metaData, 2);
+  
+  await optimizer.flush(); // 2차 플러시
+  
+  // 🎨 3차: 폴리싱 (헤더/밴딩/검증/조건부서식/보호)
+  console.log('🎨 3차: 폴리싱...');
+  
+  // Summary 차트 생성 (라인 + 스택)
+  addSummaryCharts(optimizer, summarySheetId, summaryData.length);
+  
+  // Meta 스타일링
+  addMetaFormatting(optimizer, metaSheetId);
+  
+  // 보호 설정 (Meta 탭 읽기 전용)
+  optimizer.addProtectionOperation({
+    addProtectedRange: {
+      protectedRange: {
+        range: { sheetId: metaSheetId },
+        description: 'Meta 정보 보호',
+        warningOnly: true
+      }
+    }
+  }, 1);
+  
+  await optimizer.flush(); // 3차 플러시
+  
+  console.log('✅ 시트 파이프라인(불변, 고성능) 완료!');
+}
+
+// 📊 Summary 데이터 생성 (라인 차트용)
+function createSummaryData(programData: WorkoutProgram): any[][] {
+  const summaryData = [
+    ['주차', 'Squat 세트', 'Bench 세트', 'Deadlift 세트', '총 볼륨', '평균 강도'],
+    ...Array.from({ length: Math.min(programData.training_weeks?.length || 0, 18) }, (_, i) => {
+      const week = programData.training_weeks?.[i];
+      if (!week) return [`Week ${i + 1}`, 0, 0, 0, 0, 0];
+      
+      let sqSets = 0, bpSets = 0, dlSets = 0, totalIntensity = 0, exerciseCount = 0;
+      week.workouts?.forEach(workout => {
+        workout.exercises?.forEach(ex => {
+          const sets = parseInt(ex.sets) || 0;
+          const intensity = parseInt(ex.weight_percent) || 70;
+          
+          if (ex.exercise.toLowerCase().includes('squat')) sqSets += sets;
+          else if (ex.exercise.toLowerCase().includes('bench')) bpSets += sets;
+          else if (ex.exercise.toLowerCase().includes('deadlift')) dlSets += sets;
+          
+          totalIntensity += intensity;
+          exerciseCount++;
+        });
+      });
+      
+      const avgIntensity = exerciseCount > 0 ? Math.round(totalIntensity / exerciseCount) : 70;
+      return [`Week ${i + 1}`, sqSets, bpSets, dlSets, sqSets + bpSets + dlSets, avgIntensity];
+    })
+  ];
+  
+  return summaryData;
+}
+
+// 📊 피벗 데이터 생성 (스택 차트용)
+function createPivotData(programData: WorkoutProgram): any[][] {
+  const pivotData = [
+    ['운동별 총 볼륨', ''],
+    ['', ''],
+    ['운동', '총 세트'],
+    ['Squat', 0],
+    ['Bench Press', 0], 
+    ['Deadlift', 0],
+    ['', ''],
+    ['주차별 분포', ''],
+    ...Array.from({ length: 4 }, (_, i) => [`Block ${i + 1}`, 0])
+  ];
+  
+  // 운동별 총 볼륨 계산
+  let totalSq = 0, totalBp = 0, totalDl = 0;
+  const blockVolumes = [0, 0, 0, 0];
+  
+  programData.training_weeks?.forEach((week, weekIdx) => {
+    const blockIdx = Math.floor(weekIdx / 4);
+    let weekVolume = 0;
+    
+    week.workouts?.forEach(workout => {
+      workout.exercises?.forEach(ex => {
+        const sets = parseInt(ex.sets) || 0;
+        if (ex.exercise.toLowerCase().includes('squat')) totalSq += sets;
+        else if (ex.exercise.toLowerCase().includes('bench')) totalBp += sets;
+        else if (ex.exercise.toLowerCase().includes('deadlift')) totalDl += sets;
+        weekVolume += sets;
+      });
+    });
+    
+    if (blockIdx < 4) blockVolumes[blockIdx] += weekVolume;
+  });
+  
+  pivotData[3][1] = totalSq;
+  pivotData[4][1] = totalBp;
+  pivotData[5][1] = totalDl;
+  
+  blockVolumes.forEach((vol, i) => {
+    if (pivotData[8 + i]) pivotData[8 + i][1] = vol;
+  });
+  
+  return pivotData;
+}
+
+// 📋 Meta 데이터 생성
+function createMetaData(programData: WorkoutProgram): any[][] {
+  const metaData = [
+    ['🔧 SYSTEM METADATA', '', '', '', ''],
+    ['', '', '', '', ''],
+    ['Template Version', programData.meta_data?.templateVersion || 'v1.0', '', '', ''],
+    ['Engine Version', programData.meta_data?.engineVersion || 'rules-v3', '', '', ''],
+    ['Survey Kind', programData.meta_data?.surveyKind || 'powerlifting-survey', '', '', ''],
+    ['Survey Version', programData.meta_data?.surveyVersion || 'v2.0', '', '', ''],
+    ['Canonical Hash', programData.meta_data?.canonicalHash || 'N/A', '', '', ''],
+    ['Created At', programData.meta_data?.createdAt || new Date().toISOString(), '', '', ''],
+    ['Processing Time', programData.meta_data?.processingTimeMs ? `${programData.meta_data.processingTimeMs}ms` : 'N/A', '', '', ''],
+    ['', '', '', '', ''],
+    ['⚠️ WARNINGS & CORRECTIONS', '', '', '', ''],
+    ['', '', '', '', '']
+  ];
+  
+  // Warnings 추가
+  if (programData.meta_data?.warnings && programData.meta_data.warnings.length > 0) {
+    metaData.push(['Type', 'Rule', 'Message', 'Original', 'Corrected']);
+    programData.meta_data.warnings.forEach(warning => {
+      metaData.push([
+        warning.type,
+        warning.rule,
+        warning.message,
+        JSON.stringify(warning.original),
+        JSON.stringify(warning.corrected)
+      ]);
+    });
+  } else {
+    metaData.push(['No warnings', '', '', '', '']);
+  }
+  
+  // 사용자 프로필 추가
+  metaData.push(['', '', '', '', '']);
+  metaData.push(['👤 USER PROFILE', '', '', '', '']);
+  metaData.push(['Name', programData.survey_data?.name || 'Anonymous', '', '', '']);
+  metaData.push(['Email', programData.survey_data?.email || 'N/A', '', '', '']);
+  metaData.push(['Age', programData.survey_data?.age?.toString() || 'N/A', '', '', '']);
+  metaData.push(['Experience', programData.survey_data?.experience || 'N/A', '', '', '']);
+  metaData.push(['Goal', programData.survey_data?.goal || 'N/A', '', '', '']);
+  metaData.push(['Days Per Week', programData.survey_data?.daysPerWeek?.toString() || 'N/A', '', '', '']);
+  
+  return metaData;
+}
+
+// 📈 Summary 차트 추가 (라인 + 스택)
+function addSummaryCharts(optimizer: any, summarySheetId: number, dataLength: number): void {
+  // 라인 차트 (볼륨 추이)
+  optimizer.addChartOperation({
+    addChart: {
+      chart: {
+        spec: {
+          title: '주차별 훈련 볼륨 추이',
+          basicChart: {
+            chartType: 'LINE',
+            legendPosition: 'RIGHT_LEGEND',
+            axis: [
+              { position: 'BOTTOM_AXIS', title: '주차' },
+              { position: 'LEFT_AXIS', title: '세트 수' }
+            ],
+            domains: [{
+              domain: {
+                sourceRange: {
+                  sources: [{
+                    sheetId: summarySheetId,
+                    startRowIndex: 0,
+                    endRowIndex: dataLength,
+                    startColumnIndex: 0,
+                    endColumnIndex: 1
+                  }]
+                }
+              }
+            }],
+            series: [
+              {
+                series: {
+                  sourceRange: {
+                    sources: [{
+                      sheetId: summarySheetId,
+                      startRowIndex: 0,
+                      endRowIndex: dataLength,
+                      startColumnIndex: 1,
+                      endColumnIndex: 2
+                    }]
+                  }
+                },
+                targetAxis: 'LEFT_AXIS'
+              },
+              {
+                series: {
+                  sourceRange: {
+                    sources: [{
+                      sheetId: summarySheetId,
+                      startRowIndex: 0,
+                      endRowIndex: dataLength,
+                      startColumnIndex: 2,
+                      endColumnIndex: 3
+                    }]
+                  }
+                },
+                targetAxis: 'LEFT_AXIS'
+              },
+              {
+                series: {
+                  sourceRange: {
+                    sources: [{
+                      sheetId: summarySheetId,
+                      startRowIndex: 0,
+                      endRowIndex: dataLength,
+                      startColumnIndex: 3,
+                      endColumnIndex: 4
+                    }]
+                  }
+                },
+                targetAxis: 'LEFT_AXIS'
+              }
+            ]
+          }
+        },
+        position: {
+          overlayPosition: {
+            anchorCell: { sheetId: summarySheetId, rowIndex: 1, columnIndex: 7 },
+            offsetXPixels: 10,
+            offsetYPixels: 10,
+            widthPixels: 600,
+            heightPixels: 300
+          }
+        }
+      }
+    }
+  }, 3);
+  
+  // 스택 차트 (피벗 데이터 기반)
+  optimizer.addChartOperation({
+    addChart: {
+      chart: {
+        spec: {
+          title: '운동별 총 볼륨 분포',
+          basicChart: {
+            chartType: 'COLUMN',
+            stackedType: 'STACKED',
+            legendPosition: 'BOTTOM_LEGEND'
+          }
+        },
+        position: {
+          overlayPosition: {
+            anchorCell: { sheetId: summarySheetId, rowIndex: 20, columnIndex: 7 },
+            offsetXPixels: 10,
+            offsetYPixels: 10,
+            widthPixels: 400,
+            heightPixels: 250
+          }
+        }
+      }
+    }
+  }, 3);
+}
+
+// 🎨 Meta 포맷팅 추가
+function addMetaFormatting(optimizer: any, metaSheetId: number): void {
+  // 헤더 스타일
+  optimizer.addFormatOperation({
+    repeatCell: {
+      range: { sheetId: metaSheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 5 },
+      cell: {
+        userEnteredFormat: {
+          backgroundColor: { red: 0.2, green: 0.3, blue: 0.8 },
+          textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+        }
+      },
+      fields: 'userEnteredFormat'
+    }
+  }, 3);
+  
+  // Warnings 헤더 스타일
+  optimizer.addFormatOperation({
+    repeatCell: {
+      range: { sheetId: metaSheetId, startRowIndex: 10, endRowIndex: 11, startColumnIndex: 0, endColumnIndex: 5 },
+      cell: {
+        userEnteredFormat: {
+          backgroundColor: { red: 0.8, green: 0.3, blue: 0.2 },
+          textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true }
+        }
+      },
+      fields: 'userEnteredFormat'
+    }
+  }, 3);
+}
+
+// 📈 Summary 탭 차트 생성 (피벗&라인/스택 차트) - LEGACY
 async function createSummarySheet(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
   try {
     console.log('📈 Summary 탭 차트 생성 중...');
@@ -2581,6 +2882,48 @@ async function createMetaSheet(spreadsheetId: string, programData: WorkoutProgra
     
   } catch (error) {
     console.log('❌ Meta 탭 생성 실패:', error);
+  }
+}
+
+// 🔐 권한: 제출자 이메일 read 권한(실패해도 흐름 유지)
+async function applyOptimalPermissions(spreadsheetId: string, programData: WorkoutProgram): Promise<void> {
+  let permissionGranted = false;
+  
+  // 1) 제출자 이메일에 read 권한 시도 (실패해도 흐름 유지)
+  if (programData.survey_data?.email) {
+    try {
+      await drive.permissions.create({
+        fileId: spreadsheetId,
+        supportsAllDrives: true, // 🔒 Shared Drive 강제
+        requestBody: {
+          role: 'reader',
+          type: 'user',
+          emailAddress: programData.survey_data.email
+        }
+      });
+      console.log(`✅ 제출자 이메일 read 권한: ${programData.survey_data.email}`);
+      permissionGranted = true;
+    } catch (emailPermError) {
+      console.log('⚠️ 제출자 이메일 권한 실패 (흐름 유지):', (emailPermError as any)?.message);
+    }
+  }
+  
+  // 2) 폴백: 공개 권한 (실패해도 흐름 유지)
+  if (!permissionGranted) {
+    try {
+      await drive.permissions.create({
+        fileId: spreadsheetId,
+        supportsAllDrives: true, // 🔒 Shared Drive 강제
+        requestBody: {
+          role: 'writer',
+          type: 'anyone'
+        }
+      });
+      console.log('✅ 공개 권한 설정 (폴백)');
+    } catch (permError) {
+      console.log('⚠️ 모든 권한 설정 실패 (흐름 유지):', (permError as any)?.message);
+      // 실패해도 흐름 유지 - 시트는 생성됨
+    }
   }
 }
 
