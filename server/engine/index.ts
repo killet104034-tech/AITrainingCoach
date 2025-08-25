@@ -1,6 +1,9 @@
 // ⚙️ Engine Layer - planFromTables(), guards, split, variations
 
 import { type CanonicalSurvey, type ProgramPlan, type Warning, SAFETY_LIMITS } from '../domain/index';
+import { runPreflightChecks } from './preflight';
+import fs from 'fs';
+import path from 'path';
 
 // 🎯 엔진 설정
 export interface EngineConfig {
@@ -48,9 +51,28 @@ export class ProgramEngine {
     this.initializeGuards();
   }
   
+  // 📊 JSON 규칙 로드
+  private async loadRulesFromJson(): Promise<void> {
+    try {
+      const rulesPath = path.join(process.cwd(), 'server/config/rules/weeks.json');
+      const rulesData = JSON.parse(fs.readFileSync(rulesPath, 'utf8'));
+      console.log(`📊 규칙 로드: ${rulesData.meta.version} (${rulesData.meta.description})`);
+      // 실제 규칙 적용 로직은 여기서 구현
+    } catch (error) {
+      console.warn('📊 규칙 JSON 로드 실패, 기본값 사용:', error);
+    }
+  }
+  
   // 📊 규칙 테이블에서 계획 생성
   async planFromTables(canonical: CanonicalSurvey): Promise<ProgramPlan> {
     console.log(`🔧 엔진 ${this.config.version}로 프로그램 생성 시작...`);
+    
+    // 🛡️ Preflight 검사 실행
+    const preflightWarnings = runPreflightChecks(canonical);
+    console.log(`🛡️ Preflight 검사 완료: ${preflightWarnings.length}개 조정 사항`);
+    
+    // 📊 규칙 JSON 로드
+    await this.loadRulesFromJson();
     
     // 1. 기본 구조 설정
     const totalWeeks = this.calculateTotalWeeks(canonical);
@@ -89,7 +111,11 @@ export class ProgramEngine {
     
     console.log(`✅ 엔진 프로그램 생성 완료: ${totalWeeks}주 계획`);
     
-    return programPlan as ProgramPlan;
+    // 모든 경고를 포함한 최종 프로그램 반환
+    const finalPlan = programPlan as ProgramPlan;
+    (finalPlan as any).warnings = [...preflightWarnings, ...warnings];
+    
+    return finalPlan;
   }
   
   // 📏 총 주차 계산

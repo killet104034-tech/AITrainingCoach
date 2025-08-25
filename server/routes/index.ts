@@ -5,6 +5,7 @@ import path from "path";
 import { storage } from "../storage";
 import { registerDebugRoutes } from "./debug";
 import { registerSurveyRoutes } from "./surveys";
+import { registerJobRoutes } from "./jobs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // 🔧 디버그 라우트 등록
@@ -12,6 +13,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // 📋 설문 라우트 등록 (새로운 도메인 기반 아키텍처)
   registerSurveyRoutes(app);
+  
+  // 📊 작업 상태 라우트 등록
+  registerJobRoutes(app);
   
   // Serve attached assets (images, etc.) statically
   app.use('/api/assets', express.static(path.resolve(import.meta.dirname, '..', 'attached_assets')));
