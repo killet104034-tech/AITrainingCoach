@@ -12,7 +12,24 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function Survey() {
   const [currentStep, setCurrentStep] = useState(1);
-  const form = useForm();
+  const form = useForm({
+    defaultValues: {
+      // 필수 필드들 기본값 설정
+      goals: [],
+      frequency: "",
+      equipment: [],
+      injuries: "",
+      // 기타 중요 필드들
+      name: "",
+      email: "",
+      age: "",
+      gender: "",
+      experience: "",
+      squatMax: "",
+      benchMax: "",
+      deadliftMax: ""
+    }
+  });
   const { toast } = useToast();
 
   const submitSurvey = useMutation({
@@ -34,6 +51,13 @@ export default function Survey() {
 
   const handleSubmit = () => {
     const formData = form.getValues();
+    console.log("🔍 전송 데이터:", formData);
+    console.log("🎯 필수 필드 확인:", {
+      goals: formData.goals,
+      frequency: formData.frequency, 
+      equipment: formData.equipment,
+      injuries: formData.injuries
+    });
     submitSurvey.mutate(formData);
   };
 
