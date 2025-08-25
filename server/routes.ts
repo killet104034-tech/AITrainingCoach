@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import { insertSurveyResponseSchema } from "@shared/schema";
 import { generateTrainingProgram } from "./services/programGenerator";
 import { sendTrainingProgram } from "./services/email";
+import { createWorkoutSheet } from "./services/sheetsService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve attached assets (images, etc.) statically

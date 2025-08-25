@@ -19,6 +19,9 @@ const sheets = google.sheets({ version: 'v4', auth });
   try {
     console.log('🔍 Google API 60초 자가진단 시작...');
     
+    // 🎯 비서님 제안: 빠른 검증 포인트
+    console.log('ENV:', process.env.SHARED_FOLDER_ID, process.env.SHEET_TEMPLATE_ID);
+    
     // 1. 인증 테스트
     const authClient = await auth.getClient();
     console.log('✅ 인증 성공');

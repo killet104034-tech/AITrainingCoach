@@ -75,16 +75,16 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
 
       // 핵심 데이터만 업데이트 (빠르고 효율적)
       const updateData = [
-        [programData.user_maxes.squat],    // B6: Squat 1RM
-        [programData.user_maxes.bench],    // B7: Bench 1RM  
-        [programData.user_maxes.deadlift], // B8: Deadlift 1RM
-        [programData.program_title],       // B9: Program Title
-        [new Date().toLocaleDateString('ko-KR')] // B10: Created Date
+        ['Squat 1RM', programData.user_maxes.squat],
+        ['Bench 1RM', programData.user_maxes.bench],  
+        ['Deadlift 1RM', programData.user_maxes.deadlift],
+        ['프로그램명', programData.program_title],
+        ['생성일', new Date().toLocaleDateString('ko-KR')]
       ];
       
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: 'Program Info!B6:B10',
+        range: 'A1:B5', // 기본 시트의 첫 번째 영역
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: updateData
