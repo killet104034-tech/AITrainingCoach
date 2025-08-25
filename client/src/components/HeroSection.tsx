@@ -15,12 +15,12 @@ export default function HeroSection() {
       <div className="w-full max-w-4xl mx-auto px-8 text-center">
         <h1 className="text-5xl md:text-7xl font-light leading-tight mb-8">
           AI가 설계한<br />
-          <span className="text-white">맞춤형 파워리프팅</span><br />
-          훈련 프로그램
+          <span className="text-white">맞춤형 훈련</span><br />
+          프로그램
         </h1>
         <p className="text-xl md:text-2xl text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
-          당신의 현재 수준, 목표, 환경을 분석하여 최적화된 개인별 훈련 계획을 제공합니다. 
-          스쿼트, 벤치프레스, 데드리프트 기록을 체계적으로 향상시키세요.
+          파워리프팅, 근비대, 다이어트, 대회준비까지. 
+          당신의 목표와 환경을 분석하여 최적화된 개인별 훈련 계획을 제공합니다.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button 

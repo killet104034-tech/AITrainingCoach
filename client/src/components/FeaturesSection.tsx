@@ -7,9 +7,9 @@ export default function FeaturesSection() {
       bgColor: "bg-accent"
     },
     {
-      icon: "fas fa-target",
-      title: "개인 맞춤형 프로그램",
-      description: "스쿼트, 벤치프레스, 데드리프트 현재 최대중량과 목표를 바탕으로 체계적인 점진적 과부하 계획을 제공합니다.",
+      icon: "fas fa-bullseye",
+      title: "다양한 목표 지원",
+      description: "파워리프팅, 근비대, 다이어트, 대회준비 등 다양한 피트니스 목표에 최적화된 개별 프로그램을 제공합니다.",
       bgColor: "bg-electric"
     },
     {

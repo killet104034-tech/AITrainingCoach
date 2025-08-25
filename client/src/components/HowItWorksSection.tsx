@@ -15,7 +15,7 @@ export default function HowItWorksSection() {
     {
       number: "3",
       title: "프로그램 수령", 
-      description: "상세한 훈련 계획서가 이메일로 즉시 전송됩니다. 바로 체계적인 파워리프팅 훈련을 시작하세요!",
+      description: "상세한 훈련 계획서가 이메일로 즉시 전송됩니다. 바로 체계적인 맞춤형 훈련을 시작하세요!",
       bgColor: "bg-success"
     }
   ];
@@ -28,7 +28,7 @@ export default function HowItWorksSection() {
             3단계로 시작하는 맞춤형 훈련
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto font-light">
-            복잡한 과정 없이 간단한 설문만으로 전문가 수준의 파워리프팅 프로그램을 받아보세요.
+            복잡한 과정 없이 간단한 설문만으로 전문가 수준의 맞춤형 훈련 프로그램을 받아보세요.
           </p>
         </div>
 
