@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { createWorkoutSpreadsheet, type WorkoutProgramData } from './googleSheets.js';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -25,6 +26,11 @@ export async function sendTrainingProgram(
 ): Promise<void> {
   try {
     const parsedProgram = JSON.parse(program);
+    
+    // 구글 스프레드시트 생성
+    console.log('구글 스프레드시트 생성 중...');
+    const spreadsheetUrl = await createWorkoutSpreadsheet(parsedProgram, email);
+    console.log('스프레드시트 생성 완료:', spreadsheetUrl);
     
     const htmlContent = `
     <!DOCTYPE html>
@@ -65,110 +71,23 @@ export async function sendTrainingProgram(
         </div>
 
         <div class="section">
-            <h2>📋 ${parsedProgram.program_title} 스프레드시트</h2>
+            <h2>📋 구글 스프레드시트 훈련 프로그램</h2>
             <p style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                💡 <strong>스프레드시트 사용법:</strong><br>
-                1. 아래 링크를 클릭하여 구글 스프레드시트로 복사하세요<br>
-                2. "파일 > 사본 만들기"로 개인 시트를 생성하세요<br>
-                3. 실제 중량, 세트, 반복수를 기록하며 훈련하세요
+                💡 <strong>훈련 기록 방법:</strong><br>
+                1. 아래 링크를 클릭하여 구글 스프레드시트를 여세요<br>
+                2. 각 운동별로 실제 수행한 세트, 횟수, 중량을 기록하세요<br>
+                3. RPE(체감강도)와 메모를 남겨 진행상황을 추적하세요<br>
+                4. "진행상황 추적" 시트에서 최고기록을 업데이트하세요
             </p>
             <div style="text-align: center; margin: 30px 0;">
-                <a href="#" style="display: inline-block; padding: 15px 30px; background: #4285f4; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                    📊 구글 스프레드시트로 열기
+                <a href="${spreadsheetUrl}" target="_blank" style="display: inline-block; padding: 15px 30px; background: #4285f4; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    📊 구글 스프레드시트로 훈련하기
                 </a>
             </div>
             
-            <!-- 최대중량 기록 섹션 -->
-            <table class="workout-table" style="margin-bottom: 30px;">
-                <tr class="week-header">
-                    <td colspan="4">🏋️ 현재 최대중량 (Training Maxes)</td>
-                </tr>
-                <tr style="background: #f8f9fa;">
-                    <th style="width: 25%;">운동</th>
-                    <th style="width: 25%;">LB</th>
-                    <th style="width: 25%;">KG</th>
-                    <th style="width: 25%;">업데이트</th>
-                </tr>
-                <tr>
-                    <td><strong>Squat</strong></td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;">${Math.round(parseInt(parsedProgram.user_maxes?.squat || '100') * 2.20462)}</td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;">${parsedProgram.user_maxes?.squat || '100'}</td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                </tr>
-                <tr>
-                    <td><strong>Bench</strong></td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;">${Math.round(parseInt(parsedProgram.user_maxes?.bench || '80') * 2.20462)}</td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;">${parsedProgram.user_maxes?.bench || '80'}</td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                </tr>
-                <tr>
-                    <td><strong>Deadlift</strong></td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;">${Math.round(parseInt(parsedProgram.user_maxes?.deadlift || '120') * 2.20462)}</td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;">${parsedProgram.user_maxes?.deadlift || '120'}</td>
-                    <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                </tr>
-            </table>
-
-            <!-- RPE 차트 -->
-            <table class="workout-table" style="margin-bottom: 30px;">
-                <tr class="week-header">
-                    <td colspan="2">💪 RPE 평가 기준</td>
-                </tr>
-                <tr style="background: #f8f9fa;">
-                    <th style="width: 15%;">RPE</th>
-                    <th>설명</th>
-                </tr>
-                <tr><td><strong>10</strong></td><td>최대 노력 - 더 이상 불가능</td></tr>
-                <tr><td><strong>9.5</strong></td><td>아마도 한 번 더 가능</td></tr>
-                <tr><td><strong>9</strong></td><td>확실히 한 번 더 가능</td></tr>
-                <tr><td><strong>8.5</strong></td><td>아마도 두 번 더 가능</td></tr>
-                <tr><td><strong>8</strong></td><td>확실히 두 번 더 가능</td></tr>
-                <tr><td><strong>7.5</strong></td><td>아마도 세 번 더 가능</td></tr>
-                <tr><td><strong>7</strong></td><td>확실히 세 번 더 가능</td></tr>
-                <tr><td><strong>6.5</strong></td><td>아마도 네 번 더 가능</td></tr>
-                <tr><td><strong>6</strong></td><td>확실히 네 번 더 가능</td></tr>
-            </table>
-
-            <!-- 실제 훈련 스프레드시트 -->
-            ${parsedProgram.training_weeks.map((week: any) => `
-                <table class="workout-table" style="margin-bottom: 40px;">
-                    <tr class="week-header">
-                        <td colspan="10">Week ${week.week} - ${week.focus}</td>
-                    </tr>
-                    ${week.workouts.map((workout: any) => `
-                        <tr style="background: #e8f5e8;">
-                            <td colspan="10"><strong>Day ${workout.day} - ${workout.workout_name}</strong></td>
-                        </tr>
-                        <tr style="background: #f8f9fa; font-weight: bold;">
-                            <td>운동명</td>
-                            <td>목표 세트</td>
-                            <td>목표 렙</td>
-                            <td>목표 중량</td>
-                            <td>실제 세트</td>
-                            <td>실제 렙</td>
-                            <td>실제 중량</td>
-                            <td>RPE</td>
-                            <td>볼륨</td>
-                            <td>메모</td>
-                        </tr>
-                        ${workout.exercises.map((exercise: any) => `
-                            <tr>
-                                <td><strong>${exercise.exercise}</strong></td>
-                                <td>${exercise.sets}</td>
-                                <td>${exercise.reps}</td>
-                                <td>${exercise.weight_percent}</td>
-                                <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                                <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                                <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                                <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                                <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                                <td style="background: #fff3cd; border: 2px solid #ffc107;"></td>
-                            </tr>
-                        `).join('')}
-                        <tr style="height: 10px;"><td colspan="10"></td></tr>
-                    `).join('')}
-                </table>
-            `).join('')}
+            <p style="text-align: center; font-size: 14px; color: #666; margin-top: 20px;">
+                ※ 구글 스프레드시트에서 실제 훈련 기록을 작성하고 진행상황을 추적하세요!
+            </p>
         </div>
 
         <div class="info-grid">
