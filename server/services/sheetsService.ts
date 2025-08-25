@@ -143,6 +143,15 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('❌ 4단계 실패:', error);
     }
 
+    // 🎨 5단계: 조건부 서식
+    console.log('🎯 5단계 시작: 조건부 서식...');
+    try {
+      await addConditionalFormatting(spreadsheetId);
+      console.log('🎯 5단계 완료: 조건부 서식 완료!');
+    } catch (error) {
+      console.log('❌ 5단계 실패:', error);
+    }
+
     // 📊 관리자용 마스터 스프레드시트에도 데이터 추가
     console.log('🎯 마스터 스프레드시트 업데이트 시작...');
     try {
