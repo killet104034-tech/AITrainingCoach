@@ -410,9 +410,22 @@ function getRepsByGoal(goal: string): number {
 }
 
 // 🔄 레거시 호환용 async 래퍼
-export async function planFromTablesAsync(input: CanonicalInput): Promise<ProgramPlan> {
+export async function planFromTablesAsync(input: CanonicalInput): Promise<{ plan: ProgramPlan; warnings: any[] }> {
   try {
     console.log('📊 planFromTables() 시작: 규칙 테이블 기반 프로그램 생성');
+    
+    // 🚨 Preflight 사전 검사
+    const { runPreflight } = await import('./preflight');
+    const preflightResult = runPreflight(input);
+    
+    if (preflightResult.blocked) {
+      console.log('🚫 Preflight 차단:', preflightResult.warnings);
+      throw new Error(`프로그램 생성이 차단되었습니다: ${preflightResult.warnings.map(w => w.message).join(', ')}`);
+    }
+    
+    // 보정된 입력 사용
+    const correctedInput = preflightResult.input;
+    console.log(`🔍 Preflight 완료: ${preflightResult.warnings.length}개 경고`);
     
     // 규칙 로드
     const cfg: Cfg = {
@@ -424,15 +437,28 @@ export async function planFromTablesAsync(input: CanonicalInput): Promise<Progra
       guards: await loadRuleData('guards.json', {})
     };
     
-    // 새로운 엔진 호출
-    const programPlan = planFromTables(input, cfg);
+    // 새로운 엔진 호출 (보정된 입력 사용)
+    const programPlan = planFromTables(correctedInput, cfg);
     
     console.log('✅ planFromTables() 완료: 규칙 기반 ProgramPlan 생성');
-    return programPlan;
+    return {
+      plan: programPlan,
+      warnings: preflightResult.warnings  // API 응답과 스프레드시트 Meta에 기록
+    };
     
   } catch (error) {
     console.log('❌ planFromTables() 실패, 폴백 사용:', error);
-    return generateExpertProgram(input);
+    const fallbackPlan = await generateExpertProgram(input);
+    return {
+      plan: fallbackPlan,
+      warnings: [{
+        type: 'error',
+        rule: 'engine_fallback',
+        message: '규칙 엔진 실패로 기본 엔진을 사용했습니다.',
+        original: null,
+        corrected: null
+      }]
+    };
   }
 }
 
