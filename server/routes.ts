@@ -7,6 +7,7 @@ import { insertSurveyResponseSchema } from "@shared/schema";
 import { generateTrainingProgram } from "./services/programGenerator";
 import { sendTrainingProgram } from "./services/email";
 import { createWorkoutSheet } from "./services/sheetsService";
+import { runPipeline, getPipelineStatus } from "./services/pipeline/index";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // 🔧 환경변수 상태 확인 엔드포인트
@@ -25,8 +26,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Serve attached assets (images, etc.) statically
   app.use('/api/assets', express.static(path.resolve(import.meta.dirname, '..', 'attached_assets')));
-  // Survey submission endpoint
+  // Survey submission endpoint - 새로운 파이프라인 사용
   app.post("/api/survey", async (req, res) => {
+    try {
+      console.log('🚀 새로운 파이프라인 API 호출');
+      
+      // 🔄 새로운 파이프라인 실행
+      const pipelineResult = await runPipeline(req.body);
+      
+      if (!pipelineResult.success) {
+        return res.status(400).json({
+          success: false,
+          message: `파이프라인 실패 (${pipelineResult.stage}): ${pipelineResult.error}`,
+          stage: pipelineResult.stage,
+          surveyId: pipelineResult.surveyId
+        });
+      }
+      
+      console.log('✅ 파이프라인 성공:', pipelineResult.spreadsheetUrl);
+      
+      res.json({
+        success: true,
+        message: "🎯 개인맞춤 파워리프팅 프로그램이 성공적으로 생성되었습니다!",
+        surveyId: pipelineResult.surveyId,
+        spreadsheetUrl: pipelineResult.spreadsheetUrl,
+        programUrl: pipelineResult.spreadsheetUrl, // 호환성을 위해 동일한 URL
+        emailSent: pipelineResult.stages.notify.emailSent,
+        pipeline: {
+          stages: Object.keys(pipelineResult.stages),
+          timing: pipelineResult.timing,
+          totalTime: pipelineResult.timing.total
+        }
+      });
+      
+    } catch (error) {
+      console.error("파이프라인 실행 오류:", error);
+      res.status(500).json({
+        success: false,
+        message: "파이프라인 처리 중 오류가 발생했습니다.",
+        error: (error as Error).message
+      });
+    }
+  });
+
+  // 🔄 기존 API (폴백)
+  app.post("/api/survey-legacy", async (req, res) => {
     try {
       // Validate request body
       const validatedData = insertSurveyResponseSchema.parse(req.body);
@@ -133,6 +177,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ 
         success: false, 
         message: (error as Error).message || "설문 제출 처리 중 오류가 발생했습니다." 
+      });
+    }
+  });
+
+  // 📊 파이프라인 상태 조회
+  app.get("/api/pipeline/:surveyId", async (req, res) => {
+    try {
+      const status = await getPipelineStatus(req.params.surveyId);
+      res.json(status);
+    } catch (error) {
+      res.status(404).json({
+        success: false,
+        message: "파이프라인 상태를 찾을 수 없습니다."
       });
     }
   });
