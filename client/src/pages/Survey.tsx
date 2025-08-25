@@ -1,3 +1,8 @@
+// 📋 설문 페이지 (Survey Page)
+// ✨ 기능: 전문가급 파워리프팅 설문 실행 및 프로그램 생성 요청
+// 🔄 흐름: 20단계 설문 → API 전송 → Google Sheets 18주 프로그램 생성 → 이메일 발송
+// 🎯 목표: 최고의 개인화된 파워리프팅 훈련 제공
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AdvancedSurveySection } from '@/components/AdvancedSurveySection';

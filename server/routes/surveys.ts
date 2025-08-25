@@ -1,4 +1,7 @@
-// 📋 Survey Routes - POST /api/surveys
+// 📋 설문 API 라우터 (Survey Routes)
+// ✨ 기능: POST /api/surveys 설문 제출 처리 및 프로그램 생성
+// 🔄 흐름: 설문 검증 → Canonical 변환 → 엔진 실행 → Google Sheets 생성 → 이메일 발송
+// 🛡️ 보안: 운영 가드, Rate Limiting, Idempotency, 감사 로그
 
 import type { Express } from "express";
 import { storage } from "../storage";

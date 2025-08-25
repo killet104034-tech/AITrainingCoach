@@ -1,9 +1,12 @@
-// 📋 Survey Registry - basic_v1만 등록
+// 📋 설문 등록 시스템 (Survey Registry) 
+// ✨ 기능: 다양한 설문 타입을 등록하고 관리하는 중앙 시스템
+// 🏗️ 구조: "설문이 들어도 엔진/시트는 고정" 원칙 구현
+// 📈 확장성: basic_v1, advanced_v1 등 무한 설문 타입 추가 가능
 
 import { z } from 'zod';
 import { type CanonicalSurvey, createCanonicalSurvey, validateCanonicalSurvey } from '../domain/canonical';
 
-// 🔍 설문 종류별 레지스트리
+// 🔍 설문 종류별 레지스트리 (각 설문 타입의 정의)
 export interface SurveyTypeDefinition {
   kind: string;
   version: string;

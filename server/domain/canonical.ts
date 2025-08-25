@@ -1,8 +1,11 @@
-// 📋 Canonical Survey - 통합 설문 인터페이스와 검증
+// 📋 표준 설문 인터페이스 (Canonical Survey)
+// ✨ 기능: 모든 설문 타입을 하나의 통일된 형태로 변환 및 검증
+// 🔄 변환: basic_v1, advanced_v1 등 → 공통 CanonicalSurvey 형태
+// 🛡️ 안정성: 엔진이 항상 같은 데이터 구조로 프로그램을 생성할 수 있도록 보장
 
 import { type CanonicalSurvey, SAFETY_LIMITS } from './types';
 
-// 🚨 불변 로직: 계약 검증
+// 🚨 데이터 무결성 검증 (필수 필드 및 안전 범위 체크)
 export function validateCanonicalSurvey(survey: CanonicalSurvey): string[] {
   const errors: string[] = [];
   

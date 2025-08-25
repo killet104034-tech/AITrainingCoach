@@ -1,3 +1,8 @@
+// 📝 고급 설문 컴포넌트 (AdvancedSurveySection)
+// ✨ 기능: 20단계 전문가급 파워리프팅 설문 UI (40-50개 상세 질문)
+// 🧠 분석: 신체구조/영양/회복/프로그램선호도 등 종합 분석
+// 🎯 목표: 진짜 최고의 개인화된 18주 파워리프팅 프로그램 생성
+
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';

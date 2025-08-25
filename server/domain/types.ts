@@ -1,6 +1,9 @@
-// 🎯 Domain Types - 핵심 도메인 타입 정의
+// 🎯 핵심 도메인 타입 정의 (Domain Types)
+// ✨ 기능: 시스템 전체에서 사용하는 모든 데이터 구조 정의
+// 📊 타입: ProgramPlan (18주 프로그램), CanonicalSurvey (표준 설문), TrainingWeek (주차별 계획)
+// 🛡️ 타입 안전성: TypeScript 타입 체크로 런타임 오류 방지
 
-// 프로그램 구조
+// 📋 18주 파워리프팅 프로그램 전체 구조
 export interface ProgramPlan {
   // 메타 정보
   programTitle: string;

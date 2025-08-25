@@ -1,8 +1,11 @@
-// ⚙️ Engine - 표 기반 개인화 + 시드된 가중치 선택 파워리프팅 프로그래밍
+// ⚙️ 파워리프팅 프로그램 생성 엔진 (PowerliftingProgramEngine)
+// ✨ 기능: 설문 데이터 → 18주 개인맞춤 파워리프팅 프로그램 자동 생성
+// 🧠 로직: 진짜 주기화 적용 (68%→95% 강도, 딜로드주, Heavy/Mod/Light 분류)
+// 📊 과학적: 볼륨/빈도/강도 최적화, 개인별 약점 분석 및 보강
 
 import { type CanonicalSurvey, type ProgramPlan, type Warning, SAFETY_LIMITS } from '../domain/types';
 
-// 🔧 진짜 파워리프팅 프로그래밍 엔진 (표 기반 개인화)
+// 🔧 진짜 파워리프팅 프로그래밍 엔진 (표준 Canonical 데이터 입력 → 18주 프로그램 출력)
 export class PowerliftingProgramEngine {
   
   private volConfig: any;
