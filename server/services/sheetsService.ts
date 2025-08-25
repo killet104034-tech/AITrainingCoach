@@ -83,27 +83,7 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     spreadsheetId = copy.data.id!;
     console.log('✅ 템플릿 복사 완료! ID:', spreadsheetId);
 
-    // 핵심 데이터만 업데이트 (빠르고 효율적)
-    const updateData = [
-      ['Squat 1RM', programData.user_maxes.squat],
-      ['Bench 1RM', programData.user_maxes.bench],  
-      ['Deadlift 1RM', programData.user_maxes.deadlift],
-      ['프로그램명', programData.program_title],
-      ['생성일', new Date().toLocaleDateString('ko-KR')]
-    ];
-    
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'A1:B5', // 기본 시트의 첫 번째 영역
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: updateData
-      }
-    });
-    
-    console.log('✅ 템플릿 데이터 업데이트 완료!');
-
-    // 🔥 프로급 파워리프팅 시트 구조 생성!
+    // 🔥 프로급 파워리프팅 시트 구조 생성 (기존 코드 완전 제거)
     await createProPowerliftingSheets(spreadsheetId, programData);
 
     // 공개 권한 설정
