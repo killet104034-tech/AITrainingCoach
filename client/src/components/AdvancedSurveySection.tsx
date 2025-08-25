@@ -1162,8 +1162,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 12단계: 부상 이력
-  const renderStep12 = () => (
+  // 15단계: 부상 이력
+  const renderStep15_injury = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🎯 부상 이력 및 건강 상태</h2>
@@ -1459,7 +1459,7 @@ export function AdvancedSurveySection({
   );
 
   // 17단계: 멘탈 및 고급 설정
-  const renderStep17 = () => (
+  const renderStep17_mental = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🧠 멘탈 및 고급 설정</h2>
@@ -1615,7 +1615,7 @@ export function AdvancedSurveySection({
   );
 
   // 18단계: 수면 및 회복 패턴
-  const renderStep18 = () => (
+  const renderStep18_sleep = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">😴 수면 및 회복 패턴</h2>
@@ -1741,8 +1741,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 17단계: 영양 및 보충제
-  const renderStep17 = () => (
+  // 19단계: 영양 및 보충제
+  const renderStep19_nutrition = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">🥗 영양 및 보충제</h2>
@@ -1851,8 +1851,8 @@ export function AdvancedSurveySection({
     </div>
   );
 
-  // 18단계: 프로그램 선호도
-  const renderStep18 = () => (
+  // 20단계: 프로그램 선호도
+  const renderStep20_program = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-light text-white mb-3">⚙️ 프로그램 선호도</h2>
@@ -2268,12 +2268,12 @@ export function AdvancedSurveySection({
       case 12: return renderStep12();
       case 13: return renderStep13();
       case 14: return renderStep14();
-      case 15: return renderStep15();
+      case 15: return renderStep15_injury();
       case 16: return renderStep16();
-      case 17: return renderStep17();
-      case 18: return renderStep18();
-      case 19: return renderStep19();
-      case 20: return renderStep20();
+      case 17: return renderStep17_mental();
+      case 18: return renderStep18_sleep();
+      case 19: return renderStep19_nutrition();
+      case 20: return renderStep20_program();
       default: return <div>단계 {currentStep} 준비중...</div>;
     }
   };
