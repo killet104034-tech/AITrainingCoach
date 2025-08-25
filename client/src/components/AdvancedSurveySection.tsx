@@ -24,7 +24,7 @@ export function AdvancedSurveySection({
   onSubmit, 
   isSubmitting 
 }: AdvancedSurveySectionProps) {
-  const totalSteps = 4; // 간소화된 4단계
+  const totalSteps = 15; // 완전한 15단계 전문가 시스템
 
   // 1단계: 기본 정보
   const renderStep1 = () => (
@@ -314,9 +314,21 @@ export function AdvancedSurveySection({
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
 
+  // 5단계: 현재 수준
+  const renderStep5 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">현재 수준</h2>
+        <p className="text-gray-400">현재 최대중량과 경험 수준을 알려주세요</p>
+      </div>
+      
+      <div className="space-y-4">
         <div>
-          <Label className="text-white">현재 수준</Label>
+          <Label className="text-white">경험 수준 *</Label>
           <RadioGroup 
             value={form.watch("experience")} 
             onValueChange={(value) => form.setValue("experience", value)}
@@ -337,6 +349,10 @@ export function AdvancedSurveySection({
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="elite" id="elite" />
               <label htmlFor="elite" className="text-gray-300">엘리트 (국내외 대회 입상 경험)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="experience-unknown" />
+              <label htmlFor="experience-unknown" className="text-gray-300">모르겠음</label>
             </div>
           </RadioGroup>
         </div>
@@ -373,6 +389,110 @@ export function AdvancedSurveySection({
             />
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="bodyweight" className="text-white">체중 (kg)</Label>
+            <Input
+              id="bodyweight"
+              data-testid="input-bodyweight"
+              {...form.register("bodyweight")}
+              placeholder="70"
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+          <div>
+            <Label className="text-white">대회 참가 경험</Label>
+            <RadioGroup 
+              value={form.watch("competitionExperience")} 
+              onValueChange={(value) => form.setValue("competitionExperience", value)}
+              className="mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="none" id="comp-none" />
+                <label htmlFor="comp-none" className="text-gray-300">없음</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="local" id="comp-local" />
+                <label htmlFor="comp-local" className="text-gray-300">지역 대회</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="national" id="comp-national" />
+                <label htmlFor="comp-national" className="text-gray-300">전국 대회</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="international" id="comp-international" />
+                <label htmlFor="comp-international" className="text-gray-300">국제 대회</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="unknown" id="comp-unknown" />
+                <label htmlFor="comp-unknown" className="text-gray-300">모르겠음</label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 6단계: 목표 설정
+  const renderStep6 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">목표 설정</h2>
+        <p className="text-gray-400">훈련 기간과 목표를 설정해주세요</p>
+      </div>
+      
+      <div className="space-y-4">
+        <div>
+          <Label className="text-white">훈련 기간 목표 *</Label>
+          <RadioGroup 
+            value={form.watch("trainingDuration")} 
+            onValueChange={(value) => form.setValue("trainingDuration", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="3months" id="3months" />
+              <label htmlFor="3months" className="text-gray-300">3개월</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="6months" id="6months" />
+              <label htmlFor="6months" className="text-gray-300">6개월</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1year" id="1year" />
+              <label htmlFor="1year" className="text-gray-300">1년</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="longterm" id="longterm" />
+              <label htmlFor="longterm" className="text-gray-300">장기 (1년 이상)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="duration-unknown" />
+              <label htmlFor="duration-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label htmlFor="nextCompetition" className="text-white">다음 대회 목표 (선택사항)</Label>
+          <Input
+            id="nextCompetition"
+            {...form.register("nextCompetition")}
+            placeholder="2025년 전국 파워리프팅 대회"
+            className="bg-gray-800 border-gray-600 text-white"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  // 7단계~15단계는 계속 추가될 예정
+  const renderStepPlaceholder = (stepNumber: number, title: string) => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">{title}</h2>
+        <p className="text-gray-400">전문가 설문 시스템 구현 중...</p>
       </div>
     </div>
   );
@@ -423,11 +543,22 @@ export function AdvancedSurveySection({
       case 2: return renderStep2();  // 🚀 신체 특성 분석 
       case 3: return renderStep3();  // 🧠 심리적 성향 분석 
       case 4: return renderStep4();  // ⚡ 볼륨 내성 테스트 
+      case 5: return renderStep5();  // 현재 수준
+      case 6: return renderStep6();  // 목표 설정
+      case 7: return renderStepPlaceholder(7, "훈련 빈도 & 구성");
+      case 8: return renderStepPlaceholder(8, "기술적 분석");
+      case 9: return renderStepPlaceholder(9, "약점 & 강점 분석");
+      case 10: return renderStepPlaceholder(10, "장비 & 환경");
+      case 11: return renderStepPlaceholder(11, "부상 & 건강");
+      case 12: return renderStepPlaceholder(12, "라이프스타일 & 회복");
+      case 13: return renderStepPlaceholder(13, "과거 프로그램 경험");
+      case 14: return renderStepPlaceholder(14, "멘탈 & 고급 설정");
+      case 15: return renderStepPlaceholder(15, "최종 확인");
       default: return <div>단계 {currentStep} 준비중...</div>;
     }
   };
 
-  if (currentStep === 5) {
+  if (currentStep === 16) {
     return (
       <div className="max-w-4xl mx-auto px-8 py-16">
         <div className="text-center">
