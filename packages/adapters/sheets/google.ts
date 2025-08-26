@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { createGoogleAuth } from '../google';
+import { createGoogleAuth } from '../../../apps/api/google';
 
 // Google Sheets 인증 설정
 const auth = createGoogleAuth();
