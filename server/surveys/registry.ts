@@ -28,16 +28,17 @@ export function processSurvey(
   conflicts: SurveyConflict[]; 
   warnings: SurveyConflict[]; 
 } {
-  // 🎯 체크박스 포함 변환 로직 (디자인용)
+  // 🎯 간소화된 변환 (조건 매핑 제거)
   const canonical: CanonicalSurvey = {
     name: input.name || '',
     goals: input.goals || [],
     email: input.email || ''
   };
 
+  // 모든 조건 매핑 로직 제거 - 사용자가 나중에 다시 훈련시킬 예정
   return {
     canonical,
-    conflicts: [],
-    warnings: []
+    conflicts: [], // 복잡한 충돌 감지 로직 제거
+    warnings: []   // 복잡한 경고 로직 제거
   };
 }

@@ -5,67 +5,49 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
 });
 
+// 🎯 간소화된 설문 데이터 (복잡한 조건 매핑 제거)
 export interface SurveyData {
-  experience: string;
-  squatMax: string;
-  benchMax: string;
-  deadliftMax: string;
-  goals: string[];
-  frequency: string;
-  equipment: string[];
-  injuries: string;
-  injuryDetails?: string;
   name?: string;
+  goals?: string[];
+  email?: string;
 }
 
 export async function generateTrainingProgram(surveyData: SurveyData): Promise<string> {
   try {
+    // 🎯 간소화된 프롬프트 (복잡한 조건 매핑 제거)
     const prompt = `당신은 세계 최고의 파워리프팅 코치입니다. 다음 정보를 바탕으로 한국어로 상세한 개인 맞춤형 파워리프팅 훈련 프로그램을 작성해주세요.
 
 설문 정보:
-- 경험 수준: ${surveyData.experience}
-- 현재 스쿼트 1RM: ${surveyData.squatMax}kg
-- 현재 벤치프레스 1RM: ${surveyData.benchMax}kg  
-- 현재 데드리프트 1RM: ${surveyData.deadliftMax}kg
-- 목표: ${surveyData.goals.join(', ')}
-- 주당 훈련 횟수: 주 ${surveyData.frequency}회
-- 사용 가능 장비: ${surveyData.equipment.join(', ')}
-- 부상 이력: ${surveyData.injuries}
-${surveyData.injuryDetails ? `- 부상 상세: ${surveyData.injuryDetails}` : ''}
+- 이름: ${surveyData.name || '고객'}
+- 목표: ${Array.isArray(surveyData.goals) ? surveyData.goals.join(', ') : '근력 향상'}
 
-다음 형식으로 JSON 응답해주세요 (스프레드시트 형태로 구성):
+다음 형식으로 JSON 응답해주세요:
 {
-  "program_title": "프로그램 제목",
+  "program_title": "${surveyData.name || '고객'}님의 맞춤 훈련 프로그램",
   "overview": "프로그램 개요 설명",
   "training_weeks": [
     {
       "week": 1,
-      "focus": "적응기",
+      "focus": "기본 적응",
       "workouts": [
         {
           "day": 1,
-          "workout_name": "스쿼트 중심 훈련",
+          "workout_name": "전신 운동",
           "exercises": [
             {
-              "exercise": "백 스쿼트",
-              "sets": 4,
-              "reps": "8-10",
-              "weight_percent": "75%",
-              "rest_minutes": 3,
+              "exercise": "스쿼트",
+              "sets": "3",
+              "reps": "8",
+              "weight_percent": "70%",
+              "rest_minutes": "2-3",
               "rpe": "7-8",
-              "notes": "깊은 자세 유지"
+              "notes": "기본 폼 집중"
             }
           ]
         }
       ]
     }
-  ],
-  "progression_notes": "주차별 진행 방법",
-  "warmup_protocol": "웜업 프로토콜",
-  "cooldown_protocol": "쿨다운 프로토콜",
-  "nutrition_guidelines": "영양 가이드라인",
-  "recovery_guidelines": "회복 가이드라인",
-  "safety_guidelines": "안전 수칙"
+  ]
 }`;
 
     const response = await openai.chat.completions.create({
