@@ -9,7 +9,7 @@ export default function FeaturesSection() {
     {
       icon: "fas fa-bullseye",
       title: "다양한 목표 지원",
-      description: "파워리프팅, 근비대, 다이어트, 대회준비 등 다양한 피트니스 목표에 최적화된 개별 프로그램을 제공합니다.",
+      description: "근력향상, 체력증진, 다이어트, 체력대회 등 다양한 피트니스 목표에 최적화된 개별 프로그램을 제공합니다.",
       bgColor: "bg-electric"
     },
     {
@@ -21,7 +21,7 @@ export default function FeaturesSection() {
     {
       icon: "fas fa-dumbbell",
       title: "장비별 최적화",
-      description: "홈짐, 상업적 헬스장, 파워리프팅 전용 짐 등 사용 가능한 장비에 따라 운동 선택과 프로그래밍을 조정합니다.",
+      description: "홈짐, 상업적 헬스장, 전문 트레이닝 센터 등 사용 가능한 장비에 따라 운동 선택과 프로그래밍을 조정합니다.",
       bgColor: "bg-accent"
     },
     {

@@ -26,7 +26,7 @@ export function registerDebugRoutes(app: Express): void {
       // 🎯 완료 체크리스트 상태
       checklist: {
         'CanonicalInput/ProgramPlan 타입 도입': '✅ 완료',
-        'SurveyRegistry 가동, sample 2종 통과': '✅ 완료 (powerlifting, crossfit)',
+        'SurveyRegistry 가동, sample 2종 통과': '✅ 완료 (훈련 패턴 A, B)',
         'planFromTables + rules JSON 반영': '✅ 완료 (weeks.json)',
         'Preflight 3개 규칙 활성 + warnings': '✅ 완료 (빈도/부상/초보자)',
         'Shared Drive 저장/날짜 샤딩/폴리싱': '✅ 완료 (기존 구현)',

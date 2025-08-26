@@ -15,7 +15,7 @@ export interface SurveyData {
 export async function generateTrainingProgram(surveyData: SurveyData): Promise<string> {
   try {
     // 🎯 간소화된 프롬프트 (복잡한 조건 매핑 제거)
-    const prompt = `당신은 세계 최고의 파워리프팅 코치입니다. 다음 정보를 바탕으로 한국어로 상세한 개인 맞춤형 파워리프팅 훈련 프로그램을 작성해주세요.
+    const prompt = `당신은 세계 최고의 훈련 코치입니다. 다음 정보를 바탕으로 한국어로 상세한 개인 맞춤형 훈련 프로그램을 작성해주세요.
 
 설문 정보:
 - 이름: ${surveyData.name || '고객'}
@@ -35,7 +35,7 @@ export async function generateTrainingProgram(surveyData: SurveyData): Promise<s
           "workout_name": "전신 운동",
           "exercises": [
             {
-              "exercise": "스쿼트",
+              "exercise": "운동 1",
               "sets": "3",
               "reps": "8",
               "weight_percent": "70%",
@@ -55,7 +55,7 @@ export async function generateTrainingProgram(surveyData: SurveyData): Promise<s
       messages: [
         {
           role: "system",
-          content: "당신은 경험이 풍부한 파워리프팅 코치입니다. 과학적 근거를 바탕으로 안전하고 효과적인 훈련 프로그램을 설계합니다."
+          content: "당신은 경험이 풍부한 훈련 코치입니다. 과학적 근거를 바탕으로 안전하고 효과적인 훈련 프로그램을 설계합니다."
         },
         {
           role: "user",

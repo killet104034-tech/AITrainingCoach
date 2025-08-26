@@ -59,7 +59,7 @@ export async function sendTrainingProgram(
     <body>
         <div class="header">
             <h1>SINABRO STRENGTH</h1>
-            <p>${name ? `${name}님을 위한` : '당신을 위한'} 개인 맞춤형 파워리프팅 프로그램</p>
+            <p>${name ? `${name}님을 위한` : '당신을 위한'} 개인 맞춤형 훈련 프로그램</p>
         </div>
 
         <div class="section">
@@ -178,7 +178,7 @@ export async function sendTrainingProgram(
     await transporter.sendMail({
       from: fromEmail,
       to: email,
-      subject: `💪 ${name ? `${name}님의` : '당신의'} Sinabro Strength 맞춤형 파워리프팅 프로그램`,
+      subject: `💪 ${name ? `${name}님의` : '당신의'} Sinabro Strength 맞춤형 훈련 프로그램`,
       html: htmlContent
     });
 

@@ -5,7 +5,6 @@ import type { Express } from "express";
 import { storage } from "../storage";
 import { insertSurveyResponseSchema } from "@shared/schema";
 import { sendTrainingProgram } from "../services/email";
-import { TrainingGenerator } from "../../packages/packs/powerlifting-v1/protocol-generator";
 
 export function registerSurveyRoutes(app: Express): void {
   // 설문 제출 엔드포인트 (깔끔하게 최적화)
@@ -15,21 +14,17 @@ export function registerSurveyRoutes(app: Express): void {
       const validatedData = insertSurveyResponseSchema.parse(req.body);
       const surveyResponse = await storage.createSurveyResponse(validatedData);
       
-      // 2. 파워리프팅 프로그램 생성 (김동환님 매핑 기반)
-      const generator = new TrainingGenerator();
+      // 2. 훈련 프로그램 생성 (코치 매핑 기반)
       let trainingProgram;
       
       try {
-        trainingProgram = generator.generateProgram(validatedData);
-      } catch (mappingError) {
-        console.log('매핑 없음:', mappingError.message);
-        // 김동환님 매핑이 없으면 간단한 기본 프로그램
+        // 간단한 기본 프로그램 생성
         trainingProgram = {
           program_title: `${validatedData.name}님의 기본 프로그램`,
           user_maxes: {
-            squat: validatedData.squat_max || "100",
-            bench: validatedData.bench_max || "80", 
-            deadlift: validatedData.deadlift_max || "120"
+            exercise1: validatedData.exercise1_max || "100",
+            exercise2: validatedData.exercise2_max || "80", 
+            exercise3: validatedData.exercise3_max || "120"
           },
           training_weeks: [{
             week: 1,
@@ -38,13 +33,13 @@ export function registerSurveyRoutes(app: Express): void {
               day: 1,
               workout_name: "전신 운동",
               exercises: [{
-                exercise: "스쿼트",
+                exercise: "운동 1",
                 sets: "3",
                 reps: "8",
                 weight_percent: "70%",
                 rest_minutes: "3분",
                 rpe: "7",
-                notes: "김동환님 매핑 필요"
+                notes: "코치 매핑 필요"
               }]
             }]
           }],
@@ -55,6 +50,8 @@ export function registerSurveyRoutes(app: Express): void {
             source: "기본 템플릿"
           }
         };
+      } catch (error) {
+        console.log('프로그램 생성 오류:', error.message);
       }
       
       // 3. 프로그램 저장

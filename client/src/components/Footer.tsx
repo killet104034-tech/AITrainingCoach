@@ -5,7 +5,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-12">
           <div>
             <h3 className="text-xl font-light mb-6">Sinabro Strength</h3>
-            <p className="text-gray-400 mb-6 font-light leading-relaxed">인공지능 기반 개인 맞춤형 파워리프팅 훈련 프로그램으로 더 강해지세요.</p>
+            <p className="text-gray-400 mb-6 font-light leading-relaxed">인공지능 기반 개인 맞춤형 훈련 프로그램으로 더 강해지세요.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">
                 <i className="fab fa-instagram text-xl"></i>

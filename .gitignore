@@ -4,3 +4,10 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Domain pollution prevention
+.local/
+attached_assets/
+*.cache/
+*.log
+**/__generated__/
