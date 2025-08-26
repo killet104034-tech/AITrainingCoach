@@ -257,9 +257,8 @@ async function populateWeekSection(
     const minWeight = Math.max(exercise.targetWeight - 10, Math.round(exercise.max * 0.5));
     const maxWeight = exercise.targetWeight + 10;
     
-    // 🎯 실제 사용자 시트 컬럼 순서에 정확히 맞춘 매핑
+    // 🎯 운동명은 기존 고정값 유지, B열부터만 데이터 입력
     const rowData = [
-      exercise.exercise,           // A열: 운동명
       exercise.sets,               // B열: Set수
       exercise.rpe,                // C열: RPE
       `${minWeight}`,              // D열: 최소중량
@@ -270,10 +269,10 @@ async function populateWeekSection(
       ''                           // I열: 메모 (빈칸)
     ];
     
-    // 시트에 데이터 입력
+    // 시트에 데이터 입력 (A열 운동명 제외, B열부터만)
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `Block!A${currentRow}:K${currentRow}`,
+      range: `Block!B${currentRow}:I${currentRow}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [rowData]
