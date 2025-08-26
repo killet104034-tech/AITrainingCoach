@@ -130,12 +130,13 @@ async function populateTrainingData(spreadsheetId: string, programData: WorkoutP
   const deadliftMax = parseInt(programData.user_maxes.deadlift);
 
   // 사용자 시트 구조에 맞춘 데이터 입력 (W1~W5까지 전체)
+  // 실제 시트 구조에서 각 주차별 시작 행 확인 필요
   const weekSections = [
-    { label: 'W1', startRow: 14, weekNum: 1 },
-    { label: 'W2', startRow: 35, weekNum: 2 },  
-    { label: 'W3', startRow: 56, weekNum: 3 },
-    { label: 'W4', startRow: 77, weekNum: 4 },
-    { label: 'W5', startRow: 98, weekNum: 5 }
+    { label: 'W1', startRow: 15, weekNum: 1 },   // W1 운동 시작행
+    { label: 'W2', startRow: 36, weekNum: 2 },   // W2 운동 시작행  
+    { label: 'W3', startRow: 57, weekNum: 3 },   // W3 운동 시작행
+    { label: 'W4', startRow: 78, weekNum: 4 },   // W4 운동 시작행
+    { label: 'W5', startRow: 99, weekNum: 5 }    // W5 운동 시작행
   ];
   
   // 각 주차별로 데이터 입력
