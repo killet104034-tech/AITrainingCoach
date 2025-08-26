@@ -1,7 +1,7 @@
 // 🏋️ 파워리프팅 v1 프로토콜 생성기
-// 📋 조건매핑 → 구체적 운동프로그램 변환
+// 📋 사용자 정의 조건매핑 → 구체적 운동프로그램 변환
 
-import { TrainingProtocol, ConditionMapper } from '@sinabro/core/condition-mapper';
+import { UserDefinedMapper } from '@sinabro/core/user-defined-mapping';
 
 export interface WorkoutDay {
   day: number;
@@ -40,21 +40,188 @@ export interface GeneratedProgram {
 }
 
 export class PowerliftingProtocolGenerator {
-  private conditionMapper: ConditionMapper;
+  private userMapper: UserDefinedMapper;
   
   constructor() {
-    this.conditionMapper = new ConditionMapper();
+    this.userMapper = new UserDefinedMapper();
   }
 
-  // 🎯 메인 프로그램 생성 함수
+  // 🎯 메인 프로그램 생성 함수 - 사용자 정의 수치 사용
   public generateProgram(surveyData: any): GeneratedProgram {
-    // 1. 조건 매핑으로 프로토콜 결정
-    const protocol = this.conditionMapper.mapConditionsToProtocol(surveyData);
+    // 1. 사용자 정의 매핑으로 정확한 수치 찾기
+    const userProtocol = this.userMapper.mapToUserDefinedProtocol(surveyData);
     
-    // 2. 프로토콜을 실제 운동 프로그램으로 변환
-    const program = this.protocolToProgram(protocol, surveyData);
+    if (!userProtocol) {
+      throw new Error(`조건에 맞는 프로토콜을 찾을 수 없습니다. 사용 가능한 조건: ${this.userMapper.getAvailableConditions().join(', ')}`);
+    }
+    
+    // 2. 사용자 정의 수치를 실제 운동 프로그램으로 변환
+    const program = this.userProtocolToProgram(userProtocol, surveyData);
     
     return program;
+  }
+
+  // 🔄 사용자 정의 프로토콜 → 구체적 프로그램 변환
+  private userProtocolToProgram(userProtocol: any, surveyData: any): GeneratedProgram {
+    const weeks = [];
+    
+    for (let weekNum = 1; weekNum <= userProtocol.protocol.block_length_weeks; weekNum++) {
+      const week = {
+        week: weekNum,
+        focus: this.getWeekFocus(weekNum, userProtocol.protocol),
+        workouts: this.generateWeekWorkoutsFromUserProtocol(weekNum, userProtocol.protocol, surveyData)
+      };
+      weeks.push(week);
+    }
+
+    return {
+      program_title: `${surveyData.name || '고객'}님의 맞춤 파워리프팅 프로그램`,
+      user_maxes: {
+        squat: surveyData.squat_max || "100",
+        bench: surveyData.bench_max || "80", 
+        deadlift: surveyData.deadlift_max || "120"
+      },
+      training_weeks: weeks,
+      metadata: {
+        protocol_used: userProtocol.condition_key,
+        condition_path: userProtocol.condition_key,
+        customizations: []
+      }
+    };
+  }
+
+  // 📅 사용자 정의 수치로 주차별 운동 생성
+  private generateWeekWorkoutsFromUserProtocol(weekNum: number, protocol: any, surveyData: any): WorkoutDay[] {
+    const workouts: WorkoutDay[] = [];
+    
+    for (let dayNum = 1; dayNum <= protocol.days_per_week; dayNum++) {
+      const workout = this.generateDayWorkoutFromUserProtocol(dayNum, weekNum, protocol, surveyData);
+      workouts.push(workout);
+    }
+    
+    return workouts;
+  }
+
+  // 🏋️ 사용자 정의 수치로 일일 운동 생성
+  private generateDayWorkoutFromUserProtocol(dayNum: number, weekNum: number, protocol: any, surveyData: any): WorkoutDay {
+    const exercises: Exercise[] = [];
+    
+    // 요일별 메인 운동 배치
+    const mainLift = this.getMainLiftForDay(dayNum, protocol.days_per_week);
+    
+    if (mainLift === 'squat') {
+      exercises.push(...this.generateSquatFromUserProtocol(protocol, weekNum));
+    } else if (mainLift === 'bench') {
+      exercises.push(...this.generateBenchFromUserProtocol(protocol, weekNum));
+    } else if (mainLift === 'deadlift') {
+      exercises.push(...this.generateDeadliftFromUserProtocol(protocol, weekNum));
+    }
+    
+    // 보조 운동 추가 (사용자 정의 수치)
+    exercises.push(...this.generateAccessoryFromUserProtocol(protocol, mainLift));
+    
+    return {
+      day: dayNum,
+      workout_name: `${mainLift} 중심 훈련`,
+      focus: mainLift.toUpperCase(),
+      exercises
+    };
+  }
+
+  // 🏋️ 사용자 정의 스쿼트 운동 생성
+  private generateSquatFromUserProtocol(protocol: any, weekNum: number): Exercise[] {
+    const squat = protocol.squat;
+    const adjustedWeight = this.adjustWeightByWeek(squat.weight_percent, weekNum);
+    
+    return [{
+      exercise: '백 스쿼트',
+      sets: squat.sets.toString(),
+      reps: squat.reps.toString(),
+      weight_percent: `${adjustedWeight}%`,
+      rpe: squat.rpe.toString(),
+      rest_minutes: `${squat.rest_minutes}분`,
+      notes: `사용자 정의 프로토콜 적용`
+    }];
+  }
+
+  // 🏋️ 사용자 정의 벤치 운동 생성
+  private generateBenchFromUserProtocol(protocol: any, weekNum: number): Exercise[] {
+    const bench = protocol.bench;
+    const adjustedWeight = this.adjustWeightByWeek(bench.weight_percent, weekNum);
+    
+    return [{
+      exercise: '벤치 프레스',
+      sets: bench.sets.toString(),
+      reps: bench.reps.toString(),
+      weight_percent: `${adjustedWeight}%`,
+      rpe: bench.rpe.toString(),
+      rest_minutes: `${bench.rest_minutes}분`,
+      notes: `사용자 정의 프로토콜 적용`
+    }];
+  }
+
+  // 🏋️ 사용자 정의 데드리프트 운동 생성
+  private generateDeadliftFromUserProtocol(protocol: any, weekNum: number): Exercise[] {
+    const deadlift = protocol.deadlift;
+    const adjustedWeight = this.adjustWeightByWeek(deadlift.weight_percent, weekNum);
+    
+    return [{
+      exercise: '데드리프트',
+      sets: deadlift.sets.toString(),
+      reps: deadlift.reps.toString(),
+      weight_percent: `${adjustedWeight}%`,
+      rpe: deadlift.rpe.toString(),
+      rest_minutes: `${deadlift.rest_minutes}분`,
+      notes: `사용자 정의 프로토콜 적용`
+    }];
+  }
+
+  // 💪 사용자 정의 보조운동 생성
+  private generateAccessoryFromUserProtocol(protocol: any, mainLift: string): Exercise[] {
+    const accessories = this.getAccessoryExercises(mainLift);
+    
+    return accessories.map(exercise => ({
+      exercise,
+      sets: protocol.accessory_sets.toString(),
+      reps: protocol.accessory_reps,
+      weight_percent: "70-75%",
+      rpe: protocol.accessory_rpe.toString(),
+      rest_minutes: "2분",
+      notes: "보조 운동"
+    }));
+  }
+
+  // 🎯 헬퍼 함수들
+  private getMainLiftForDay(dayNum: number, daysPerWeek: number): string {
+    if (daysPerWeek === 3) {
+      const lifts = ['squat', 'bench', 'deadlift'];
+      return lifts[dayNum - 1];
+    } else if (daysPerWeek === 4) {
+      const lifts = ['squat', 'bench', 'deadlift', 'squat'];
+      return lifts[dayNum - 1];
+    }
+    return 'squat';
+  }
+
+  private adjustWeightByWeek(baseWeight: number, weekNum: number): number {
+    // 주차별 2.5% 증가
+    return baseWeight + (weekNum - 1) * 2.5;
+  }
+
+  private getAccessoryExercises(mainLift: string): string[] {
+    const accessories: { [key: string]: string[] } = {
+      'squat': ['프론트 스쿼트', '불가리안 스플릿 스쿼트'],
+      'bench': ['인클라인 벤치프레스', '딥스'],
+      'deadlift': ['루마니안 데드리프트', '벤트오버 로우']
+    };
+    return accessories[mainLift] || [];
+  }
+
+  private getWeekFocus(weekNum: number, protocol: any): string {
+    if (weekNum === protocol.deload_week) {
+      return `디로드 주차`;
+    }
+    return `훈련 ${weekNum}주차`;
   }
 
   // 🔄 프로토콜 → 구체적 프로그램 변환
