@@ -37,143 +37,31 @@ export interface UserDefinedRule {
   };
 }
 
-// 🗂️ 김동환 코치 매핑 테이블 (김동환님이 실제로 훈련 짜는 방식)
+// 🗂️ 김동환 코치 매핑 테이블 (김동환님만 입력 가능)
+// ⚠️ 경고: AI가 임의로 수치를 정하면 절대 안 됨! 김동환님만 추가할 것!
 export const DONGHWAN_COACHING_MAPPINGS: UserDefinedRule[] = [
+  // 🚫 AI 금지! 김동환님이 직접 여기에 조건-수치 매핑을 추가해야 함
+  // 예시 형태만 보여줌 (실제 수치는 김동환님이 입력):
+  /*
   {
-    condition_key: "beginner-strength-straight_sets-excited_style",
-    protocol: {
-      // 🎯 김동환님이 초급자+흥분스타일에게 근력훈련+스트레이트세트로 실제 짜주는 방식
-      squat: {
-        sets: 5,           // 김동환: "초급자는 볼륨이 중요해서 5세트"
-        reps: 5,           // 김동환: "근력은 5회가 최적"
-        weight_percent: 77, // 김동환: "흥분하는 타입은 2% 더 올려도 괜찮아"
-        rpe: 9,            // 김동환: "흥분하는 애들은 RPE 9까지 밀어도 돼"
-        rest_minutes: 2    // 김동환: "흥분하는 애들은 2분만 쉬어도 다음 세트 잘해"
-      },
-      bench: {
-        sets: 3,           // 김동환: "벤치는 어깨 부담 있어서 3세트"  
-        reps: 8,           // 김동환: "초급자 벤치는 8회로 폼 익히기"
-        weight_percent: 70, // 김동환: "벤치는 보수적으로 70%"
-        rpe: 7,            // 김동환: "벤치는 RPE 7이 안전"
-        rest_minutes: 2    // 김동환: "벤치는 2분이면 충분"
-      },
-      deadlift: {
-        sets: 3,           // 김동환: "데드는 피로 누적 심해서 3세트만"
-        reps: 5,           // 김동환: "데드 5회가 폼 유지 한계"
-        weight_percent: 80, // 김동환: "데드는 80%까지 올려도 괜찮아"
-        rpe: 8,            // 김동환: "데드 RPE 8은 적당한 자극"
-        rest_minutes: 4    // 김동환: "데드는 4분 쉬어야 다음 세트 가능"
-      },
-      days_per_week: 3,      // 김동환: "초급자는 주 3회가 최적 회복"
-      block_length_weeks: 4, // 김동환: "4주면 적응하고 변화 필요"
-      deload_week: 4,        // 김동환: "4주마다 디로드"
-      accessory_sets: 3,     // 김동환: "보조운동은 3세트면 충분"
-      accessory_reps: "8-12", // 김동환: "보조는 8-12회로 볼륨"
-      accessory_rpe: 7       // 김동환: "보조는 RPE 7로 가볍게"
-    }
-  },
-  {
-    condition_key: "beginner-strength-down_sets",
+    condition_key: "김동환님이_정한_조건키",
     protocol: {
       squat: {
-        sets: 5, // 메인 3세트 + 백오프 2세트
-        reps: 5, // 메인은 5회, 백오프는 8회
-        weight_percent: 75, // 메인 75%, 백오프 65%
-        rpe: 8,
-        rest_minutes: 3
+        sets: 김동환님이_정한_세트수,
+        reps: 김동환님이_정한_횟수,
+        weight_percent: 김동환님이_정한_중량퍼센트,
+        rpe: 김동환님이_정한_RPE,
+        rest_minutes: 김동환님이_정한_휴식시간
       },
-      bench: {
-        sets: 4,
-        reps: 6,
-        weight_percent: 70,
-        rpe: 7,
-        rest_minutes: 2
-      },
-      deadlift: {
-        sets: 4,
-        reps: 5,
-        weight_percent: 80,
-        rpe: 8,
-        rest_minutes: 4
-      },
-      days_per_week: 3,
-      block_length_weeks: 6,
-      deload_week: 6,
-      accessory_sets: 3,
-      accessory_reps: "10-15",
-      accessory_rpe: 6
-    }
-  },
-  {
-    condition_key: "intermediate-strength-straight_sets",
-    protocol: {
-      squat: {
-        sets: 5,
-        reps: 3,
-        weight_percent: 85,
-        rpe: 9,
-        rest_minutes: 4
-      },
-      bench: {
-        sets: 4,
-        reps: 5,
-        weight_percent: 80,
-        rpe: 8,
-        rest_minutes: 3
-      },
-      deadlift: {
-        sets: 3,
-        reps: 3,
-        weight_percent: 90,
-        rpe: 9,
-        rest_minutes: 5
-      },
-      days_per_week: 4,
-      block_length_weeks: 6,
-      deload_week: 6,
-      accessory_sets: 4,
-      accessory_reps: "6-10",
-      accessory_rpe: 8
-    }
-  },
-  {
-    condition_key: "intermediate-strength-down_sets",
-    protocol: {
-      squat: {
-        sets: 6, // 메인 4세트 + 백오프 2세트
-        reps: 3,
-        weight_percent: 85,
-        rpe: 9,
-        rest_minutes: 4
-      },
-      bench: {
-        sets: 5,
-        reps: 4,
-        weight_percent: 82,
-        rpe: 8,
-        rest_minutes: 3
-      },
-      deadlift: {
-        sets: 4,
-        reps: 2,
-        weight_percent: 92,
-        rpe: 9,
-        rest_minutes: 5
-      },
-      days_per_week: 4,
-      block_length_weeks: 8,
-      deload_week: 8,
-      accessory_sets: 4,
-      accessory_reps: "8-12",
-      accessory_rpe: 7
+      // 벤치, 데드리프트도 김동환님이 직접...
     }
   }
-  // ✏️ 여기에 사용자가 계속 추가할 수 있음!
+  */
 ];
 
 export class UserDefinedMapper {
   
-  // 🎯 설문 조건을 사용자 정의 수치로 매핑
+  // 🎯 설문 조건을 김동환님 정의 수치로 매핑 (AI 수치 생성 금지!)
   public mapToUserDefinedProtocol(surveyData: any): UserDefinedRule | null {
     // 1. 설문 데이터에서 조건 키 생성
     const conditionKey = this.buildConditionKey(surveyData);
@@ -183,8 +71,14 @@ export class UserDefinedMapper {
       rule => rule.condition_key === conditionKey
     );
     
-    console.log(`🔍 [UserMapper] 조건키: ${conditionKey}`);
-    console.log(`📋 [UserMapper] 매칭결과: ${matchingRule ? '발견' : '없음'}`);
+    console.log(`🔍 [김동환매퍼] 조건키: ${conditionKey}`);
+    console.log(`📋 [김동환매퍼] 매칭결과: ${matchingRule ? '김동환님 수치 발견' : '김동환님이 아직 입력 안함'}`);
+    
+    // ⚠️ 중요: 매칭되는 규칙이 없으면 null 반환 (AI가 임의로 만들면 안 됨!)
+    if (!matchingRule) {
+      console.log(`❌ [김동환매퍼] 조건키 "${conditionKey}"에 대한 김동환님의 수치가 없습니다.`);
+      console.log(`💡 [김동환매퍼] 김동환님께 해당 조건의 훈련 방식을 문의하세요.`);
+    }
     
     return matchingRule || null;
   }
@@ -219,37 +113,6 @@ export class UserDefinedMapper {
     DONGHWAN_COACHING_MAPPINGS.push(rule);
   }
 
-  // 🔄 새 조건 항목 추가 시 매핑 확장
-  public expandMapping(newCondition: string, donghwanJudgment: any): void {
-    // 기존 모든 조건에 새 항목 추가
-    DONGHWAN_COACHING_MAPPINGS.forEach(rule => {
-      const newKey = `${rule.condition_key}-${newCondition}`;
-      const adjustedProtocol = this.applyDonghwanJudgment(rule.protocol, donghwanJudgment);
-      
-      DONGHWAN_COACHING_MAPPINGS.push({
-        condition_key: newKey,
-        protocol: adjustedProtocol
-      });
-    });
-  }
-
-  // 🧠 김동환님 판단 적용
-  private applyDonghwanJudgment(baseProtocol: any, judgment: any): any {
-    const adjusted = JSON.parse(JSON.stringify(baseProtocol));
-    
-    // 김동환님이 새 조건에 대해 어떻게 조정하라고 했는지 적용
-    if (judgment.intensityAdjustment) {
-      adjusted.squat.weight_percent += judgment.intensityAdjustment;
-      adjusted.bench.weight_percent += judgment.intensityAdjustment;
-      adjusted.deadlift.weight_percent += judgment.intensityAdjustment;
-    }
-    
-    if (judgment.restAdjustment) {
-      adjusted.squat.rest_minutes += judgment.restAdjustment;
-      adjusted.bench.rest_minutes += judgment.restAdjustment;
-      adjusted.deadlift.rest_minutes += judgment.restAdjustment;
-    }
-    
-    return adjusted;
-  }
+  // 🚫 AI 수치 생성 절대 금지 함수들 삭제됨
+  // 김동환님이 직접 addCoachingRule()로만 추가 가능
 }

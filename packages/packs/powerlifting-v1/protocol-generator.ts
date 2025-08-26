@@ -2,6 +2,7 @@
 // 📋 사용자 정의 조건매핑 → 구체적 운동프로그램 변환
 
 import { UserDefinedMapper } from '@sinabro/core/user-defined-mapping';
+import { AIPreventionGuard } from '@sinabro/core/ai-prevention-guard';
 
 export interface WorkoutDay {
   day: number;
@@ -46,30 +47,43 @@ export class PowerliftingProtocolGenerator {
     this.userMapper = new UserDefinedMapper();
   }
 
-  // 🎯 메인 프로그램 생성 함수 - 사용자 정의 수치 사용
+  // 🎯 메인 프로그램 생성 함수 - 김동환님 수치만 사용 (AI 생성 금지!)
   public generateProgram(surveyData: any): GeneratedProgram {
-    // 1. 사용자 정의 매핑으로 정확한 수치 찾기
-    const userProtocol = this.userMapper.mapToUserDefinedProtocol(surveyData);
+    // 1. 김동환님 매핑에서 정확한 수치 찾기
+    const donghwanProtocol = this.userMapper.mapToUserDefinedProtocol(surveyData);
     
-    if (!userProtocol) {
-      throw new Error(`조건에 맞는 프로토콜을 찾을 수 없습니다. 사용 가능한 조건: ${this.userMapper.getAvailableConditions().join(', ')}`);
+    // 🚫 김동환님이 아직 입력하지 않은 조건이면 AI가 임의로 만들면 안 됨!
+    if (!donghwanProtocol) {
+      const conditionKey = this.buildConditionKeyForError(surveyData);
+      const waitingMessage = AIPreventionGuard.generateWaitingMessage(conditionKey);
+      console.log(waitingMessage);
+      
+      throw new Error(`❌ 김동환님 수치 없음: ${conditionKey}\n\n${waitingMessage}`);
     }
     
-    // 2. 사용자 정의 수치를 실제 운동 프로그램으로 변환
-    const program = this.userProtocolToProgram(userProtocol, surveyData);
+    // 2. 김동환님 수치를 실제 운동 프로그램으로 변환 (수치 변경 없이!)
+    const program = this.donghwanProtocolToProgram(donghwanProtocol, surveyData);
     
     return program;
   }
 
-  // 🔄 사용자 정의 프로토콜 → 구체적 프로그램 변환
-  private userProtocolToProgram(userProtocol: any, surveyData: any): GeneratedProgram {
+  // 🔑 에러용 조건키 생성
+  private buildConditionKeyForError(surveyData: any): string {
+    const experience = surveyData.experience_level || 'unknown';
+    const goal = surveyData.goals?.[0] || 'unknown';
+    const backoff = surveyData.backoff_method || 'unknown';
+    return `${experience}-${goal}-${backoff}`;
+  }
+
+  // 🔄 김동환님 프로토콜 → 구체적 프로그램 변환 (수치 변경 금지!)
+  private donghwanProtocolToProgram(donghwanProtocol: any, surveyData: any): GeneratedProgram {
     const weeks = [];
     
-    for (let weekNum = 1; weekNum <= userProtocol.protocol.block_length_weeks; weekNum++) {
+    for (let weekNum = 1; weekNum <= donghwanProtocol.protocol.block_length_weeks; weekNum++) {
       const week = {
         week: weekNum,
-        focus: this.getWeekFocus(weekNum, userProtocol.protocol),
-        workouts: this.generateWeekWorkoutsFromUserProtocol(weekNum, userProtocol.protocol, surveyData)
+        focus: this.getWeekFocus(weekNum, donghwanProtocol.protocol),
+        workouts: this.generateWeekWorkoutsFromDonghwanProtocol(weekNum, donghwanProtocol.protocol, surveyData)
       };
       weeks.push(week);
     }
@@ -83,42 +97,43 @@ export class PowerliftingProtocolGenerator {
       },
       training_weeks: weeks,
       metadata: {
-        protocol_used: userProtocol.condition_key,
-        condition_path: userProtocol.condition_key,
-        customizations: []
+        protocol_used: donghwanProtocol.condition_key,
+        condition_path: donghwanProtocol.condition_key,
+        customizations: [],
+        source: "김동환님 직접 입력 수치"
       }
     };
   }
 
-  // 📅 사용자 정의 수치로 주차별 운동 생성
-  private generateWeekWorkoutsFromUserProtocol(weekNum: number, protocol: any, surveyData: any): WorkoutDay[] {
+  // 📅 김동환님 수치로 주차별 운동 생성 (수치 변경 금지!)
+  private generateWeekWorkoutsFromDonghwanProtocol(weekNum: number, protocol: any, surveyData: any): WorkoutDay[] {
     const workouts: WorkoutDay[] = [];
     
     for (let dayNum = 1; dayNum <= protocol.days_per_week; dayNum++) {
-      const workout = this.generateDayWorkoutFromUserProtocol(dayNum, weekNum, protocol, surveyData);
+      const workout = this.generateDayWorkoutFromDonghwanProtocol(dayNum, weekNum, protocol, surveyData);
       workouts.push(workout);
     }
     
     return workouts;
   }
 
-  // 🏋️ 사용자 정의 수치로 일일 운동 생성
-  private generateDayWorkoutFromUserProtocol(dayNum: number, weekNum: number, protocol: any, surveyData: any): WorkoutDay {
+  // 🏋️ 김동환님 수치로 일일 운동 생성 (수치 변경 금지!)
+  private generateDayWorkoutFromDonghwanProtocol(dayNum: number, weekNum: number, protocol: any, surveyData: any): WorkoutDay {
     const exercises: Exercise[] = [];
     
     // 요일별 메인 운동 배치
     const mainLift = this.getMainLiftForDay(dayNum, protocol.days_per_week);
     
     if (mainLift === 'squat') {
-      exercises.push(...this.generateSquatFromUserProtocol(protocol, weekNum));
+      exercises.push(...this.generateSquatFromDonghwanProtocol(protocol, weekNum));
     } else if (mainLift === 'bench') {
-      exercises.push(...this.generateBenchFromUserProtocol(protocol, weekNum));
+      exercises.push(...this.generateBenchFromDonghwanProtocol(protocol, weekNum));
     } else if (mainLift === 'deadlift') {
-      exercises.push(...this.generateDeadliftFromUserProtocol(protocol, weekNum));
+      exercises.push(...this.generateDeadliftFromDonghwanProtocol(protocol, weekNum));
     }
     
-    // 보조 운동 추가 (사용자 정의 수치)
-    exercises.push(...this.generateAccessoryFromUserProtocol(protocol, mainLift));
+    // 보조 운동 추가 (김동환님 수치만 사용!)
+    exercises.push(...this.generateAccessoryFromDonghwanProtocol(protocol, mainLift));
     
     return {
       day: dayNum,
@@ -128,66 +143,66 @@ export class PowerliftingProtocolGenerator {
     };
   }
 
-  // 🏋️ 사용자 정의 스쿼트 운동 생성
-  private generateSquatFromUserProtocol(protocol: any, weekNum: number): Exercise[] {
+  // 🏋️ 김동환님 스쿼트 수치 그대로 적용 (변경 금지!)
+  private generateSquatFromDonghwanProtocol(protocol: any, weekNum: number): Exercise[] {
     const squat = protocol.squat;
-    const adjustedWeight = this.adjustWeightByWeek(squat.weight_percent, weekNum);
+    // 🚫 AI가 임의로 조정하면 안 됨! 김동환님 수치 그대로 사용!
     
     return [{
       exercise: '백 스쿼트',
       sets: squat.sets.toString(),
       reps: squat.reps.toString(),
-      weight_percent: `${adjustedWeight}%`,
+      weight_percent: `${squat.weight_percent}%`, // 김동환님 수치 그대로!
       rpe: squat.rpe.toString(),
       rest_minutes: `${squat.rest_minutes}분`,
-      notes: `사용자 정의 프로토콜 적용`
+      notes: `김동환 코치 직접 설정 수치`
     }];
   }
 
-  // 🏋️ 사용자 정의 벤치 운동 생성
-  private generateBenchFromUserProtocol(protocol: any, weekNum: number): Exercise[] {
+  // 🏋️ 김동환님 벤치 수치 그대로 적용 (변경 금지!)
+  private generateBenchFromDonghwanProtocol(protocol: any, weekNum: number): Exercise[] {
     const bench = protocol.bench;
-    const adjustedWeight = this.adjustWeightByWeek(bench.weight_percent, weekNum);
+    // 🚫 AI가 임의로 조정하면 안 됨! 김동환님 수치 그대로 사용!
     
     return [{
       exercise: '벤치 프레스',
       sets: bench.sets.toString(),
       reps: bench.reps.toString(),
-      weight_percent: `${adjustedWeight}%`,
+      weight_percent: `${bench.weight_percent}%`, // 김동환님 수치 그대로!
       rpe: bench.rpe.toString(),
       rest_minutes: `${bench.rest_minutes}분`,
-      notes: `사용자 정의 프로토콜 적용`
+      notes: `김동환 코치 직접 설정 수치`
     }];
   }
 
-  // 🏋️ 사용자 정의 데드리프트 운동 생성
-  private generateDeadliftFromUserProtocol(protocol: any, weekNum: number): Exercise[] {
+  // 🏋️ 김동환님 데드리프트 수치 그대로 적용 (변경 금지!)
+  private generateDeadliftFromDonghwanProtocol(protocol: any, weekNum: number): Exercise[] {
     const deadlift = protocol.deadlift;
-    const adjustedWeight = this.adjustWeightByWeek(deadlift.weight_percent, weekNum);
+    // 🚫 AI가 임의로 조정하면 안 됨! 김동환님 수치 그대로 사용!
     
     return [{
       exercise: '데드리프트',
       sets: deadlift.sets.toString(),
       reps: deadlift.reps.toString(),
-      weight_percent: `${adjustedWeight}%`,
+      weight_percent: `${deadlift.weight_percent}%`, // 김동환님 수치 그대로!
       rpe: deadlift.rpe.toString(),
       rest_minutes: `${deadlift.rest_minutes}분`,
-      notes: `사용자 정의 프로토콜 적용`
+      notes: `김동환 코치 직접 설정 수치`
     }];
   }
 
-  // 💪 사용자 정의 보조운동 생성
-  private generateAccessoryFromUserProtocol(protocol: any, mainLift: string): Exercise[] {
+  // 💪 김동환님 보조운동 수치 그대로 적용 (변경 금지!)
+  private generateAccessoryFromDonghwanProtocol(protocol: any, mainLift: string): Exercise[] {
     const accessories = this.getAccessoryExercises(mainLift);
     
     return accessories.map(exercise => ({
       exercise,
       sets: protocol.accessory_sets.toString(),
       reps: protocol.accessory_reps,
-      weight_percent: "70-75%",
+      weight_percent: "김동환님이 정한 값 필요", // 🚫 AI가 "70-75%" 같은 값 정하면 안 됨!
       rpe: protocol.accessory_rpe.toString(),
-      rest_minutes: "2분",
-      notes: "보조 운동"
+      rest_minutes: "김동환님이 정한 값 필요", // 🚫 AI가 "2분" 같은 값 정하면 안 됨!
+      notes: "김동환 코치 보조운동 수치"
     }));
   }
 
@@ -203,10 +218,8 @@ export class PowerliftingProtocolGenerator {
     return 'squat';
   }
 
-  private adjustWeightByWeek(baseWeight: number, weekNum: number): number {
-    // 주차별 2.5% 증가
-    return baseWeight + (weekNum - 1) * 2.5;
-  }
+  // 🚫 AI가 임의로 중량 조정하는 함수 삭제됨!
+  // 김동환님이 주차별 진행을 어떻게 할지 직접 정해야 함!
 
   private getAccessoryExercises(mainLift: string): string[] {
     const accessories: { [key: string]: string[] } = {
