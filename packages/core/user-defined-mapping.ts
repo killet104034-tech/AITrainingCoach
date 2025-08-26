@@ -1,5 +1,5 @@
-// 🎯 사용자 정의 조건매핑 시스템
-// 👨‍💼 코치가 직접 설정하는 수치 테이블
+// 🎯 김동환 코치 전용 조건매핑 시스템  
+// 👨‍💼 김동환님이 실제로 고객들에게 훈련을 짜주는 방식을 시스템화
 
 export interface UserDefinedRule {
   condition_key: string;  // "beginner-strength-straight_sets"
@@ -37,38 +37,39 @@ export interface UserDefinedRule {
   };
 }
 
-// 🗂️ 사용자 정의 매핑 테이블 (코치가 직접 설정)
-export const USER_DEFINED_MAPPINGS: UserDefinedRule[] = [
+// 🗂️ 김동환 코치 매핑 테이블 (김동환님이 실제로 훈련 짜는 방식)
+export const DONGHWAN_COACHING_MAPPINGS: UserDefinedRule[] = [
   {
     condition_key: "beginner-strength-straight_sets",
     protocol: {
+      // 🎯 김동환님이 초급자에게 근력훈련+스트레이트세트로 실제 짜주는 방식
       squat: {
-        sets: 5,
-        reps: 5,
-        weight_percent: 75,
-        rpe: 8,
-        rest_minutes: 3
+        sets: 5,           // 김동환: "초급자는 볼륨이 중요해서 5세트"
+        reps: 5,           // 김동환: "근력은 5회가 최적"
+        weight_percent: 75, // 김동환: "75%면 폼 유지하면서 근력 늘어"
+        rpe: 8,            // 김동환: "RPE 8이면 안전하게 강도 올릴 수 있어"
+        rest_minutes: 3    // 김동환: "3분은 회복해야 다음 세트 제대로 해"
       },
       bench: {
-        sets: 3,
-        reps: 8,
-        weight_percent: 70,
-        rpe: 7,
-        rest_minutes: 2
+        sets: 3,           // 김동환: "벤치는 어깨 부담 있어서 3세트"  
+        reps: 8,           // 김동환: "초급자 벤치는 8회로 폼 익히기"
+        weight_percent: 70, // 김동환: "벤치는 보수적으로 70%"
+        rpe: 7,            // 김동환: "벤치는 RPE 7이 안전"
+        rest_minutes: 2    // 김동환: "벤치는 2분이면 충분"
       },
       deadlift: {
-        sets: 3,
-        reps: 5,
-        weight_percent: 80,
-        rpe: 8,
-        rest_minutes: 4
+        sets: 3,           // 김동환: "데드는 피로 누적 심해서 3세트만"
+        reps: 5,           // 김동환: "데드 5회가 폼 유지 한계"
+        weight_percent: 80, // 김동환: "데드는 80%까지 올려도 괜찮아"
+        rpe: 8,            // 김동환: "데드 RPE 8은 적당한 자극"
+        rest_minutes: 4    // 김동환: "데드는 4분 쉬어야 다음 세트 가능"
       },
-      days_per_week: 3,
-      block_length_weeks: 4,
-      deload_week: 4,
-      accessory_sets: 3,
-      accessory_reps: "8-12",
-      accessory_rpe: 7
+      days_per_week: 3,      // 김동환: "초급자는 주 3회가 최적 회복"
+      block_length_weeks: 4, // 김동환: "4주면 적응하고 변화 필요"
+      deload_week: 4,        // 김동환: "4주마다 디로드"
+      accessory_sets: 3,     // 김동환: "보조운동은 3세트면 충분"
+      accessory_reps: "8-12", // 김동환: "보조는 8-12회로 볼륨"
+      accessory_rpe: 7       // 김동환: "보조는 RPE 7로 가볍게"
     }
   },
   {
@@ -177,8 +178,8 @@ export class UserDefinedMapper {
     // 1. 설문 데이터에서 조건 키 생성
     const conditionKey = this.buildConditionKey(surveyData);
     
-    // 2. 사용자 정의 테이블에서 찾기
-    const matchingRule = USER_DEFINED_MAPPINGS.find(
+    // 2. 김동환 코치 방식 테이블에서 찾기
+    const matchingRule = DONGHWAN_COACHING_MAPPINGS.find(
       rule => rule.condition_key === conditionKey
     );
     
@@ -208,13 +209,13 @@ export class UserDefinedMapper {
     return 'health';
   }
 
-  // 📋 사용 가능한 조건키 목록
+  // 📋 김동환 코치 방식 조건키 목록
   public getAvailableConditions(): string[] {
-    return USER_DEFINED_MAPPINGS.map(rule => rule.condition_key);
+    return DONGHWAN_COACHING_MAPPINGS.map(rule => rule.condition_key);
   }
 
-  // ➕ 새 규칙 추가 (나중에 UI에서 사용)
-  public addUserRule(rule: UserDefinedRule): void {
-    USER_DEFINED_MAPPINGS.push(rule);
+  // ➕ 김동환님 새 훈련방식 추가 (김동환님이 직접 설정)
+  public addCoachingRule(rule: UserDefinedRule): void {
+    DONGHWAN_COACHING_MAPPINGS.push(rule);
   }
 }

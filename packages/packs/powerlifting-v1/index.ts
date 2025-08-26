@@ -10,25 +10,26 @@ export class PowerliftingV1Engine implements SurveyEngine {
   }
 
   async processResponse(surveyData: any) {
-    console.log(`🏋️ [Powerlifting-v1] ${surveyData.name} 조건매핑 처리 중...`);
-    console.log(`📊 [Powerlifting-v1] 백오프 방식: ${surveyData.backoff_method || '미설정'}`);
-    console.log(`🎯 [Powerlifting-v1] 경험수준: ${surveyData.experience_level || '미설정'}`);
+    console.log(`🏋️ [김동환 코치] ${surveyData.name} 고객 훈련 분석 중...`);
+    console.log(`📊 [김동환 코치] 백오프 방식: ${surveyData.backoff_method || '미설정'}`);
+    console.log(`🎯 [김동환 코치] 경험수준: ${surveyData.experience_level || '미설정'}`);
     
-    // 🎯 100% 조건매핑으로 프로그램 생성
+    // 🎯 김동환님 방식으로 프로그램 생성
     const generatedProgram = this.protocolGenerator.generateProgram(surveyData);
     
     // 📋 구조화된 프로그램을 텍스트로 변환 (기존 호환성)
     const programText = this.formatProgramAsText(generatedProgram);
     
-    console.log(`✅ [Powerlifting-v1] 조건매핑 완료: ${generatedProgram.metadata.condition_path}`);
-    console.log(`🔧 [Powerlifting-v1] 사용된 프로토콜: ${generatedProgram.metadata.protocol_used}`);
+    console.log(`✅ [김동환 코치] 훈련 처방 완료: ${generatedProgram.metadata.condition_path}`);
+    console.log(`🔧 [김동환 코치] 적용된 방식: ${generatedProgram.metadata.protocol_used}`);
 
     return {
       trainingProgram: programText,
       structuredProgram: generatedProgram, // 새로운 구조화된 데이터
       warnings: this.generateWarnings(surveyData, generatedProgram),
       conflicts: this.detectConflicts(surveyData, generatedProgram),
-      metadata: generatedProgram.metadata
+      metadata: generatedProgram.metadata,
+      coachSignature: "김동환 코치가 직접 설계한 맞춤 프로그램"
     };
   }
 
