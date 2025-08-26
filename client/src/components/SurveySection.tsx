@@ -9,23 +9,25 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// 🎯 디자인용 최소 스키마 (2개 필드만!)
+// 🎯 디자인용 스키마 (체크박스 포함!)
 const surveySchema = z.object({
-  email: z.string().email("올바른 이메일 주소를 입력해주세요"),
-  name: z.string().min(1, "이름을 입력해주세요")
+  name: z.string().min(1, "이름을 입력해주세요"),
+  goals: z.array(z.string()).min(1, "최소 하나의 목표를 선택해주세요"),
+  email: z.string().email("올바른 이메일 주소를 입력해주세요")
 });
 
 type SurveyForm = z.infer<typeof surveySchema>;
 
 export default function SurveySection() {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 2; // 🎯 디자인용 2단계만!
+  const totalSteps = 3; // 🎯 디자인용 3단계 (체크박스 포함!)
   const { toast } = useToast();
 
   const form = useForm<SurveyForm>({
     resolver: zodResolver(surveySchema),
     defaultValues: {
       name: "",
+      goals: [],
       email: ""
     }
   });
@@ -42,7 +44,7 @@ export default function SurveySection() {
       return await response.json();
     },
     onSuccess: () => {
-      setCurrentStep(3); // Success state
+      setCurrentStep(4); // Success state
       toast({
         title: "성공!",
         description: "훈련 프로그램이 이메일로 전송되었습니다.",
@@ -70,11 +72,11 @@ export default function SurveySection() {
   };
 
   const onSubmit = (data: SurveyForm) => {
-    setCurrentStep(3); // Loading state
+    setCurrentStep(4); // Loading state
     submitMutation.mutate(data);
   };
 
-  if (currentStep === 3) {
+  if (currentStep === 4) {
     return (
       <section className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-full max-w-2xl px-8 text-center">
@@ -153,8 +155,67 @@ export default function SurveySection() {
               </div>
             )}
 
-            {/* Step 2: 이메일 */}
+            {/* Step 2: 운동 목표 (체크박스) */}
             {currentStep === 2 && (
+              <div data-testid="step-goals">
+                <h3 className="text-3xl font-light text-white mb-12">운동 목표를 선택해주세요</h3>
+                <p className="text-gray-400 mb-8">여러 개를 선택할 수 있어요</p>
+                
+                <div className="space-y-4 max-w-lg mx-auto">
+                  {[
+                    { value: "strength", title: "💪 근력 향상", desc: "더 무거운 중량을 들고 싶어요" },
+                    { value: "muscle", title: "🏋️ 근육량 증가", desc: "몸을 더 크고 탄탄하게 만들고 싶어요" },
+                    { value: "health", title: "🌟 건강 관리", desc: "전반적인 체력과 건강을 개선하고 싶어요" },
+                    { value: "competition", title: "🏆 대회 준비", desc: "파워리프팅 대회에 참가하고 싶어요" },
+                    { value: "technique", title: "⚙️ 기술 향상", desc: "올바른 자세와 테크닉을 배우고 싶어요" }
+                  ].map((goal) => {
+                    const isSelected = form.watch("goals")?.includes(goal.value);
+                    return (
+                      <label 
+                        key={goal.value}
+                        className={`flex items-center p-6 border border-gray-600 rounded-lg cursor-pointer hover:border-white transition-all duration-200 ${
+                          isSelected ? "border-white bg-gray-900/50 shadow-lg" : "border-gray-600"
+                        }`}
+                      >
+                        <input 
+                          type="checkbox" 
+                          value={goal.value}
+                          data-testid={`checkbox-goal-${goal.value}`}
+                          checked={isSelected}
+                          onChange={(e) => {
+                            const currentGoals = form.getValues("goals") || [];
+                            if (e.target.checked) {
+                              form.setValue("goals", [...currentGoals, goal.value]);
+                            } else {
+                              form.setValue("goals", currentGoals.filter(g => g !== goal.value));
+                            }
+                          }}
+                          className="sr-only" 
+                        />
+                        <div className="flex items-center w-full">
+                          <div className={`w-6 h-6 border-2 rounded-md mr-4 flex items-center justify-center transition-all duration-200 ${
+                            isSelected ? "bg-white border-white" : "border-gray-500"
+                          }`}>
+                            {isSelected && (
+                              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-white text-lg">{goal.title}</div>
+                            <div className="text-gray-400 text-sm mt-1">{goal.desc}</div>
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: 이메일 */}
+            {currentStep === 3 && (
               <div data-testid="step-email">
                 <h3 className="text-3xl font-light text-white mb-12">이메일 주소</h3>
                 <p className="text-gray-400 mb-8">완성된 프로그램을 이메일로 보내드려요</p>

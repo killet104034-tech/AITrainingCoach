@@ -12,9 +12,10 @@ export const users = pgTable("users", {
 export const surveyResponses = pgTable("survey_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   
-  // 🎯 디자인용 최소 필드 (딱 2개!)
-  email: text("email").notNull(),
+  // 🎯 디자인용 필드들 (체크박스 포함!)
   name: text("name"),
+  goals: jsonb("goals"), // 체크박스 배열
+  email: text("email").notNull(),
   
   // 시스템 데이터
   trainingProgram: text("training_program"), // AI generated program

@@ -3,11 +3,13 @@
 
 export interface BasicSurveyInput {
   name?: string;
+  goals?: string[];
   email?: string;
 }
 
 export interface CanonicalSurvey {
   name: string;
+  goals: string[];
   email: string;
 }
 
@@ -26,9 +28,10 @@ export function processSurvey(
   conflicts: SurveyConflict[]; 
   warnings: SurveyConflict[]; 
 } {
-  // 🎯 최소 변환 로직 (디자인용)
+  // 🎯 체크박스 포함 변환 로직 (디자인용)
   const canonical: CanonicalSurvey = {
     name: input.name || '',
+    goals: input.goals || [],
     email: input.email || ''
   };
 

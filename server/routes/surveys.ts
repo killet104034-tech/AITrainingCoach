@@ -61,6 +61,7 @@ export function registerSurveyRoutes(app: Express): void {
           survey_data: {
             timestamp: new Date().toISOString(),
             name: validatedData.name,
+            goals: Array.isArray(validatedData.goals) ? validatedData.goals.join(', ') : '',
             email: validatedData.email
           }
         };
