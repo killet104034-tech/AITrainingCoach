@@ -1,0 +1,12 @@
+{
+  "name": "@sinabro/pack-powerlifting-v1",
+  "version": "1.0.0",
+  "description": "파워리프팅 도메인 플러그인 - 룰/템플릿/매핑",
+  "main": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "@sinabro/core": "workspace:*",
+    "@sinabro/dsl": "workspace:*",
+    "openai": "^4.20.1"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@sinabro/api",
+  "version": "1.0.0",
+  "description": "API 서버 - Express 기반",
+  "main": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "@sinabro/core": "workspace:*",
+    "@sinabro/dsl": "workspace:*",
+    "@sinabro/adapter-email": "workspace:*",
+    "@sinabro/adapter-storage": "workspace:*",
+    "@sinabro/adapter-sheets": "workspace:*",
+    "@sinabro/pack-powerlifting-v1": "workspace:*",
+    "express": "^4.18.2",
+    "openai": "^4.20.1"
+  }
+}

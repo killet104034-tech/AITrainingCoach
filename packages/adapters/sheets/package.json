@@ -1,0 +1,11 @@
+{
+  "name": "@sinabro/adapter-sheets",
+  "version": "1.0.0",
+  "description": "시트 어댑터 - Google Sheets/CSV 지원",
+  "main": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "googleapis": "^128.0.0",
+    "google-auth-library": "^9.4.1"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@sinabro/adapter-email",
+  "version": "1.0.0",
+  "description": "이메일 어댑터 - SMTP/Resend/SendGrid 지원",
+  "main": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "nodemailer": "^6.9.7"
+  }
+}

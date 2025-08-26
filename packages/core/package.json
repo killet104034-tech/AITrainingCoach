@@ -1,0 +1,10 @@
+{
+  "name": "@sinabro/core",
+  "version": "1.0.0",
+  "description": "순수 로직 엔진 - 도메인 불문 규칙/조건/그래프/플래너",
+  "main": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}
