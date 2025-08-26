@@ -63,25 +63,25 @@ export class ConditionMapper {
       }],
       result: {
         program_structure: {
-          block_length: 4,
+          block_length: 'from_survey', // 설문에서 훈련기간 가져오기
           progression_scheme: 'linear',
-          deload_frequency: 4
+          deload_frequency: 'calculated' // 블록길이 기준으로 계산
         },
         scheduling: {
-          days_per_week: 3,
-          session_distribution: ['squat_focus', 'bench_focus', 'deadlift_focus'],
-          rest_day_pattern: 'every_other_day'
+          days_per_week: 'from_available_days', // 설문의 가능한 요일 수
+          session_distribution: 'auto_assign', // 요일 수에 맞춰 자동 배치
+          rest_day_pattern: 'from_preference' // 설문의 휴식일 선호도
         },
         exercise_selection: {
           core_lifts: ['squat', 'bench', 'deadlift'],
-          accessory_exercises: ['rows', 'overhead_press', 'lunges'],
-          exercise_rotation: 'weekly'
+          accessory_exercises: 'from_equipment', // 설문의 장비 접근성 기준
+          exercise_rotation: 'from_preference' // 설문의 변화 선호도
         },
         intensity_protocols: {
           backoff_method: 'straight_sets',
           set_structure: 'same_weight_reps',
-          rpe_targets: [7, 8, 8],
-          percentage_ranges: ['70-75%', '75-80%', '80-85%']
+          rpe_targets: 'from_intensity_preference', // 설문의 강도 선호도
+          percentage_ranges: 'calculated_from_experience' // 경험 수준 기준 계산
         }
       },
       priority: 100
@@ -183,27 +183,121 @@ export class ConditionMapper {
            ruleCondition.tertiary === userCondition.tertiary;
   }
 
-  // 🛠️ 프로토콜 개별 맞춤화
+  // 🛠️ 프로토콜 개별 맞춤화 - 모든 수치를 설문 기반으로 결정
   private customizeProtocol(baseProtocol: TrainingProtocol, surveyData: any): TrainingProtocol {
     const customized = JSON.parse(JSON.stringify(baseProtocol));
     
-    // 훈련 가능 요일에 따른 스케줄 조정
-    if (surveyData.available_days) {
-      customized.scheduling.days_per_week = Math.min(
-        customized.scheduling.days_per_week, 
-        surveyData.available_days.length
-      );
-    }
+    // 1. 프로그램 구조 수치 결정
+    customized.program_structure = this.determineStructureFromSurvey(baseProtocol.program_structure, surveyData);
     
-    // 장비 제약에 따른 운동 선택 조정
-    if (surveyData.equipment_limitations) {
-      customized.exercise_selection = this.adjustForEquipment(
-        customized.exercise_selection, 
-        surveyData.equipment_limitations
-      );
-    }
+    // 2. 스케줄링 수치 결정  
+    customized.scheduling = this.determineSchedulingFromSurvey(baseProtocol.scheduling, surveyData);
+    
+    // 3. 운동 선택 결정
+    customized.exercise_selection = this.determineExercisesFromSurvey(baseProtocol.exercise_selection, surveyData);
+    
+    // 4. 강도 프로토콜 수치 결정
+    customized.intensity_protocols = this.determineIntensityFromSurvey(baseProtocol.intensity_protocols, surveyData);
     
     return customized;
+  }
+
+  // 📊 프로그램 구조 수치를 설문에서 결정
+  private determineStructureFromSurvey(structure: any, surveyData: any): any {
+    return {
+      block_length: surveyData.training_duration_weeks || 
+                   (surveyData.experience_level === 'beginner' ? 4 : 
+                    surveyData.experience_level === 'intermediate' ? 6 : 8),
+      progression_scheme: structure.progression_scheme,
+      deload_frequency: surveyData.deload_preference || 
+                       Math.ceil((surveyData.training_duration_weeks || 4) / 4) * 4
+    };
+  }
+
+  // 📅 스케줄링을 설문에서 결정
+  private determineSchedulingFromSurvey(scheduling: any, surveyData: any): any {
+    const availableDays = surveyData.available_days?.length || 3;
+    const preferredFrequency = surveyData.training_frequency || availableDays;
+    
+    return {
+      days_per_week: Math.min(preferredFrequency, availableDays),
+      session_distribution: this.assignSessionsToAvailableDays(
+        Math.min(preferredFrequency, availableDays), 
+        surveyData.session_preference
+      ),
+      rest_day_pattern: surveyData.rest_preference || 'every_other_day'
+    };
+  }
+
+  // 🏋️ 운동 선택을 설문에서 결정
+  private determineExercisesFromSurvey(exercises: any, surveyData: any): any {
+    return {
+      core_lifts: exercises.core_lifts, // 파워리프팅은 고정
+      accessory_exercises: this.selectAccessoriesFromEquipment(surveyData.equipment_access),
+      exercise_rotation: surveyData.variety_preference || 'weekly'
+    };
+  }
+
+  // 💪 강도 프로토콜을 설문에서 결정
+  private determineIntensityFromSurvey(intensity: any, surveyData: any): any {
+    return {
+      backoff_method: intensity.backoff_method,
+      set_structure: intensity.set_structure,
+      rpe_targets: this.calculateRPETargets(surveyData.intensity_preference, surveyData.experience_level),
+      percentage_ranges: this.calculatePercentageRanges(surveyData.intensity_preference, surveyData.experience_level)
+    };
+  }
+
+  // 🎯 RPE 목표치 계산
+  private calculateRPETargets(intensityPref: string, experience: string): number[] {
+    if (intensityPref === 'high') {
+      return experience === 'beginner' ? [8, 9] : [8.5, 9, 9.5];
+    } else if (intensityPref === 'moderate') {
+      return experience === 'beginner' ? [7, 8] : [7.5, 8, 8.5];
+    } else {
+      return experience === 'beginner' ? [6, 7] : [7, 7.5, 8];
+    }
+  }
+
+  // 📊 퍼센트 범위 계산
+  private calculatePercentageRanges(intensityPref: string, experience: string): string[] {
+    if (intensityPref === 'high') {
+      return experience === 'beginner' ? ['75-80%', '80-85%'] : ['80-85%', '85-90%', '90-95%'];
+    } else if (intensityPref === 'moderate') {
+      return experience === 'beginner' ? ['70-75%', '75-80%'] : ['75-80%', '80-85%', '85-90%'];
+    } else {
+      return experience === 'beginner' ? ['65-70%', '70-75%'] : ['70-75%', '75-80%', '80-85%'];
+    }
+  }
+
+  // 📍 세션 배치
+  private assignSessionsToAvailableDays(daysPerWeek: number, preference: string): string[] {
+    if (daysPerWeek === 3) {
+      return ['squat_focus', 'bench_focus', 'deadlift_focus'];
+    } else if (daysPerWeek === 4) {
+      return ['squat_bench', 'deadlift_press', 'squat_accessories', 'bench_accessories'];
+    } else if (daysPerWeek === 5) {
+      return ['squat_focus', 'bench_focus', 'deadlift_focus', 'squat_volume', 'bench_volume'];
+    } else {
+      return ['full_body', 'full_body'];
+    }
+  }
+
+  // 🔧 장비 기반 보조운동 선택
+  private selectAccessoriesFromEquipment(equipment: string[]): string[] {
+    const accessories: string[] = [];
+    
+    if (equipment?.includes('dumbbells')) {
+      accessories.push('dumbbell_rows', 'dumbbell_press');
+    }
+    if (equipment?.includes('cables')) {
+      accessories.push('cable_rows', 'lat_pulldowns');
+    }
+    if (equipment?.includes('machines')) {
+      accessories.push('leg_press', 'chest_press');
+    }
+    
+    return accessories.length > 0 ? accessories : ['bodyweight_pushups', 'bodyweight_rows'];
   }
 
   // 🏃‍♂️ 장비 제약 대응
