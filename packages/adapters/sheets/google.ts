@@ -48,25 +48,17 @@ export interface WorkoutProgram {
   };
 }
 
-// 🏋️ 기본 템플릿 사용
-const BASIC_TEMPLATE_ID = '1q4KvO5-SuvLyd6hdOoLPu4PLqoGwL5T_LZRuUPthsQQ';
+// 🏋️ 기본 템플릿 사용 (스크린샷에서 확인된 스프레드시트)
+const BASIC_TEMPLATE_ID = '1Oj-c6pIjOsaHMFiTRaZIfAoS6p-5PhwWZUaMxwvFoQo';
 
 // 메인 스프레드시트 생성 함수
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
-    console.log('📋 간단한 스프레드시트 생성 시작...');
+    console.log('📋 기존 스프레드시트 수정 시작...');
 
-    // 1. 간단한 새 스프레드시트 생성 (템플릿 복사 대신)
-    const createResponse = await sheets.spreadsheets.create({
-      requestBody: {
-        properties: {
-          title: `${programData.program_title || 'Sinabro Strength'} - ${new Date().toISOString().split('T')[0]}`
-        }
-      }
-    });
-
-    const spreadsheetId = createResponse.data.spreadsheetId!;
-    console.log(`✅ 새 스프레드시트 생성 완료: ${spreadsheetId}`);
+    // 1. 기존 스프레드시트 사용 (새로 생성하지 않고)
+    const spreadsheetId = BASIC_TEMPLATE_ID;
+    console.log(`✅ 기존 스프레드시트 사용: ${spreadsheetId}`);
 
     // 2. 기본 헤더 데이터 입력
     const headerData = [
