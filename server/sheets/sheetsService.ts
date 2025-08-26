@@ -185,11 +185,20 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
       console.log('⚠️ 프로급 시트 생성 중 오류 (계속 진행):', error);
     }
 
-    // 🎨 폴리싱 및 요약 적용 (batchUpdate 2회 이내)
+    // 🏋️ 시나브로 전문 파워리프팅 템플릿 적용
     try {
-      await applyPolishingAndSummary(spreadsheetId, programData);
+      const { createProfessionalPowerliftingTemplate } = await import('./professionalTemplate');
+      await createProfessionalPowerliftingTemplate(spreadsheetId, programData);
+      console.log('✅ 시나브로 전문 템플릿 적용 완료!');
     } catch (error) {
-      console.log('⚠️ 폴리싱/요약 적용 중 오류 (계속 진행):', error);
+      console.log('⚠️ 전문 템플릿 적용 중 오류 (기존 폴리싱으로 대체):', error);
+      
+      // 폴백: 기존 폴리싱 사용
+      try {
+        await applyPolishingAndSummary(spreadsheetId, programData);
+      } catch (fallbackError) {
+        console.log('⚠️ 기존 폴리싱도 실패:', fallbackError);
+      }
     }
     
     // 📝 Form 시트 추가 및 설문 데이터 저장
