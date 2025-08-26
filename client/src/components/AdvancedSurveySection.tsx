@@ -2309,15 +2309,15 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_range" id="squat-rpe-range" />
-              <label htmlFor="squat-rpe-range" className="text-gray-300">RPE+Range (RPE와 해당 RPE 상하한선 중량 범위 설정)</label>
+              <label htmlFor="squat-rpe-range" className="text-gray-300">RPE+Range (예: @8, 177.5~185kg 범위에서 선택)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="percentage" id="squat-percentage" />
-              <label htmlFor="squat-percentage" className="text-gray-300">%기반 (예: 1RM의 85%)</label>
+              <label htmlFor="squat-percentage" className="text-gray-300">%기반 (예: 85%1RM, 180kg 고정)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="ascending" id="squat-ascending" />
-              <label htmlFor="squat-ascending" className="text-gray-300">Ascending Set (점진적 중량 증가)</label>
+              <label htmlFor="squat-ascending" className="text-gray-300">Ascending Set (예: 160kg-170kg-180kg 단계별 증가)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="squat-topset-unknown" />
@@ -2327,7 +2327,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">스쿼트 탑셋 선호 RPE</Label>
+          <Label className="text-white">스쿼트 탑셋 선호 Reps</Label>
           <RadioGroup 
             value={form.watch("squatTopSetIntensity")} 
             onValueChange={(value) => form.setValue("squatTopSetIntensity", value)}
@@ -2335,19 +2335,19 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="light" id="squat-light" />
-              <label htmlFor="squat-light" className="text-gray-300">RPE 6-7 (가벼운 강도, 여유로운 중량)</label>
+              <label htmlFor="squat-light" className="text-gray-300">1-3 Reps (예: 1x3 @RPE8, 높은 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="moderate" id="squat-moderate" />
-              <label htmlFor="squat-moderate" className="text-gray-300">RPE 7-8 (적당한 강도, 다소 힘들지만 공량 여유)</label>
+              <label htmlFor="squat-moderate" className="text-gray-300">3-5 Reps (예: 1x5 @RPE8, 중간 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="heavy" id="squat-heavy" />
-              <label htmlFor="squat-heavy" className="text-gray-300">RPE 8-9 (무거운 강도, 1-2개 여유로 마무리)</label>
+              <label htmlFor="squat-heavy" className="text-gray-300">5-8 Reps (예: 1x8 @RPE8, 중간-높은 반복수)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="max" id="squat-max" />
-              <label htmlFor="squat-max" className="text-gray-300">RPE 9-10 (최대 강도, 간신히 또는 전력)</label>
+              <label htmlFor="squat-max" className="text-gray-300">8+ Reps (예: 1x12 @RPE8, 높은 반복수)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="squat-intensity-unknown" />
@@ -2425,15 +2425,15 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_backoff" id="squat-rpe-back" />
-              <label htmlFor="squat-rpe-back" className="text-gray-300">RPE 백오프 (RPE 7-8로 자율 조절)</label>
+              <label htmlFor="squat-rpe-back" className="text-gray-300">RPE 백오프 (예: 3x5 @RPE7 자율 조절)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="amrap" id="squat-amrap" />
-              <label htmlFor="squat-amrap" className="text-gray-300">AMRAP (특정 중량을 특정 RPE까지 최대한)</label>
+              <label htmlFor="squat-amrap" className="text-gray-300">AMRAP (예: 160kg @RPE9까지 최대 반복)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="percentage_drop" id="squat-perc-drop" />
-              <label htmlFor="squat-perc-drop" className="text-gray-300">퍼센트 드랍 (탑셋의 80-85%로 볼륨 작업)</label>
+              <label htmlFor="squat-perc-drop" className="text-gray-300">Percent Drop (예: 탑셋 180kg → 144kg 3x8 Volume 작업)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="squat-backoff-unknown" />
@@ -2511,7 +2511,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">벤치프레스 탑셋 선호 RPE</Label>
+          <Label className="text-white">벤치프레스 탑셋 선호 Reps</Label>
           <RadioGroup 
             value={form.watch("benchTopSetIntensity")} 
             onValueChange={(value) => form.setValue("benchTopSetIntensity", value)}
@@ -2519,19 +2519,19 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="light" id="bench-light" />
-              <label htmlFor="bench-light" className="text-gray-300">RPE 6-7 (가벼운 강도, 여유로운 중량)</label>
+              <label htmlFor="bench-light" className="text-gray-300">1-3 Reps (예: 1x3 @RPE8, 높은 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="moderate" id="bench-moderate" />
-              <label htmlFor="bench-moderate" className="text-gray-300">RPE 7-8 (적당한 강도, 다소 힘들지만 공럅 여유)</label>
+              <label htmlFor="bench-moderate" className="text-gray-300">3-5 Reps (예: 1x5 @RPE8, 중간 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="heavy" id="bench-heavy" />
-              <label htmlFor="bench-heavy" className="text-gray-300">RPE 8-9 (무거운 강도, 1-2개 여유로 마무리)</label>
+              <label htmlFor="bench-heavy" className="text-gray-300">5-8 Reps (예: 1x8 @RPE8, 중간-높은 반복수)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="max" id="bench-max" />
-              <label htmlFor="bench-max" className="text-gray-300">RPE 9-10 (최대 강도, 간신히 또는 전력)</label>
+              <label htmlFor="bench-max" className="text-gray-300">8+ Reps (예: 1x12 @RPE8, 높은 반복수)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="bench-intensity-unknown" />
@@ -2609,15 +2609,15 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_backoff" id="bench-rpe-back" />
-              <label htmlFor="bench-rpe-back" className="text-gray-300">RPE 백오프 (RPE 7-8로 자율 조절)</label>
+              <label htmlFor="bench-rpe-back" className="text-gray-300">RPE 백오프 (예: 3x5 @RPE7 자율 조절)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="amrap" id="bench-amrap" />
-              <label htmlFor="bench-amrap" className="text-gray-300">AMRAP (특정 중량을 특정 RPE까지 최대한)</label>
+              <label htmlFor="bench-amrap" className="text-gray-300">AMRAP (예: 120kg @RPE9까지 최대 반복)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="percentage_drop" id="bench-perc-drop" />
-              <label htmlFor="bench-perc-drop" className="text-gray-300">퍼센트 드랍 (탑셋의 80-85%로 볼륨 작업)</label>
+              <label htmlFor="bench-perc-drop" className="text-gray-300">Percent Drop (예: 탑셋 140kg → 112kg 3x8 Volume 작업)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="bench-backoff-unknown" />
@@ -2695,7 +2695,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">데드리프트 탑셋 선호 RPE</Label>
+          <Label className="text-white">데드리프트 탑셋 선호 Reps</Label>
           <RadioGroup 
             value={form.watch("deadliftTopSetIntensity")} 
             onValueChange={(value) => form.setValue("deadliftTopSetIntensity", value)}
@@ -2703,19 +2703,19 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="light" id="deadlift-light" />
-              <label htmlFor="deadlift-light" className="text-gray-300">RPE 6-7 (가벼운 강도, 여유로운 중량)</label>
+              <label htmlFor="deadlift-light" className="text-gray-300">1-3 Reps (예: 1x3 @RPE8, 높은 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="moderate" id="deadlift-moderate" />
-              <label htmlFor="deadlift-moderate" className="text-gray-300">RPE 7-8 (적당한 강도, 다소 힘들지만 공럅 여유)</label>
+              <label htmlFor="deadlift-moderate" className="text-gray-300">3-5 Reps (예: 1x5 @RPE8, 중간 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="heavy" id="deadlift-heavy" />
-              <label htmlFor="deadlift-heavy" className="text-gray-300">RPE 8-9 (무거운 강도, 1-2개 여유로 마무리)</label>
+              <label htmlFor="deadlift-heavy" className="text-gray-300">5-8 Reps (예: 1x8 @RPE8, 중간-높은 반복수)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="max" id="deadlift-max" />
-              <label htmlFor="deadlift-max" className="text-gray-300">RPE 9-10 (최대 강도, 간신히 또는 전력)</label>
+              <label htmlFor="deadlift-max" className="text-gray-300">8+ Reps (예: 1x12 @RPE8, 높은 반복수)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="deadlift-intensity-unknown" />
@@ -2793,15 +2793,15 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_backoff" id="deadlift-rpe-back" />
-              <label htmlFor="deadlift-rpe-back" className="text-gray-300">RPE 백오프 (RPE 7-8로 자율 조절)</label>
+              <label htmlFor="deadlift-rpe-back" className="text-gray-300">RPE 백오프 (예: 3x5 @RPE7 자율 조절)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="amrap" id="deadlift-amrap" />
-              <label htmlFor="deadlift-amrap" className="text-gray-300">AMRAP (특정 중량을 특정 RPE까지 최대한)</label>
+              <label htmlFor="deadlift-amrap" className="text-gray-300">AMRAP (예: 210kg @RPE9까지 최대 반복)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="percentage_drop" id="deadlift-perc-drop" />
-              <label htmlFor="deadlift-perc-drop" className="text-gray-300">퍼센트 드랍 (탑셋의 80-85%로 볼륨 작업)</label>
+              <label htmlFor="deadlift-perc-drop" className="text-gray-300">Percent Drop (예: 탑셋 220kg → 176kg 3x8 Volume 작업)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="deadlift-backoff-unknown" />
