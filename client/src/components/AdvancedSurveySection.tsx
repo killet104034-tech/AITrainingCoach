@@ -29,7 +29,7 @@ export function AdvancedSurveySection({
   onSubmit, 
   isSubmitting 
 }: AdvancedSurveySectionProps) {
-  const totalSteps = 50; // 한 창에 질문 하나씩! (50개 질문)
+  const totalSteps = 23; // 한 창에 질문 하나씩! (23개 질문)
 
   // 1단계: 이름
   const renderStep1 = () => (
@@ -160,6 +160,10 @@ export function AdvancedSurveySection({
                   <RadioGroupItem value="knee_cave" id="squat-fail-knee" />
                   <label htmlFor="squat-fail-knee" className="text-gray-300">무릎 붕괴 (무릎이 안쪽으로 들어옴)</label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="unknown" id="squat-fail-unknown" />
+                  <label htmlFor="squat-fail-unknown" className="text-gray-300">모르겠음</label>
+                </div>
               </RadioGroup>
             </div>
 
@@ -181,6 +185,10 @@ export function AdvancedSurveySection({
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="hip_dominant" id="squat-hip" />
                   <label htmlFor="squat-hip" className="text-gray-300">힙 주도 (엉덩이부터 뒤로 빠짐)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="unknown" id="squat-posture-unknown" />
+                  <label htmlFor="squat-posture-unknown" className="text-gray-300">모르겠음</label>
                 </div>
               </RadioGroup>
             </div>
@@ -215,6 +223,10 @@ export function AdvancedSurveySection({
                   <RadioGroupItem value="uneven" id="bench-fail-uneven" />
                   <label htmlFor="bench-fail-uneven" className="text-gray-300">불균형 (한쪽만 먼저 올라감)</label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="unknown" id="bench-fail-unknown" />
+                  <label htmlFor="bench-fail-unknown" className="text-gray-300">모르겠음</label>
+                </div>
               </RadioGroup>
             </div>
 
@@ -236,6 +248,10 @@ export function AdvancedSurveySection({
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="medium" id="bench-medium" />
                   <label htmlFor="bench-medium" className="text-gray-300">미디엄 (보통 그립, 적당한 아치)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="unknown" id="bench-style-unknown" />
+                  <label htmlFor="bench-style-unknown" className="text-gray-300">모르겠음</label>
                 </div>
               </RadioGroup>
             </div>
@@ -270,6 +286,10 @@ export function AdvancedSurveySection({
                   <RadioGroupItem value="back_round" id="deadlift-fail-back" />
                   <label htmlFor="deadlift-fail-back" className="text-gray-300">허리 굽음 (등이 둥글게 말림)</label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="unknown" id="deadlift-fail-unknown" />
+                  <label htmlFor="deadlift-fail-unknown" className="text-gray-300">모르겠음</label>
+                </div>
               </RadioGroup>
             </div>
 
@@ -291,6 +311,10 @@ export function AdvancedSurveySection({
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="both" id="deadlift-both" />
                   <label htmlFor="deadlift-both" className="text-gray-300">둘 다 (상황에 따라)</label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="unknown" id="deadlift-style-unknown" />
+                  <label htmlFor="deadlift-style-unknown" className="text-gray-300">모르겠음</label>
                 </div>
               </RadioGroup>
             </div>
@@ -919,7 +943,7 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="narrow" id="stance-narrow" />
-              <label htmlFor="stance-narrow" className="text-gray-300">좌은 스탠스</label>
+              <label htmlFor="stance-narrow" className="text-gray-300">좁은 스탠스</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="medium" id="stance-medium" />
@@ -2230,8 +2254,560 @@ export function AdvancedSurveySection({
             data-testid="textarea-additional-info"
             {...form.register("additionalInfo")}
             placeholder="예: 특별한 제약사항, 개인적인 선호도, 과거 경험 등 프로그램 설계에 도움이 될 만한 정보를 자유롭게 작성해주세요."
-            className="bg-gray-800 border-gray-600 text-white min-h-[120px]"
+            className="bg-black/40 border-gray-600/50 text-white backdrop-blur-sm rounded-lg focus:border-white/50 transition-colors duration-200 min-h-[120px]"
           />
+        </div>
+      </div>
+    </div>
+  );
+
+  // 21단계: 스쿼트 상세 훈련 선호도
+  const renderStep21_squatPreferences = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">🦵 스쿼트 훈련 상세 설정</h2>
+        <p className="text-gray-400">스쿼트 훈련의 구체적인 선호도를 설정해주세요</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div>
+          <Label className="text-white">스쿼트 훈련 빈도 (주당)</Label>
+          <RadioGroup 
+            value={form.watch("squatFrequency")} 
+            onValueChange={(value) => form.setValue("squatFrequency", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1" id="squat-freq-1" />
+              <label htmlFor="squat-freq-1" className="text-gray-300">1회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="2" id="squat-freq-2" />
+              <label htmlFor="squat-freq-2" className="text-gray-300">2회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="3" id="squat-freq-3" />
+              <label htmlFor="squat-freq-3" className="text-gray-300">3회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="4+" id="squat-freq-4" />
+              <label htmlFor="squat-freq-4" className="text-gray-300">4회 이상</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="squat-freq-unknown" />
+              <label htmlFor="squat-freq-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">스쿼트 탑셋 방식</Label>
+          <RadioGroup 
+            value={form.watch("squatTopSetMethod")} 
+            onValueChange={(value) => form.setValue("squatTopSetMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_range" id="squat-rpe-range" />
+              <label htmlFor="squat-rpe-range" className="text-gray-300">RPE+Range (예: RPE 8-9 범위)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="percentage" id="squat-percentage" />
+              <label htmlFor="squat-percentage" className="text-gray-300">%기반 (예: 1RM의 85%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ascending" id="squat-ascending" />
+              <label htmlFor="squat-ascending" className="text-gray-300">Ascending Set (점진적 중량 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="squat-topset-unknown" />
+              <label htmlFor="squat-topset-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">스쿼트 탑셋 강도 선호</Label>
+          <RadioGroup 
+            value={form.watch("squatTopSetIntensity")} 
+            onValueChange={(value) => form.setValue("squatTopSetIntensity", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="light" id="squat-light" />
+              <label htmlFor="squat-light" className="text-gray-300">가벼운 (RPE 6-7, ~80%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="moderate" id="squat-moderate" />
+              <label htmlFor="squat-moderate" className="text-gray-300">적당한 (RPE 7-8, ~85%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="heavy" id="squat-heavy" />
+              <label htmlFor="squat-heavy" className="text-gray-300">무거운 (RPE 8-9, ~90%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="max" id="squat-max" />
+              <label htmlFor="squat-max" className="text-gray-300">최대 (RPE 9-10, ~95%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="squat-intensity-unknown" />
+              <label htmlFor="squat-intensity-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">스쿼트 탑셋 개수</Label>
+          <RadioGroup 
+            value={form.watch("squatTopSetCount")} 
+            onValueChange={(value) => form.setValue("squatTopSetCount", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1" id="squat-top-1" />
+              <label htmlFor="squat-top-1" className="text-gray-300">1세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="2-3" id="squat-top-2-3" />
+              <label htmlFor="squat-top-2-3" className="text-gray-300">2-3세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="4-5" id="squat-top-4-5" />
+              <label htmlFor="squat-top-4-5" className="text-gray-300">4-5세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="squat-topcount-unknown" />
+              <label htmlFor="squat-topcount-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">스쿼트 매주 진전 방식 (과부하 방법)</Label>
+          <RadioGroup 
+            value={form.watch("squatProgressionMethod")} 
+            onValueChange={(value) => form.setValue("squatProgressionMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="weight_increase" id="squat-weight-inc" />
+              <label htmlFor="squat-weight-inc" className="text-gray-300">중량 증가 (매주 2.5-5kg 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="reps_increase" id="squat-reps-inc" />
+              <label htmlFor="squat-reps-inc" className="text-gray-300">반복수 증가 (중량 고정, 횟수 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_progression" id="squat-rpe-prog" />
+              <label htmlFor="squat-rpe-prog" className="text-gray-300">RPE 점진 (RPE 7→8→9 순서)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="volume_increase" id="squat-vol-inc" />
+              <label htmlFor="squat-vol-inc" className="text-gray-300">볼륨 증가 (세트수 추가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="squat-prog-unknown" />
+              <label htmlFor="squat-prog-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">스쿼트 백오프 방식</Label>
+          <RadioGroup 
+            value={form.watch("squatBackoffMethod")} 
+            onValueChange={(value) => form.setValue("squatBackoffMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="straight_sets" id="squat-straight" />
+              <label htmlFor="squat-straight" className="text-gray-300">스트레이트 세트 (5x5, 3x5 같은 고정 중량/횟수)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_backoff" id="squat-rpe-back" />
+              <label htmlFor="squat-rpe-back" className="text-gray-300">RPE 백오프 (RPE 7-8로 자율 조절)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="amrap" id="squat-amrap" />
+              <label htmlFor="squat-amrap" className="text-gray-300">AMRAP (특정 중량을 특정 RPE까지 최대한)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="percentage_drop" id="squat-perc-drop" />
+              <label htmlFor="squat-perc-drop" className="text-gray-300">퍼센트 드랍 (탑셋의 80-85%로 볼륨 작업)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="squat-backoff-unknown" />
+              <label htmlFor="squat-backoff-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 22단계: 벤치프레스 상세 훈련 선호도
+  const renderStep22_benchPreferences = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">💪 벤치프레스 훈련 상세 설정</h2>
+        <p className="text-gray-400">벤치프레스 훈련의 구체적인 선호도를 설정해주세요</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div>
+          <Label className="text-white">벤치프레스 훈련 빈도 (주당)</Label>
+          <RadioGroup 
+            value={form.watch("benchFrequency")} 
+            onValueChange={(value) => form.setValue("benchFrequency", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1" id="bench-freq-1" />
+              <label htmlFor="bench-freq-1" className="text-gray-300">1회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="2" id="bench-freq-2" />
+              <label htmlFor="bench-freq-2" className="text-gray-300">2회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="3" id="bench-freq-3" />
+              <label htmlFor="bench-freq-3" className="text-gray-300">3회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="4+" id="bench-freq-4" />
+              <label htmlFor="bench-freq-4" className="text-gray-300">4회 이상</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="bench-freq-unknown" />
+              <label htmlFor="bench-freq-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">벤치프레스 탑셋 방식</Label>
+          <RadioGroup 
+            value={form.watch("benchTopSetMethod")} 
+            onValueChange={(value) => form.setValue("benchTopSetMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_range" id="bench-rpe-range" />
+              <label htmlFor="bench-rpe-range" className="text-gray-300">RPE+Range (예: RPE 8-9 범위)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="percentage" id="bench-percentage" />
+              <label htmlFor="bench-percentage" className="text-gray-300">%기반 (예: 1RM의 85%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ascending" id="bench-ascending" />
+              <label htmlFor="bench-ascending" className="text-gray-300">Ascending Set (점진적 중량 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="bench-topset-unknown" />
+              <label htmlFor="bench-topset-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">벤치프레스 탑셋 강도 선호</Label>
+          <RadioGroup 
+            value={form.watch("benchTopSetIntensity")} 
+            onValueChange={(value) => form.setValue("benchTopSetIntensity", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="light" id="bench-light" />
+              <label htmlFor="bench-light" className="text-gray-300">가벼운 (RPE 6-7, ~80%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="moderate" id="bench-moderate" />
+              <label htmlFor="bench-moderate" className="text-gray-300">적당한 (RPE 7-8, ~85%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="heavy" id="bench-heavy" />
+              <label htmlFor="bench-heavy" className="text-gray-300">무거운 (RPE 8-9, ~90%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="max" id="bench-max" />
+              <label htmlFor="bench-max" className="text-gray-300">최대 (RPE 9-10, ~95%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="bench-intensity-unknown" />
+              <label htmlFor="bench-intensity-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">벤치프레스 탑셋 개수</Label>
+          <RadioGroup 
+            value={form.watch("benchTopSetCount")} 
+            onValueChange={(value) => form.setValue("benchTopSetCount", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1" id="bench-top-1" />
+              <label htmlFor="bench-top-1" className="text-gray-300">1세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="2-3" id="bench-top-2-3" />
+              <label htmlFor="bench-top-2-3" className="text-gray-300">2-3세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="4-5" id="bench-top-4-5" />
+              <label htmlFor="bench-top-4-5" className="text-gray-300">4-5세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="bench-topcount-unknown" />
+              <label htmlFor="bench-topcount-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">벤치프레스 매주 진전 방식 (과부하 방법)</Label>
+          <RadioGroup 
+            value={form.watch("benchProgressionMethod")} 
+            onValueChange={(value) => form.setValue("benchProgressionMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="weight_increase" id="bench-weight-inc" />
+              <label htmlFor="bench-weight-inc" className="text-gray-300">중량 증가 (매주 1.25-2.5kg 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="reps_increase" id="bench-reps-inc" />
+              <label htmlFor="bench-reps-inc" className="text-gray-300">반복수 증가 (중량 고정, 횟수 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_progression" id="bench-rpe-prog" />
+              <label htmlFor="bench-rpe-prog" className="text-gray-300">RPE 점진 (RPE 7→8→9 순서)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="volume_increase" id="bench-vol-inc" />
+              <label htmlFor="bench-vol-inc" className="text-gray-300">볼륨 증가 (세트수 추가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="bench-prog-unknown" />
+              <label htmlFor="bench-prog-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">벤치프레스 백오프 방식</Label>
+          <RadioGroup 
+            value={form.watch("benchBackoffMethod")} 
+            onValueChange={(value) => form.setValue("benchBackoffMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="straight_sets" id="bench-straight" />
+              <label htmlFor="bench-straight" className="text-gray-300">스트레이트 세트 (5x5, 3x5 같은 고정 중량/횟수)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_backoff" id="bench-rpe-back" />
+              <label htmlFor="bench-rpe-back" className="text-gray-300">RPE 백오프 (RPE 7-8로 자율 조절)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="amrap" id="bench-amrap" />
+              <label htmlFor="bench-amrap" className="text-gray-300">AMRAP (특정 중량을 특정 RPE까지 최대한)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="percentage_drop" id="bench-perc-drop" />
+              <label htmlFor="bench-perc-drop" className="text-gray-300">퍼센트 드랍 (탑셋의 80-85%로 볼륨 작업)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="bench-backoff-unknown" />
+              <label htmlFor="bench-backoff-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 23단계: 데드리프트 상세 훈련 선호도
+  const renderStep23_deadliftPreferences = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-light text-white mb-3">🏋️ 데드리프트 훈련 상세 설정</h2>
+        <p className="text-gray-400">데드리프트 훈련의 구체적인 선호도를 설정해주세요</p>
+      </div>
+      
+      <div className="space-y-6">
+        <div>
+          <Label className="text-white">데드리프트 훈련 빈도 (주당)</Label>
+          <RadioGroup 
+            value={form.watch("deadliftFrequency")} 
+            onValueChange={(value) => form.setValue("deadliftFrequency", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1" id="deadlift-freq-1" />
+              <label htmlFor="deadlift-freq-1" className="text-gray-300">1회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="2" id="deadlift-freq-2" />
+              <label htmlFor="deadlift-freq-2" className="text-gray-300">2회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="3" id="deadlift-freq-3" />
+              <label htmlFor="deadlift-freq-3" className="text-gray-300">3회</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="4+" id="deadlift-freq-4" />
+              <label htmlFor="deadlift-freq-4" className="text-gray-300">4회 이상</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="deadlift-freq-unknown" />
+              <label htmlFor="deadlift-freq-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">데드리프트 탑셋 방식</Label>
+          <RadioGroup 
+            value={form.watch("deadliftTopSetMethod")} 
+            onValueChange={(value) => form.setValue("deadliftTopSetMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_range" id="deadlift-rpe-range" />
+              <label htmlFor="deadlift-rpe-range" className="text-gray-300">RPE+Range (예: RPE 8-9 범위)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="percentage" id="deadlift-percentage" />
+              <label htmlFor="deadlift-percentage" className="text-gray-300">%기반 (예: 1RM의 85%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ascending" id="deadlift-ascending" />
+              <label htmlFor="deadlift-ascending" className="text-gray-300">Ascending Set (점진적 중량 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="deadlift-topset-unknown" />
+              <label htmlFor="deadlift-topset-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">데드리프트 탑셋 강도 선호</Label>
+          <RadioGroup 
+            value={form.watch("deadliftTopSetIntensity")} 
+            onValueChange={(value) => form.setValue("deadliftTopSetIntensity", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="light" id="deadlift-light" />
+              <label htmlFor="deadlift-light" className="text-gray-300">가벼운 (RPE 6-7, ~80%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="moderate" id="deadlift-moderate" />
+              <label htmlFor="deadlift-moderate" className="text-gray-300">적당한 (RPE 7-8, ~85%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="heavy" id="deadlift-heavy" />
+              <label htmlFor="deadlift-heavy" className="text-gray-300">무거운 (RPE 8-9, ~90%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="max" id="deadlift-max" />
+              <label htmlFor="deadlift-max" className="text-gray-300">최대 (RPE 9-10, ~95%)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="deadlift-intensity-unknown" />
+              <label htmlFor="deadlift-intensity-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">데드리프트 탑셋 개수</Label>
+          <RadioGroup 
+            value={form.watch("deadliftTopSetCount")} 
+            onValueChange={(value) => form.setValue("deadliftTopSetCount", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1" id="deadlift-top-1" />
+              <label htmlFor="deadlift-top-1" className="text-gray-300">1세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="2-3" id="deadlift-top-2-3" />
+              <label htmlFor="deadlift-top-2-3" className="text-gray-300">2-3세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="4-5" id="deadlift-top-4-5" />
+              <label htmlFor="deadlift-top-4-5" className="text-gray-300">4-5세트</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="deadlift-topcount-unknown" />
+              <label htmlFor="deadlift-topcount-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">데드리프트 매주 진전 방식 (과부하 방법)</Label>
+          <RadioGroup 
+            value={form.watch("deadliftProgressionMethod")} 
+            onValueChange={(value) => form.setValue("deadliftProgressionMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="weight_increase" id="deadlift-weight-inc" />
+              <label htmlFor="deadlift-weight-inc" className="text-gray-300">중량 증가 (매주 2.5-5kg 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="reps_increase" id="deadlift-reps-inc" />
+              <label htmlFor="deadlift-reps-inc" className="text-gray-300">반복수 증가 (중량 고정, 횟수 증가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_progression" id="deadlift-rpe-prog" />
+              <label htmlFor="deadlift-rpe-prog" className="text-gray-300">RPE 점진 (RPE 7→8→9 순서)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="volume_increase" id="deadlift-vol-inc" />
+              <label htmlFor="deadlift-vol-inc" className="text-gray-300">볼륨 증가 (세트수 추가)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="deadlift-prog-unknown" />
+              <label htmlFor="deadlift-prog-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label className="text-white">데드리프트 백오프 방식</Label>
+          <RadioGroup 
+            value={form.watch("deadliftBackoffMethod")} 
+            onValueChange={(value) => form.setValue("deadliftBackoffMethod", value)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="straight_sets" id="deadlift-straight" />
+              <label htmlFor="deadlift-straight" className="text-gray-300">스트레이트 세트 (5x5, 3x5 같은 고정 중량/횟수)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rpe_backoff" id="deadlift-rpe-back" />
+              <label htmlFor="deadlift-rpe-back" className="text-gray-300">RPE 백오프 (RPE 7-8로 자율 조절)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="amrap" id="deadlift-amrap" />
+              <label htmlFor="deadlift-amrap" className="text-gray-300">AMRAP (특정 중량을 특정 RPE까지 최대한)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="percentage_drop" id="deadlift-perc-drop" />
+              <label htmlFor="deadlift-perc-drop" className="text-gray-300">퍼센트 드랍 (탑셋의 80-85%로 볼륨 작업)</label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="unknown" id="deadlift-backoff-unknown" />
+              <label htmlFor="deadlift-backoff-unknown" className="text-gray-300">모르겠음</label>
+            </div>
+          </RadioGroup>
         </div>
       </div>
     </div>
@@ -2299,11 +2875,14 @@ export function AdvancedSurveySection({
       case 18: return renderStep18_sleep();
       case 19: return renderStep19_nutrition();
       case 20: return renderStep20_program();
+      case 21: return renderStep21_squatPreferences();
+      case 22: return renderStep22_benchPreferences();
+      case 23: return renderStep23_deadliftPreferences();
       default: return <div>단계 {currentStep} 준비중...</div>;
     }
   };
 
-  if (currentStep === 21) {
+  if (currentStep === 24) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="max-w-4xl mx-auto px-8 py-16">
