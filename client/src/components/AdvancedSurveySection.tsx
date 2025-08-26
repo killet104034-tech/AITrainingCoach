@@ -2309,7 +2309,7 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_range" id="squat-rpe-range" />
-              <label htmlFor="squat-rpe-range" className="text-gray-300">RPE+Range (예: RPE 8-9 범위)</label>
+              <label htmlFor="squat-rpe-range" className="text-gray-300">RPE+Range (RPE와 해당 RPE 상하한선 중량 범위 설정)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="percentage" id="squat-percentage" />
@@ -2327,7 +2327,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">스쿼트 탑셋 강도 선호</Label>
+          <Label className="text-white">스쿼트 탑셋 선호 RPE</Label>
           <RadioGroup 
             value={form.watch("squatTopSetIntensity")} 
             onValueChange={(value) => form.setValue("squatTopSetIntensity", value)}
@@ -2335,19 +2335,19 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="light" id="squat-light" />
-              <label htmlFor="squat-light" className="text-gray-300">가벼운 (RPE 6-7, ~80%)</label>
+              <label htmlFor="squat-light" className="text-gray-300">RPE 6-7 (가벼운 강도, 여유로운 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="moderate" id="squat-moderate" />
-              <label htmlFor="squat-moderate" className="text-gray-300">적당한 (RPE 7-8, ~85%)</label>
+              <label htmlFor="squat-moderate" className="text-gray-300">RPE 7-8 (적당한 강도, 다소 힘들지만 공량 여유)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="heavy" id="squat-heavy" />
-              <label htmlFor="squat-heavy" className="text-gray-300">무거운 (RPE 8-9, ~90%)</label>
+              <label htmlFor="squat-heavy" className="text-gray-300">RPE 8-9 (무거운 강도, 1-2개 여유로 마무리)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="max" id="squat-max" />
-              <label htmlFor="squat-max" className="text-gray-300">최대 (RPE 9-10, ~95%)</label>
+              <label htmlFor="squat-max" className="text-gray-300">RPE 9-10 (최대 강도, 간신히 또는 전력)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="squat-intensity-unknown" />
@@ -2357,7 +2357,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">스쿼트 탑셋 개수</Label>
+          <Label className="text-white">스쿼트 탑Set Count</Label>
           <RadioGroup 
             value={form.watch("squatTopSetCount")} 
             onValueChange={(value) => form.setValue("squatTopSetCount", value)}
@@ -2365,15 +2365,15 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1" id="squat-top-1" />
-              <label htmlFor="squat-top-1" className="text-gray-300">1세트</label>
+              <label htmlFor="squat-top-1" className="text-gray-300">1 Set</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="2-3" id="squat-top-2-3" />
-              <label htmlFor="squat-top-2-3" className="text-gray-300">2-3세트</label>
+              <label htmlFor="squat-top-2-3" className="text-gray-300">2-3 Sets</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="4-5" id="squat-top-4-5" />
-              <label htmlFor="squat-top-4-5" className="text-gray-300">4-5세트</label>
+              <label htmlFor="squat-top-4-5" className="text-gray-300">4-5 Sets</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="squat-topcount-unknown" />
@@ -2395,7 +2395,7 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="reps_increase" id="squat-reps-inc" />
-              <label htmlFor="squat-reps-inc" className="text-gray-300">반복수 증가 (중량 고정, 횟수 증가)</label>
+              <label htmlFor="squat-reps-inc" className="text-gray-300">Reps 증가 (중량 고정, 횟수 증가)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_progression" id="squat-rpe-prog" />
@@ -2403,7 +2403,7 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="volume_increase" id="squat-vol-inc" />
-              <label htmlFor="squat-vol-inc" className="text-gray-300">볼륨 증가 (세트수 추가)</label>
+              <label htmlFor="squat-vol-inc" className="text-gray-300">Volume 증가 (Set수 추가)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="squat-prog-unknown" />
@@ -2421,7 +2421,7 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="straight_sets" id="squat-straight" />
-              <label htmlFor="squat-straight" className="text-gray-300">스트레이트 세트 (5x5, 3x5 같은 고정 중량/횟수)</label>
+              <label htmlFor="squat-straight" className="text-gray-300">Straight Sets (5x5, 3x5 같은 고정 중량/Reps)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_backoff" id="squat-rpe-back" />
@@ -2493,7 +2493,7 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_range" id="bench-rpe-range" />
-              <label htmlFor="bench-rpe-range" className="text-gray-300">RPE+Range (예: RPE 8-9 범위)</label>
+              <label htmlFor="bench-rpe-range" className="text-gray-300">RPE+Range (RPE와 해당 RPE 상하한선 중량 범위 설정)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="percentage" id="bench-percentage" />
@@ -2511,7 +2511,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">벤치프레스 탑셋 강도 선호</Label>
+          <Label className="text-white">벤치프레스 탑셋 선호 RPE</Label>
           <RadioGroup 
             value={form.watch("benchTopSetIntensity")} 
             onValueChange={(value) => form.setValue("benchTopSetIntensity", value)}
@@ -2519,19 +2519,19 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="light" id="bench-light" />
-              <label htmlFor="bench-light" className="text-gray-300">가벼운 (RPE 6-7, ~80%)</label>
+              <label htmlFor="bench-light" className="text-gray-300">RPE 6-7 (가벼운 강도, 여유로운 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="moderate" id="bench-moderate" />
-              <label htmlFor="bench-moderate" className="text-gray-300">적당한 (RPE 7-8, ~85%)</label>
+              <label htmlFor="bench-moderate" className="text-gray-300">RPE 7-8 (적당한 강도, 다소 힘들지만 공럅 여유)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="heavy" id="bench-heavy" />
-              <label htmlFor="bench-heavy" className="text-gray-300">무거운 (RPE 8-9, ~90%)</label>
+              <label htmlFor="bench-heavy" className="text-gray-300">RPE 8-9 (무거운 강도, 1-2개 여유로 마무리)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="max" id="bench-max" />
-              <label htmlFor="bench-max" className="text-gray-300">최대 (RPE 9-10, ~95%)</label>
+              <label htmlFor="bench-max" className="text-gray-300">RPE 9-10 (최대 강도, 간신히 또는 전력)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="bench-intensity-unknown" />
@@ -2541,7 +2541,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">벤치프레스 탑셋 개수</Label>
+          <Label className="text-white">벤치프레스 탑Set Count</Label>
           <RadioGroup 
             value={form.watch("benchTopSetCount")} 
             onValueChange={(value) => form.setValue("benchTopSetCount", value)}
@@ -2549,15 +2549,15 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1" id="bench-top-1" />
-              <label htmlFor="bench-top-1" className="text-gray-300">1세트</label>
+              <label htmlFor="bench-top-1" className="text-gray-300">1 Set</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="2-3" id="bench-top-2-3" />
-              <label htmlFor="bench-top-2-3" className="text-gray-300">2-3세트</label>
+              <label htmlFor="bench-top-2-3" className="text-gray-300">2-3 Sets</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="4-5" id="bench-top-4-5" />
-              <label htmlFor="bench-top-4-5" className="text-gray-300">4-5세트</label>
+              <label htmlFor="bench-top-4-5" className="text-gray-300">4-5 Sets</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="bench-topcount-unknown" />
@@ -2579,7 +2579,7 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="reps_increase" id="bench-reps-inc" />
-              <label htmlFor="bench-reps-inc" className="text-gray-300">반복수 증가 (중량 고정, 횟수 증가)</label>
+              <label htmlFor="bench-reps-inc" className="text-gray-300">Reps 증가 (중량 고정, 횟수 증가)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_progression" id="bench-rpe-prog" />
@@ -2587,7 +2587,7 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="volume_increase" id="bench-vol-inc" />
-              <label htmlFor="bench-vol-inc" className="text-gray-300">볼륨 증가 (세트수 추가)</label>
+              <label htmlFor="bench-vol-inc" className="text-gray-300">Volume 증가 (Set수 추가)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="bench-prog-unknown" />
@@ -2605,7 +2605,7 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="straight_sets" id="bench-straight" />
-              <label htmlFor="bench-straight" className="text-gray-300">스트레이트 세트 (5x5, 3x5 같은 고정 중량/횟수)</label>
+              <label htmlFor="bench-straight" className="text-gray-300">Straight Sets (5x5, 3x5 같은 고정 중량/Reps)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_backoff" id="bench-rpe-back" />
@@ -2677,7 +2677,7 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_range" id="deadlift-rpe-range" />
-              <label htmlFor="deadlift-rpe-range" className="text-gray-300">RPE+Range (예: RPE 8-9 범위)</label>
+              <label htmlFor="deadlift-rpe-range" className="text-gray-300">RPE+Range (RPE와 해당 RPE 상하한선 중량 범위 설정)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="percentage" id="deadlift-percentage" />
@@ -2695,7 +2695,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">데드리프트 탑셋 강도 선호</Label>
+          <Label className="text-white">데드리프트 탑셋 선호 RPE</Label>
           <RadioGroup 
             value={form.watch("deadliftTopSetIntensity")} 
             onValueChange={(value) => form.setValue("deadliftTopSetIntensity", value)}
@@ -2703,19 +2703,19 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="light" id="deadlift-light" />
-              <label htmlFor="deadlift-light" className="text-gray-300">가벼운 (RPE 6-7, ~80%)</label>
+              <label htmlFor="deadlift-light" className="text-gray-300">RPE 6-7 (가벼운 강도, 여유로운 중량)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="moderate" id="deadlift-moderate" />
-              <label htmlFor="deadlift-moderate" className="text-gray-300">적당한 (RPE 7-8, ~85%)</label>
+              <label htmlFor="deadlift-moderate" className="text-gray-300">RPE 7-8 (적당한 강도, 다소 힘들지만 공럅 여유)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="heavy" id="deadlift-heavy" />
-              <label htmlFor="deadlift-heavy" className="text-gray-300">무거운 (RPE 8-9, ~90%)</label>
+              <label htmlFor="deadlift-heavy" className="text-gray-300">RPE 8-9 (무거운 강도, 1-2개 여유로 마무리)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="max" id="deadlift-max" />
-              <label htmlFor="deadlift-max" className="text-gray-300">최대 (RPE 9-10, ~95%)</label>
+              <label htmlFor="deadlift-max" className="text-gray-300">RPE 9-10 (최대 강도, 간신히 또는 전력)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="deadlift-intensity-unknown" />
@@ -2725,7 +2725,7 @@ export function AdvancedSurveySection({
         </div>
 
         <div>
-          <Label className="text-white">데드리프트 탑셋 개수</Label>
+          <Label className="text-white">데드리프트 탑Set Count</Label>
           <RadioGroup 
             value={form.watch("deadliftTopSetCount")} 
             onValueChange={(value) => form.setValue("deadliftTopSetCount", value)}
@@ -2733,15 +2733,15 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1" id="deadlift-top-1" />
-              <label htmlFor="deadlift-top-1" className="text-gray-300">1세트</label>
+              <label htmlFor="deadlift-top-1" className="text-gray-300">1 Set</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="2-3" id="deadlift-top-2-3" />
-              <label htmlFor="deadlift-top-2-3" className="text-gray-300">2-3세트</label>
+              <label htmlFor="deadlift-top-2-3" className="text-gray-300">2-3 Sets</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="4-5" id="deadlift-top-4-5" />
-              <label htmlFor="deadlift-top-4-5" className="text-gray-300">4-5세트</label>
+              <label htmlFor="deadlift-top-4-5" className="text-gray-300">4-5 Sets</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="deadlift-topcount-unknown" />
@@ -2763,7 +2763,7 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="reps_increase" id="deadlift-reps-inc" />
-              <label htmlFor="deadlift-reps-inc" className="text-gray-300">반복수 증가 (중량 고정, 횟수 증가)</label>
+              <label htmlFor="deadlift-reps-inc" className="text-gray-300">Reps 증가 (중량 고정, 횟수 증가)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_progression" id="deadlift-rpe-prog" />
@@ -2771,7 +2771,7 @@ export function AdvancedSurveySection({
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="volume_increase" id="deadlift-vol-inc" />
-              <label htmlFor="deadlift-vol-inc" className="text-gray-300">볼륨 증가 (세트수 추가)</label>
+              <label htmlFor="deadlift-vol-inc" className="text-gray-300">Volume 증가 (Set수 추가)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="unknown" id="deadlift-prog-unknown" />
@@ -2789,7 +2789,7 @@ export function AdvancedSurveySection({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="straight_sets" id="deadlift-straight" />
-              <label htmlFor="deadlift-straight" className="text-gray-300">스트레이트 세트 (5x5, 3x5 같은 고정 중량/횟수)</label>
+              <label htmlFor="deadlift-straight" className="text-gray-300">Straight Sets (5x5, 3x5 같은 고정 중량/Reps)</label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rpe_backoff" id="deadlift-rpe-back" />
@@ -2859,25 +2859,25 @@ export function AdvancedSurveySection({
       case 2: return renderStep2();   // 이메일
       case 3: return renderStep3();   // 나이
       case 4: return renderStep4();   // 성별
-      case 5: return renderStep5();   // 🚀 신체 특성 분석 
-      case 6: return renderStep6();   // 🧠 심리적 성향 분석 
-      case 7: return renderStep7();   // ⚡ 볼륨 내성 테스트 
-      case 8: return renderStep8();   // 현재 수준
-      case 9: return renderStep9();   // 목표 설정
-      case 10: return renderStep10();
-      case 11: return renderStep11();
-      case 12: return renderStep12();
-      case 13: return renderStep13();
-      case 14: return renderStep14();
-      case 15: return renderStep15_injury();
-      case 16: return renderStep16();
-      case 17: return renderStep17_mental();
-      case 18: return renderStep18_sleep();
-      case 19: return renderStep19_nutrition();
-      case 20: return renderStep20_program();
-      case 21: return renderStep21_squatPreferences();
-      case 22: return renderStep22_benchPreferences();
-      case 23: return renderStep23_deadliftPreferences();
+      case 5: return renderStep8();   // 현재 수준 (1RM, 경험)
+      case 6: return renderStep5();   // 🚀 실패 패턴 분석
+      case 7: return renderStep21_squatPreferences();  // 스쿼트 상세 훈련 선호도
+      case 8: return renderStep22_benchPreferences();  // 벤치프레스 상세 훈련 선호도
+      case 9: return renderStep23_deadliftPreferences(); // 데드리프트 상세 훈련 선호도
+      case 10: return renderStep9();   // 목표 설정
+      case 11: return renderStep15_injury(); // 부상 이력
+      case 12: return renderStep6();   // 🧠 심리적 성향 분석
+      case 13: return renderStep7();   // ⚡ 볼륨 내성 테스트
+      case 14: return renderStep17_mental(); // 정신력 & 동기
+      case 15: return renderStep18_sleep(); // 수면 패턴
+      case 16: return renderStep19_nutrition(); // 영양 관리
+      case 17: return renderStep10(); // 장비 및 환경
+      case 18: return renderStep11(); // 훈련 블럭 선호도
+      case 19: return renderStep12(); // 기술적 선호도
+      case 20: return renderStep13(); // 약점 및 강점 분석
+      case 21: return renderStep14(); // 기타 설정
+      case 22: return renderStep16(); // 추가 정보
+      case 23: return renderStep20_program(); // 프로그램 설정
       default: return <div>단계 {currentStep} 준비중...</div>;
     }
   };
