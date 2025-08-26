@@ -64,10 +64,11 @@ export interface WorkoutProgram {
   };
 }
 
-// 템플릿 스프레드시트 ID (환경변수로 설정 가능)
-const TEMPLATE_SHEET_ID = process.env.SHEET_TEMPLATE_ID?.includes('spreadsheets/d/') 
-  ? process.env.SHEET_TEMPLATE_ID.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1]
-  : process.env.SHEET_TEMPLATE_ID;
+// 🏋️ 사용자 제공 시나브로 전문 템플릿 사용
+const SINABRO_TEMPLATE_ID = '1q4KvO5-SuvLyd6hdOoLPu4PLqoGwL5T_LZRuUPthsQQ'; // 시나브로 프로그램 양식의 사본
+
+// 템플릿 스프레드시트 ID (사용자 템플릿 우선 사용)
+const TEMPLATE_SHEET_ID = SINABRO_TEMPLATE_ID;
 
 // 📊 관리자용 마스터 스프레드시트 ID (모든 응답 누적)
 const MASTER_SHEET_ID = process.env.MASTER_SHEET_ID?.includes('spreadsheets/d/') 
@@ -170,35 +171,21 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     spreadsheetId = copy.data.id!;
     console.log(`✅ 템플릿 복사 완료! ID: ${spreadsheetId}, driveId: ${copy.data.driveId || 'Shared Drive 확인됨'}`);
 
-    // 🔥 프로급 파워리프팅 시트 구조 생성 (기존 코드 완전 제거)
-    console.log('💡 시트 생성 전 프로그램 데이터 확인:', {
+    // 🏋️ 사용자 시트 구조에 AI 데이터 입력 (구조 변경 없음)
+    console.log('🏋️ 시나브로 사용자 템플릿에 AI 데이터 입력 시작...');
+    console.log('💡 프로그램 데이터 확인:', {
       has_training_weeks: !!programData.training_weeks,
       training_weeks_length: programData.training_weeks ? programData.training_weeks.length : 0,
-      training_weeks_type: typeof programData.training_weeks,
       user_maxes: programData.user_maxes,
       program_title: programData.program_title
     });
     
     try {
-      await createProPowerliftingSheets(spreadsheetId, programData);
+      const { populateUserTemplateWithAIData } = await import('./userTemplatePopulator');
+      await populateUserTemplateWithAIData(spreadsheetId, programData);
+      console.log('✅ 사용자 템플릿에 AI 데이터 입력 완료!');
     } catch (error) {
-      console.log('⚠️ 프로급 시트 생성 중 오류 (계속 진행):', error);
-    }
-
-    // 🏋️ 시나브로 전문 파워리프팅 템플릿 적용
-    try {
-      const { createProfessionalPowerliftingTemplate } = await import('./professionalTemplate');
-      await createProfessionalPowerliftingTemplate(spreadsheetId, programData);
-      console.log('✅ 시나브로 전문 템플릿 적용 완료!');
-    } catch (error) {
-      console.log('⚠️ 전문 템플릿 적용 중 오류 (기존 폴리싱으로 대체):', error);
-      
-      // 폴백: 기존 폴리싱 사용
-      try {
-        await applyPolishingAndSummary(spreadsheetId, programData);
-      } catch (fallbackError) {
-        console.log('⚠️ 기존 폴리싱도 실패:', fallbackError);
-      }
+      console.log('⚠️ 데이터 입력 중 오류:', error);
     }
     
     // 📝 Form 시트 추가 및 설문 데이터 저장
