@@ -10,9 +10,12 @@ const drive = google.drive({ version: 'v3', auth });
 export interface WorkoutProgram {
   program_title: string;
   user_maxes: {
-    squat: string;
-    bench: string;
-    deadlift: string;
+    exercise1?: string;
+    exercise2?: string; 
+    exercise3?: string;
+    squat?: string;
+    bench?: string;
+    deadlift?: string;
   };
   training_weeks: Array<{
     week: number;
@@ -51,35 +54,25 @@ const BASIC_TEMPLATE_ID = '1q4KvO5-SuvLyd6hdOoLPu4PLqoGwL5T_LZRuUPthsQQ';
 // 메인 스프레드시트 생성 함수
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
-    console.log('📋 기본 스프레드시트 생성 시작...');
+    console.log('📋 템플릿 기반 스프레드시트 복사 시작...');
 
-    // 1. 새 스프레드시트 생성
-    const spreadsheet = await sheets.spreadsheets.create({
+    // 1. 템플릿 스프레드시트 복사
+    const copyResponse = await drive.files.copy({
+      fileId: BASIC_TEMPLATE_ID,
       requestBody: {
-        properties: {
-          title: "Sinabro Strength - Master Database"
-        },
-        sheets: [{
-          properties: {
-            title: "Master",
-            gridProperties: {
-              rowCount: 1000,
-              columnCount: 60
-            }
-          }
-        }]
+        name: `${programData.program_title || 'Sinabro Strength'} - ${new Date().toISOString().split('T')[0]}`
       }
     });
 
-    const spreadsheetId = spreadsheet.data.spreadsheetId!;
-    console.log(`✅ 새 스프레드시트 생성 완료: ${spreadsheetId}`);
+    const spreadsheetId = copyResponse.data.id!;
+    console.log(`✅ 템플릿 복사 완료: ${spreadsheetId}`);
 
     // 2. 기본 헤더 데이터 입력
     const headerData = [
       ['프로그램 제목', programData.program_title],
-      ['스쿼트 1RM', programData.user_maxes.squat + 'kg'],
-      ['벤치 1RM', programData.user_maxes.bench + 'kg'],
-      ['데드리프트 1RM', programData.user_maxes.deadlift + 'kg'],
+      ['운동 1 최고기록', (programData.user_maxes.exercise1 || programData.user_maxes.squat || '100') + 'kg'],
+      ['운동 2 최고기록', (programData.user_maxes.exercise2 || programData.user_maxes.bench || '80') + 'kg'],
+      ['운동 3 최고기록', (programData.user_maxes.exercise3 || programData.user_maxes.deadlift || '120') + 'kg'],
       [''],
       ['주차', '운동', '세트', '횟수', '중량(%)', 'RPE', '비고']
     ];
