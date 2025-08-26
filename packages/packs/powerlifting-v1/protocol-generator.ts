@@ -121,8 +121,8 @@ export class PowerliftingProtocolGenerator {
   private generateDayWorkoutFromDonghwanProtocol(dayNum: number, weekNum: number, protocol: any, surveyData: any): WorkoutDay {
     const exercises: Exercise[] = [];
     
-    // 요일별 메인 운동 배치
-    const mainLift = this.getMainLiftForDay(dayNum, protocol.days_per_week);
+    // 요일별 메인 운동 배치 (김동환님이 정한 것만)
+    const mainLift = this.getMainLiftForDay(dayNum, protocol);
     
     if (mainLift === 'squat') {
       exercises.push(...this.generateSquatFromDonghwanProtocol(protocol, weekNum));
@@ -191,44 +191,42 @@ export class PowerliftingProtocolGenerator {
     }];
   }
 
-  // 💪 김동환님 보조운동 수치 그대로 적용 (변경 금지!)
+  // 🚫 보조운동도 AI가 정하면 안 됨! 김동환님이 직접 정해야 함!
   private generateAccessoryFromDonghwanProtocol(protocol: any, mainLift: string): Exercise[] {
-    const accessories = this.getAccessoryExercises(mainLift);
+    // 김동환님이 매핑 테이블에서 보조운동도 직접 정의해야 함
+    if (!protocol.accessory_exercises || protocol.accessory_exercises.length === 0) {
+      console.log(`❓ 김동환님께 질문: ${mainLift} 주운동 시 어떤 보조운동을 하나요?`);
+      return []; // 김동환님이 정하지 않았으면 빈 배열
+    }
     
-    return accessories.map(exercise => ({
+    return protocol.accessory_exercises.map((exercise: string) => ({
       exercise,
-      sets: protocol.accessory_sets.toString(),
-      reps: protocol.accessory_reps,
-      weight_percent: "김동환님이 정한 값 필요", // 🚫 AI가 "70-75%" 같은 값 정하면 안 됨!
-      rpe: protocol.accessory_rpe.toString(),
-      rest_minutes: "김동환님이 정한 값 필요", // 🚫 AI가 "2분" 같은 값 정하면 안 됨!
-      notes: "김동환 코치 보조운동 수치"
+      sets: protocol.accessory_sets?.toString() || "김동환님이 정한 값 필요",
+      reps: protocol.accessory_reps || "김동환님이 정한 값 필요",
+      weight_percent: protocol.accessory_weight_percent || "김동환님이 정한 값 필요",
+      rpe: protocol.accessory_rpe?.toString() || "김동환님이 정한 값 필요",
+      rest_minutes: protocol.accessory_rest_minutes || "김동환님이 정한 값 필요",
+      notes: "김동환 코치 직접 선택한 보조운동"
     }));
   }
 
   // 🎯 헬퍼 함수들
-  private getMainLiftForDay(dayNum: number, daysPerWeek: number): string {
-    if (daysPerWeek === 3) {
-      const lifts = ['squat', 'bench', 'deadlift'];
-      return lifts[dayNum - 1];
-    } else if (daysPerWeek === 4) {
-      const lifts = ['squat', 'bench', 'deadlift', 'squat'];
-      return lifts[dayNum - 1];
+  // 🚫 AI가 요일별 운동 배치 정하는 것도 금지!
+  private getMainLiftForDay(dayNum: number, protocol: any): string {
+    // 김동환님이 매핑 테이블에서 요일별 운동 배치도 직접 정해야 함
+    if (protocol.daily_schedule && protocol.daily_schedule[dayNum - 1]) {
+      return protocol.daily_schedule[dayNum - 1];
     }
-    return 'squat';
+    
+    console.log(`❓ 김동환님께 질문: 주 ${protocol.days_per_week}회 훈련 시 ${dayNum}일차에는 어떤 운동을 하나요?`);
+    return 'undefined'; // 김동환님이 정하지 않았으면 undefined
   }
 
   // 🚫 AI가 임의로 중량 조정하는 함수 삭제됨!
   // 김동환님이 주차별 진행을 어떻게 할지 직접 정해야 함!
 
-  private getAccessoryExercises(mainLift: string): string[] {
-    const accessories: { [key: string]: string[] } = {
-      'squat': ['프론트 스쿼트', '불가리안 스플릿 스쿼트'],
-      'bench': ['인클라인 벤치프레스', '딥스'],
-      'deadlift': ['루마니안 데드리프트', '벤트오버 로우']
-    };
-    return accessories[mainLift] || [];
-  }
+  // 🚫 AI가 임의로 운동 목록 정하는 함수 삭제됨!
+  // 김동환님이 보조운동도 직접 정해야 함!
 
   private getWeekFocus(weekNum: number, protocol: any): string {
     if (weekNum === protocol.deload_week) {

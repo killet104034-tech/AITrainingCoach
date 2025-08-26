@@ -4,7 +4,7 @@
 export interface UserDefinedRule {
   condition_key: string;  // "beginner-strength-straight_sets"
   protocol: {
-    // 🏋️ 사용자가 정한 정확한 수치들
+    // 🏋️ 김동환님이 정한 정확한 수치들
     squat: {
       sets: number;
       reps: number;
@@ -26,14 +26,18 @@ export interface UserDefinedRule {
       rpe: number;
       rest_minutes: number;
     };
-    // 📅 스케줄링
+    // 📅 스케줄링 (김동환님이 정함)
     days_per_week: number;
     block_length_weeks: number;
     deload_week: number;
-    // 💪 보조 운동
+    daily_schedule: string[]; // ["squat", "bench", "deadlift"] - 김동환님이 요일별 배치 정함
+    // 💪 보조 운동 (김동환님이 정함)
+    accessory_exercises: string[]; // 김동환님이 직접 선택한 보조운동 목록
     accessory_sets: number;
     accessory_reps: string; // "8-12"
+    accessory_weight_percent: string; // 김동환님이 정한 보조운동 중량
     accessory_rpe: number;
+    accessory_rest_minutes: string; // 김동환님이 정한 보조운동 휴식시간
   };
 }
 
@@ -41,22 +45,7 @@ export interface UserDefinedRule {
 // ⚠️ 경고: AI가 임의로 수치를 정하면 절대 안 됨! 김동환님만 추가할 것!
 export const DONGHWAN_COACHING_MAPPINGS: UserDefinedRule[] = [
   // 🚫 AI 금지! 김동환님이 직접 여기에 조건-수치 매핑을 추가해야 함
-  // 예시 형태만 보여줌 (실제 수치는 김동환님이 입력):
-  /*
-  {
-    condition_key: "김동환님이_정한_조건키",
-    protocol: {
-      squat: {
-        sets: 김동환님이_정한_세트수,
-        reps: 김동환님이_정한_횟수,
-        weight_percent: 김동환님이_정한_중량퍼센트,
-        rpe: 김동환님이_정한_RPE,
-        rest_minutes: 김동환님이_정한_휴식시간
-      },
-      // 벤치, 데드리프트도 김동환님이 직접...
-    }
-  }
-  */
+  // 🚫 완전히 빈 테이블! 김동환님이 처음부터 모든 것을 직접 입력해야 함!
 ];
 
 export class UserDefinedMapper {
