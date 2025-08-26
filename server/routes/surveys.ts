@@ -5,7 +5,7 @@ import type { Express } from "express";
 import { storage } from "../storage";
 import { insertSurveyResponseSchema } from "@shared/schema";
 import { sendTrainingProgram } from "../services/email";
-import { PowerliftingGenerator } from "../../packages/packs/powerlifting-v1/protocol-generator";
+import { TrainingGenerator } from "../../packages/packs/powerlifting-v1/protocol-generator";
 
 export function registerSurveyRoutes(app: Express): void {
   // 설문 제출 엔드포인트 (깔끔하게 최적화)
@@ -16,7 +16,7 @@ export function registerSurveyRoutes(app: Express): void {
       const surveyResponse = await storage.createSurveyResponse(validatedData);
       
       // 2. 파워리프팅 프로그램 생성 (김동환님 매핑 기반)
-      const generator = new PowerliftingGenerator();
+      const generator = new TrainingGenerator();
       let trainingProgram;
       
       try {

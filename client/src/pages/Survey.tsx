@@ -1,7 +1,7 @@
 // 📋 설문 페이지 (Survey Page)
-// ✨ 기능: 전문가급 파워리프팅 설문 실행 및 프로그램 생성 요청
-// 🔄 흐름: 20단계 설문 → API 전송 → Google Sheets 18주 프로그램 생성 → 이메일 발송
-// 🎯 목표: 최고의 개인화된 파워리프팅 훈련 제공
+// ✨ 기능: 훈련 설문 실행 및 프로그램 생성 요청
+// 🔄 흐름: 설문 → API 전송 → 프로그램 생성 → 이메일 발송
+// 🎯 목표: 개인화된 훈련 제공
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -25,9 +25,9 @@ export default function Survey() {
       age: "",
       gender: "",
       experience: "",
-      squatMax: "",
-      benchMax: "",
-      deadliftMax: ""
+      exercise1Max: "",
+      exercise2Max: "",
+      exercise3Max: ""
     }
   });
   const { toast } = useToast();
@@ -36,8 +36,8 @@ export default function Survey() {
     mutationFn: (data) => apiRequest("POST", "/api/surveys?kind=advanced_v1", data),
     onSuccess: (response) => {
       toast({
-        title: "🔥 파워리프팅 프로그램 생성 완료!",
-        description: "최고의 개인화된 훈련이 이메일로 전송되었습니다.",
+        title: "🔥 훈련 프로그램 생성 완료!",
+        description: "개인화된 훈련이 이메일로 전송되었습니다.",
       });
     },
     onError: (error) => {

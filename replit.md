@@ -1,8 +1,8 @@
-# AI Powerlifting Training Program Generator
+# AI Training Program Generator
 
 ## Overview
 
-This is a Korean-language AI-powered powerlifting training program generator that creates personalized workout routines based on user surveys. The application collects detailed fitness information through a multi-step survey and uses OpenAI's API to generate customized powerlifting programs that are automatically delivered via email. The system focuses on the three main powerlifting movements: squat, bench press, and deadlift, while considering user experience levels, available equipment, injury history, and training goals.
+This is a Korean-language AI-powered training program generator that creates personalized workout routines based on user surveys. The application collects detailed fitness information through a multi-step survey and uses OpenAI's API to generate customized training programs that are automatically delivered via email. The system focuses on the three main training movements while considering user experience levels, available equipment, injury history, and training goals.
 
 ## User Preferences
 
@@ -51,7 +51,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Internationalization
 - **Language**: Entire application is Korean-language focused, including UI text, AI prompts, and generated content
-- **Content**: Specialized for Korean powerlifting community with culturally appropriate terminology and formatting
+- **Content**: Specialized for Korean fitness community with culturally appropriate terminology and formatting
 
 ## External Dependencies
 

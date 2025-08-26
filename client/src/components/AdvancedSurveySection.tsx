@@ -55,7 +55,7 @@ export function AdvancedSurveySection({
           { value: "strength", title: "💪 근력 향상", desc: "더 무거운 중량을 들고 싶어요" },
           { value: "muscle", title: "🏋️ 근육량 증가", desc: "몸을 더 크고 탄탄하게 만들고 싶어요" },
           { value: "health", title: "🌟 건강 관리", desc: "전반적인 체력과 건강을 개선하고 싶어요" },
-          { value: "competition", title: "🏆 대회 준비", desc: "파워리프팅 대회에 참가하고 싶어요" },
+          { value: "competition", title: "🏆 대회 준비", desc: "체력 대회에 참가하고 싶어요" },
           { value: "technique", title: "⚙️ 기술 향상", desc: "올바른 자세와 테크닉을 배우고 싶어요" }
         ].map((goal) => {
           const isSelected = form.watch("goals")?.includes(goal.value);

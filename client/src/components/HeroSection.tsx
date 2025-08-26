@@ -19,7 +19,7 @@ export default function HeroSection() {
           프로그램
         </h1>
         <p className="text-xl md:text-2xl text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
-          파워리프팅, 근비대, 다이어트, 대회준비까지. 
+          근력향상, 근비대, 다이어트, 대회준비까지. 
           당신의 목표와 환경을 분석하여 최적화된 개인별 훈련 계획을 제공합니다.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

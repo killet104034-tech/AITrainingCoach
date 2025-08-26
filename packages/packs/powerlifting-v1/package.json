@@ -1,7 +1,7 @@
 {
-  "name": "@sinabro/pack-powerlifting-v1",
+  "name": "@sinabro/pack-training-v1",
   "version": "1.0.0",
-  "description": "파워리프팅 도메인 플러그인 - 룰/템플릿/매핑",
+  "description": "훈련 도메인 플러그인 - 룰/템플릿/매핑",
   "main": "index.ts",
   "type": "module",
   "dependencies": {

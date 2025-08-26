@@ -99,11 +99,11 @@ export default function SurveySection() {
               <div className="space-y-6">
                 {submitMutation.data?.emailSent ? (
                   <p className="text-gray-400 max-w-md mx-auto">
-                    <span className="font-medium text-white">{form.getValues("email")}</span>로 맞춤형 파워리프팅 훈련 프로그램이 전송되었습니다.
+                    <span className="font-medium text-white">{form.getValues("email")}</span>로 맞춤형 훈련 프로그램이 전송되었습니다.
                   </p>
                 ) : (
                   <p className="text-gray-400 max-w-md mx-auto">
-                    맞춤형 파워리프팅 훈련 프로그램이 생성되었습니다. 아래 버튼을 클릭해서 프로그램을 확인하세요.
+                    맞춤형 훈련 프로그램이 생성되었습니다. 아래 버튼을 클릭해서 프로그램을 확인하세요.
                   </p>
                 )}
                 

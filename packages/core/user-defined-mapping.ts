@@ -1,11 +1,11 @@
-// 🎯 김동환님 전용 조건매핑 시스템 (깔끔하게 최적화됨)
+// 🎯 코치 전용 조건매핑 시스템 (깔끔하게 최적화됨)
 
 export interface TrainingProtocol {
   condition_key: string;  
   protocol: {
-    squat: ExerciseProtocol;
-    bench: ExerciseProtocol;  
-    deadlift: ExerciseProtocol;
+    exercise1: ExerciseProtocol;
+    exercise2: ExerciseProtocol;  
+    exercise3: ExerciseProtocol;
     schedule: ScheduleProtocol;
     accessories: AccessoryProtocol;
   };
@@ -35,14 +35,14 @@ export interface AccessoryProtocol {
   rest_minutes: string;
 }
 
-// 🗂️ 김동환님 전용 매핑 테이블 (완전히 깨끗함)
+// 🗂️ 코치 전용 매핑 테이블 (완전히 깨끗함)
 export const COACHING_MAPPINGS: TrainingProtocol[] = [
-  // 김동환님이 추가할 매핑들이 여기에 들어감
+  // 코치가 추가할 매핑들이 여기에 들어감
 ];
 
 export class ConditionMapper {
   
-  // 🎯 설문 → 김동환님 매핑 찾기 (깔끔하게 최적화)
+  // 🎯 설문 → 코치 매핑 찾기 (깔끔하게 최적화)
   public findProtocol(surveyData: any): TrainingProtocol | null {
     const conditionKey = this.buildConditionKey(surveyData);
     
@@ -51,7 +51,7 @@ export class ConditionMapper {
     );
     
     console.log(`🔍 조건: ${conditionKey}`);
-    console.log(`📋 결과: ${protocol ? '매핑 발견' : '김동환님께 문의 필요'}`);
+    console.log(`📋 결과: ${protocol ? '매핑 발견' : '코치에게 문의 필요'}`);
     
     return protocol || null;
   }
@@ -65,7 +65,7 @@ export class ConditionMapper {
     return `${experience}-${goal}-${method}`;
   }
 
-  // ➕ 김동환님 매핑 추가
+  // ➕ 코치 매핑 추가
   public addMapping(protocol: TrainingProtocol): void {
     COACHING_MAPPINGS.push(protocol);
   }

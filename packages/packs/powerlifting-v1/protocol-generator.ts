@@ -1,4 +1,4 @@
-// 🏋️ 파워리프팅 프로그램 생성기 (최적화됨)
+// 🏋️ 훈련 프로그램 생성기 (최적화됨)
 
 import { ConditionMapper, TrainingProtocol } from '../../core/user-defined-mapping';
 import { AIPreventionGuard } from '../../core/ai-prevention-guard';
@@ -39,7 +39,7 @@ export interface GeneratedProgram {
   };
 }
 
-export class PowerliftingGenerator {
+export class TrainingGenerator {
   private mapper: ConditionMapper;
   
   constructor() {

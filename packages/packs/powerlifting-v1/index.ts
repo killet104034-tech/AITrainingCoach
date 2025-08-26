@@ -1,4 +1,4 @@
-// 🎯 파워리프팅 v1 팩 - 100% 조건매핑 시스템
+// 🎯 훈련 v1 팩 - 100% 조건매핑 시스템
 import { SurveyEngine } from '@sinabro/core';
 import { PowerliftingProtocolGenerator } from './protocol-generator';
 
@@ -37,9 +37,9 @@ export class PowerliftingV1Engine implements SurveyEngine {
   private formatProgramAsText(program: any): string {
     let text = `${program.program_title}\n\n`;
     text += `현재 기록:\n`;
-    text += `- 스쿼트: ${program.user_maxes.squat}kg\n`;
-    text += `- 벤치프레스: ${program.user_maxes.bench}kg\n`;
-    text += `- 데드리프트: ${program.user_maxes.deadlift}kg\n\n`;
+    text += `- 운동1: ${program.user_maxes.exercise1 || program.user_maxes.squat}kg\n`;
+    text += `- 운동2: ${program.user_maxes.exercise2 || program.user_maxes.bench}kg\n`;
+    text += `- 운동3: ${program.user_maxes.exercise3 || program.user_maxes.deadlift}kg\n\n`;
     text += `사용된 프로토콜: ${program.metadata.protocol_used}\n`;
     text += `조건 경로: ${program.metadata.condition_path}\n\n`;
 
