@@ -205,19 +205,18 @@ async function populateWeekSection(
     const minWeight = Math.max(exercise.targetWeight - 10, Math.round(exercise.max * 0.5));
     const maxWeight = exercise.targetWeight + 10;
     
-    // 행 데이터: [운동명, 타겟중량, 타겟Reps, Set, 타겟RPE, 최소중량, 최대중량, 실제중량, 실제Reps, 실제RPE, 메모]
+    // 사용자 시트의 실제 컬럼 순서에 맞춘 데이터 매핑
     const rowData = [
       exercise.exercise,           // A열: 운동명
-      `${exercise.targetWeight}`,  // B열: 타겟중량  
-      exercise.reps,               // C열: 타겟Reps
-      exercise.sets,               // D열: Set
-      exercise.rpe,                // E열: 타겟RPE
+      exercise.sets,               // B열: Set수  
+      exercise.rpe,                // C열: 타겟RPE
+      `${exercise.targetWeight}`,  // D열: 타겟중량
+      `${maxWeight}`,              // E열: 최대중량
       `${minWeight}`,              // F열: 최소중량
-      `${maxWeight}`,              // G열: 최대중량
-      '',                          // H열: 실제중량 (빈칸)
-      '',                          // I열: 실제Reps (빈칸)  
-      '',                          // J열: 실제RPE (빈칸)
-      ''                           // K열: 메모 (빈칸)
+      '',                          // G열: 실제중량 (빈칸)
+      '',                          // H열: 실제Reps (빈칸)  
+      '',                          // I열: 실제RPE (빈칸)
+      ''                           // J열: 메모 (빈칸)
     ];
     
     // 시트에 데이터 입력
