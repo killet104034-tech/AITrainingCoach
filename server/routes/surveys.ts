@@ -23,17 +23,17 @@ export function registerSurveyRoutes(app: Express): void {
     try {
       // 🔄 운영 가드와 함께 기본 처리 실행
       const result = await operationalGuard.executeWithRetry(async () => {
-        // 기본 설문 데이터 검증 및 저장
+        // 🎯 간소화된 설문 데이터 검증 및 저장
         const validatedData = insertSurveyResponseSchema.parse(req.body);
         const surveyResponse = await storage.createSurveyResponse(validatedData);
         
-        // 🎯 기본 프로그램 구조 생성 (파워리프팅 로직 제거됨)
+        // 🎯 디자인용 최소 프로그램 (2개 필드만 사용)
         const basicProgram = {
-          program_title: "기본 훈련 프로그램",
+          program_title: `${validatedData.name}님의 맞춤 훈련 프로그램`,
           user_maxes: {
-            squat: validatedData.squatMax || "100",
-            bench: validatedData.benchMax || "80", 
-            deadlift: validatedData.deadliftMax || "120"
+            squat: "100",
+            bench: "80", 
+            deadlift: "120"
           },
           training_weeks: [
             {
@@ -61,13 +61,7 @@ export function registerSurveyRoutes(app: Express): void {
           survey_data: {
             timestamp: new Date().toISOString(),
             name: validatedData.name,
-            email: validatedData.email,
-            experience: validatedData.experience,
-            daysPerWeek: validatedData.frequency,
-            goal: Array.isArray(validatedData.goals) ? validatedData.goals.join(', ') : validatedData.goals,
-            equipment: Array.isArray(validatedData.equipment) ? validatedData.equipment.join(', ') : validatedData.equipment,
-            injuries: validatedData.injuries,
-            injuryDetails: validatedData.injuryDetails
+            email: validatedData.email
           }
         };
         
