@@ -55,10 +55,10 @@ export class PowerliftingProtocolGenerator {
     // 🚫 김동환님이 아직 입력하지 않은 조건이면 AI가 임의로 만들면 안 됨!
     if (!donghwanProtocol) {
       const conditionKey = this.buildConditionKeyForError(surveyData);
-      const waitingMessage = AIPreventionGuard.generateWaitingMessage(conditionKey);
-      console.log(waitingMessage);
+      const questionMessage = AIPreventionGuard.generateQuestionMessage(conditionKey);
+      console.log(questionMessage);
       
-      throw new Error(`❌ 김동환님 수치 없음: ${conditionKey}\n\n${waitingMessage}`);
+      throw new Error(`❓ 김동환님께 질문: ${conditionKey}\n\n${questionMessage}`);
     }
     
     // 2. 김동환님 수치를 실제 운동 프로그램으로 변환 (수치 변경 없이!)

@@ -37,21 +37,22 @@ export class AIPreventionGuard {
     }
   }
 
-  // 📋 김동환님 입력 대기 메시지
-  public static generateWaitingMessage(conditionKey: string): string {
+  // 📋 김동환님께 직접 질문하는 메시지
+  public static generateQuestionMessage(conditionKey: string): string {
     return `
-🎯 김동환님 입력 필요
+🎯 김동환님께 질문
 
 조건: ${conditionKey}
 
-현재 상태: 김동환님이 아직 이 조건에 대한 훈련 방식을 입력하지 않았습니다.
+❓ 질문: 이 조건의 고객에게는 어떻게 훈련을 짜주시나요?
 
-다음 단계:
-1. 김동환님께 "${conditionKey}" 조건의 고객에게 어떻게 훈련을 짜주시는지 문의
-2. 김동환님의 답변을 매핑 테이블에 추가
-3. 시스템에서 자동으로 해당 방식 적용
+예를 들어:
+- 스쿼트: 몇 세트 x 몇 회 @ 몇%? RPE는? 휴식시간은?
+- 벤치프레스: 몇 세트 x 몇 회 @ 몇%? RPE는? 휴식시간은?
+- 데드리프트: 몇 세트 x 몇 회 @ 몇%? RPE는? 휴식시간은?
+- 주 몇 회 훈련? 몇 주 프로그램? 언제 디로드?
 
-💡 잠시만요, 김동환님께 확인하겠습니다!
+💭 김동환님의 실제 코칭 방식을 알려주세요!
     `;
   }
 }
