@@ -54,11 +54,19 @@ const BASIC_TEMPLATE_ID = '1Oj-c6pIjOsaHMFiTRaZIfAoS6p-5PhwWZUaMxwvFoQo';
 // 메인 스프레드시트 생성 함수
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
-    console.log('📋 기존 스프레드시트 수정 시작...');
+    console.log('📋 템플릿 스프레드시트 복사 시작...');
 
-    // 1. 기존 스프레드시트 사용 (새로 생성하지 않고)
-    const spreadsheetId = BASIC_TEMPLATE_ID;
-    console.log(`✅ 기존 스프레드시트 사용: ${spreadsheetId}`);
+    // 1. 템플릿 스프레드시트 복사 (드라이브 API 사용)
+    const copyResponse = await drive.files.copy({
+      fileId: BASIC_TEMPLATE_ID,
+      supportsAllDrives: true,
+      requestBody: {
+        name: `${programData.program_title || 'Sinabro Strength'} - ${new Date().toISOString().split('T')[0]} - ${Math.random().toString(36).substr(2, 9)}`
+      }
+    });
+
+    const spreadsheetId = copyResponse.data.id!;
+    console.log(`✅ 템플릿 복사 완료: ${spreadsheetId}`);
 
     // 2. 기본 헤더 데이터 입력
     const headerData = [
