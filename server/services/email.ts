@@ -27,7 +27,8 @@ export async function sendTrainingProgram(
     // 객체든 문자열이든 처리 가능
     const parsedProgram = typeof program === 'string' ? JSON.parse(program) : program;
     
-    // 스프레드시트 기능 제거됨
+    // 스프레드시트 기능 제거됨 - 기본값 설정
+    const spreadsheetUrl = '#'; // 스프레드시트 없이 HTML 프로그램만 제공
     
     const htmlContent = `
     <!DOCTYPE html>
