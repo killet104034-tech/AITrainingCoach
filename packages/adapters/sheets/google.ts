@@ -54,18 +54,19 @@ const BASIC_TEMPLATE_ID = '1q4KvO5-SuvLyd6hdOoLPu4PLqoGwL5T_LZRuUPthsQQ';
 // 메인 스프레드시트 생성 함수
 export async function createWorkoutSheet(programData: WorkoutProgram): Promise<string> {
   try {
-    console.log('📋 템플릿 기반 스프레드시트 복사 시작...');
+    console.log('📋 간단한 스프레드시트 생성 시작...');
 
-    // 1. 템플릿 스프레드시트 복사
-    const copyResponse = await drive.files.copy({
-      fileId: BASIC_TEMPLATE_ID,
+    // 1. 간단한 새 스프레드시트 생성 (템플릿 복사 대신)
+    const createResponse = await sheets.spreadsheets.create({
       requestBody: {
-        name: `${programData.program_title || 'Sinabro Strength'} - ${new Date().toISOString().split('T')[0]}`
+        properties: {
+          title: `${programData.program_title || 'Sinabro Strength'} - ${new Date().toISOString().split('T')[0]}`
+        }
       }
     });
 
-    const spreadsheetId = copyResponse.data.id!;
-    console.log(`✅ 템플릿 복사 완료: ${spreadsheetId}`);
+    const spreadsheetId = createResponse.data.spreadsheetId!;
+    console.log(`✅ 새 스프레드시트 생성 완료: ${spreadsheetId}`);
 
     // 2. 기본 헤더 데이터 입력
     const headerData = [
