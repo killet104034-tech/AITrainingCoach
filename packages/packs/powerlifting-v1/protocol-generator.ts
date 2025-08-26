@@ -1,8 +1,7 @@
-// 🏋️ 파워리프팅 v1 프로토콜 생성기
-// 📋 사용자 정의 조건매핑 → 구체적 운동프로그램 변환
+// 🏋️ 파워리프팅 프로그램 생성기 (최적화됨)
 
-import { UserDefinedMapper } from '@sinabro/core/user-defined-mapping';
-import { AIPreventionGuard } from '@sinabro/core/ai-prevention-guard';
+import { ConditionMapper, TrainingProtocol } from '../../core/user-defined-mapping';
+import { AIPreventionGuard } from '../../core/ai-prevention-guard';
 
 export interface WorkoutDay {
   day: number;
@@ -40,50 +39,50 @@ export interface GeneratedProgram {
   };
 }
 
-export class PowerliftingProtocolGenerator {
-  private userMapper: UserDefinedMapper;
+export class PowerliftingGenerator {
+  private mapper: ConditionMapper;
   
   constructor() {
-    this.userMapper = new UserDefinedMapper();
+    this.mapper = new ConditionMapper();
   }
 
-  // 🎯 메인 프로그램 생성 함수 - 김동환님 수치만 사용 (AI 생성 금지!)
+  // 🎯 메인 생성 함수 (심플하게)
   public generateProgram(surveyData: any): GeneratedProgram {
-    // 1. 김동환님 매핑에서 정확한 수치 찾기
-    const donghwanProtocol = this.userMapper.mapToUserDefinedProtocol(surveyData);
+    // 1. 매핑 찾기
+    const protocol = this.mapper.findProtocol(surveyData);
     
-    // 🚫 김동환님이 아직 입력하지 않은 조건이면 AI가 임의로 만들면 안 됨!
-    if (!donghwanProtocol) {
-      const conditionKey = this.buildConditionKeyForError(surveyData);
+    // 2. 없으면 김동환님께 질문
+    if (!protocol) {
+      const conditionKey = this.buildConditionKey(surveyData);
       const questionMessage = AIPreventionGuard.generateQuestionMessage(conditionKey);
       console.log(questionMessage);
       
       throw new Error(`❓ 김동환님께 질문: ${conditionKey}\n\n${questionMessage}`);
     }
     
-    // 2. 김동환님 수치를 실제 운동 프로그램으로 변환 (수치 변경 없이!)
-    const program = this.donghwanProtocolToProgram(donghwanProtocol, surveyData);
+    // 3. 프로그램 생성
+    const program = this.protocolToProgram(protocol, surveyData);
     
     return program;
   }
 
-  // 🔑 에러용 조건키 생성
-  private buildConditionKeyForError(surveyData: any): string {
+  // 🔑 조건키 생성
+  private buildConditionKey(surveyData: any): string {
     const experience = surveyData.experience_level || 'unknown';
     const goal = surveyData.goals?.[0] || 'unknown';
     const backoff = surveyData.backoff_method || 'unknown';
     return `${experience}-${goal}-${backoff}`;
   }
 
-  // 🔄 김동환님 프로토콜 → 구체적 프로그램 변환 (수치 변경 금지!)
-  private donghwanProtocolToProgram(donghwanProtocol: any, surveyData: any): GeneratedProgram {
+  // 🔄 프로토콜 → 프로그램 변환 (심플하게)
+  private protocolToProgram(protocol: TrainingProtocol, surveyData: any): GeneratedProgram {
     const weeks = [];
     
-    for (let weekNum = 1; weekNum <= donghwanProtocol.protocol.block_length_weeks; weekNum++) {
+    for (let weekNum = 1; weekNum <= protocol.protocol.schedule.block_length_weeks; weekNum++) {
       const week = {
         week: weekNum,
-        focus: this.getWeekFocus(weekNum, donghwanProtocol.protocol),
-        workouts: this.generateWeekWorkoutsFromDonghwanProtocol(weekNum, donghwanProtocol.protocol, surveyData)
+        focus: `훈련 ${weekNum}주차`,
+        workouts: this.generateWeekWorkouts(weekNum, protocol.protocol, surveyData)
       };
       weeks.push(week);
     }
@@ -97,10 +96,10 @@ export class PowerliftingProtocolGenerator {
       },
       training_weeks: weeks,
       metadata: {
-        protocol_used: donghwanProtocol.condition_key,
-        condition_path: donghwanProtocol.condition_key,
+        protocol_used: protocol.condition_key,
+        condition_path: protocol.condition_key,
         customizations: [],
-        source: "김동환님 직접 입력 수치"
+        source: "김동환님 직접 입력"
       }
     };
   }

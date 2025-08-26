@@ -3,19 +3,17 @@ import { createServer, type Server } from "http";
 import express from "express";
 import path from "path";
 import { storage } from "../storage";
-import { registerDebugRoutes } from "./debug";
+// registerDebugRoutes 제거됨
 import { registerSurveyRoutes } from "./surveys";
-import { registerJobRoutes } from "./jobs";
+// registerJobRoutes 제거됨
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // 🔧 디버그 라우트 등록
-  registerDebugRoutes(app);
+  // 디버그 라우트 제거됨
   
   // 📋 설문 라우트 등록 (새로운 도메인 기반 아키텍처)
   registerSurveyRoutes(app);
   
-  // 📊 작업 상태 라우트 등록
-  registerJobRoutes(app);
+  // 작업 상태 라우트 제거됨
   
   // Serve attached assets (images, etc.) statically
   app.use('/api/assets', express.static(path.resolve(import.meta.dirname, '..', 'attached_assets')));

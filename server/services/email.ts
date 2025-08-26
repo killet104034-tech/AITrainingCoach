@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import { createWorkoutSheet, type WorkoutProgram } from '../sheets/sheetsService';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -28,16 +27,7 @@ export async function sendTrainingProgram(
     // 객체든 문자열이든 처리 가능
     const parsedProgram = typeof program === 'string' ? JSON.parse(program) : program;
     
-    // 구글 스프레드시트 생성
-    let spreadsheetUrl = '#';
-    try {
-      console.log('구글 스프레드시트 생성 시작...');
-      spreadsheetUrl = await createWorkoutSheet(parsedProgram);
-      console.log('✅ 구글 스프레드시트 생성 성공:', spreadsheetUrl);
-    } catch (error) {
-      console.log('❌ 스프레드시트 생성 실패:', (error as Error)?.message);
-      // 실패해도 이메일은 보내기
-    }
+    // 스프레드시트 기능 제거됨
     
     const htmlContent = `
     <!DOCTYPE html>

@@ -1,107 +1,77 @@
-// 🎯 김동환 코치 전용 조건매핑 시스템  
-// 👨‍💼 김동환님이 실제로 고객들에게 훈련을 짜주는 방식을 시스템화
+// 🎯 김동환님 전용 조건매핑 시스템 (깔끔하게 최적화됨)
 
-export interface UserDefinedRule {
-  condition_key: string;  // "beginner-strength-straight_sets"
+export interface TrainingProtocol {
+  condition_key: string;  
   protocol: {
-    // 🏋️ 김동환님이 정한 정확한 수치들
-    squat: {
-      sets: number;
-      reps: number;
-      weight_percent: number;
-      rpe: number;
-      rest_minutes: number;
-    };
-    bench: {
-      sets: number;
-      reps: number;
-      weight_percent: number;
-      rpe: number;
-      rest_minutes: number;
-    };
-    deadlift: {
-      sets: number;
-      reps: number;
-      weight_percent: number;
-      rpe: number;
-      rest_minutes: number;
-    };
-    // 📅 스케줄링 (김동환님이 정함)
-    days_per_week: number;
-    block_length_weeks: number;
-    deload_week: number;
-    daily_schedule: string[]; // ["squat", "bench", "deadlift"] - 김동환님이 요일별 배치 정함
-    // 💪 보조 운동 (김동환님이 정함)
-    accessory_exercises: string[]; // 김동환님이 직접 선택한 보조운동 목록
-    accessory_sets: number;
-    accessory_reps: string; // "8-12"
-    accessory_weight_percent: string; // 김동환님이 정한 보조운동 중량
-    accessory_rpe: number;
-    accessory_rest_minutes: string; // 김동환님이 정한 보조운동 휴식시간
+    squat: ExerciseProtocol;
+    bench: ExerciseProtocol;  
+    deadlift: ExerciseProtocol;
+    schedule: ScheduleProtocol;
+    accessories: AccessoryProtocol;
   };
 }
 
-// 🗂️ 김동환 코치 매핑 테이블 (김동환님만 입력 가능)
-// ⚠️ 경고: AI가 임의로 수치를 정하면 절대 안 됨! 김동환님만 추가할 것!
-export const DONGHWAN_COACHING_MAPPINGS: UserDefinedRule[] = [
-  // 🚫 AI 금지! 김동환님이 직접 여기에 조건-수치 매핑을 추가해야 함
-  // 🚫 완전히 빈 테이블! 김동환님이 처음부터 모든 것을 직접 입력해야 함!
+export interface ExerciseProtocol {
+  sets: number;
+  reps: number;
+  weight_percent: number;
+  rpe: number;
+  rest_minutes: number;
+}
+
+export interface ScheduleProtocol {
+  days_per_week: number;
+  block_length_weeks: number;
+  deload_week: number;
+  daily_schedule: string[];
+}
+
+export interface AccessoryProtocol {
+  exercises: string[];
+  sets: number;
+  reps: string;
+  weight_percent: string;
+  rpe: number;
+  rest_minutes: string;
+}
+
+// 🗂️ 김동환님 전용 매핑 테이블 (완전히 깨끗함)
+export const COACHING_MAPPINGS: TrainingProtocol[] = [
+  // 김동환님이 추가할 매핑들이 여기에 들어감
 ];
 
-export class UserDefinedMapper {
+export class ConditionMapper {
   
-  // 🎯 설문 조건을 김동환님 정의 수치로 매핑 (AI 수치 생성 금지!)
-  public mapToUserDefinedProtocol(surveyData: any): UserDefinedRule | null {
-    // 1. 설문 데이터에서 조건 키 생성
+  // 🎯 설문 → 김동환님 매핑 찾기 (깔끔하게 최적화)
+  public findProtocol(surveyData: any): TrainingProtocol | null {
     const conditionKey = this.buildConditionKey(surveyData);
     
-    // 2. 김동환 코치 방식 테이블에서 찾기
-    const matchingRule = DONGHWAN_COACHING_MAPPINGS.find(
-      rule => rule.condition_key === conditionKey
+    const protocol = COACHING_MAPPINGS.find(
+      mapping => mapping.condition_key === conditionKey
     );
     
-    console.log(`🔍 [김동환매퍼] 조건키: ${conditionKey}`);
-    console.log(`📋 [김동환매퍼] 매칭결과: ${matchingRule ? '김동환님 수치 발견' : '김동환님이 아직 입력 안함'}`);
+    console.log(`🔍 조건: ${conditionKey}`);
+    console.log(`📋 결과: ${protocol ? '매핑 발견' : '김동환님께 문의 필요'}`);
     
-    // ⚠️ 중요: 매칭되는 규칙이 없으면 null 반환 (AI가 임의로 만들면 안 됨!)
-    if (!matchingRule) {
-      console.log(`❌ [김동환매퍼] 조건키 "${conditionKey}"에 대한 김동환님의 수치가 없습니다.`);
-      console.log(`💡 [김동환매퍼] 김동환님께 해당 조건의 훈련 방식을 문의하세요.`);
-    }
-    
-    return matchingRule || null;
+    return protocol || null;
   }
 
-  // 🔑 설문 데이터 → 조건 키 변환
+  // 🔑 조건키 생성 (심플하게)
   private buildConditionKey(surveyData: any): string {
     const experience = surveyData.experience_level || 'beginner';
-    const goal = this.extractPrimaryGoal(surveyData.goals);
-    const backoffMethod = surveyData.backoff_method || 'straight_sets';
+    const goal = surveyData.goals?.[0] || 'strength';
+    const method = surveyData.backoff_method || 'straight_sets';
     
-    return `${experience}-${goal}-${backoffMethod}`;
+    return `${experience}-${goal}-${method}`;
   }
 
-  // 🎯 주요 목표 추출
-  private extractPrimaryGoal(goals: string[]): string {
-    if (!goals || goals.length === 0) return 'strength';
-    
-    // 우선순위: strength > muscle > competition > health
-    if (goals.includes('strength')) return 'strength';
-    if (goals.includes('muscle')) return 'muscle';
-    if (goals.includes('competition')) return 'competition';
-    return 'health';
+  // ➕ 김동환님 매핑 추가
+  public addMapping(protocol: TrainingProtocol): void {
+    COACHING_MAPPINGS.push(protocol);
   }
 
-  // 📋 김동환 코치 방식 조건키 목록
+  // 📋 현재 매핑 목록
   public getAvailableConditions(): string[] {
-    return DONGHWAN_COACHING_MAPPINGS.map(rule => rule.condition_key);
+    return COACHING_MAPPINGS.map(m => m.condition_key);
   }
-
-  // ➕ 김동환님 새 훈련방식 추가 (김동환님이 직접 설정)
-  public addCoachingRule(rule: UserDefinedRule): void {
-    DONGHWAN_COACHING_MAPPINGS.push(rule);
-  }
-
-  // 🚫 AI 수치 생성 절대 금지 함수들 삭제됨
-  // 김동환님이 직접 addCoachingRule()로만 추가 가능
 }
