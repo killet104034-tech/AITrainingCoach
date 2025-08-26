@@ -40,15 +40,15 @@ export interface UserDefinedRule {
 // 🗂️ 김동환 코치 매핑 테이블 (김동환님이 실제로 훈련 짜는 방식)
 export const DONGHWAN_COACHING_MAPPINGS: UserDefinedRule[] = [
   {
-    condition_key: "beginner-strength-straight_sets",
+    condition_key: "beginner-strength-straight_sets-excited_style",
     protocol: {
-      // 🎯 김동환님이 초급자에게 근력훈련+스트레이트세트로 실제 짜주는 방식
+      // 🎯 김동환님이 초급자+흥분스타일에게 근력훈련+스트레이트세트로 실제 짜주는 방식
       squat: {
         sets: 5,           // 김동환: "초급자는 볼륨이 중요해서 5세트"
         reps: 5,           // 김동환: "근력은 5회가 최적"
-        weight_percent: 75, // 김동환: "75%면 폼 유지하면서 근력 늘어"
-        rpe: 8,            // 김동환: "RPE 8이면 안전하게 강도 올릴 수 있어"
-        rest_minutes: 3    // 김동환: "3분은 회복해야 다음 세트 제대로 해"
+        weight_percent: 77, // 김동환: "흥분하는 타입은 2% 더 올려도 괜찮아"
+        rpe: 9,            // 김동환: "흥분하는 애들은 RPE 9까지 밀어도 돼"
+        rest_minutes: 2    // 김동환: "흥분하는 애들은 2분만 쉬어도 다음 세트 잘해"
       },
       bench: {
         sets: 3,           // 김동환: "벤치는 어깨 부담 있어서 3세트"  
@@ -217,5 +217,39 @@ export class UserDefinedMapper {
   // ➕ 김동환님 새 훈련방식 추가 (김동환님이 직접 설정)
   public addCoachingRule(rule: UserDefinedRule): void {
     DONGHWAN_COACHING_MAPPINGS.push(rule);
+  }
+
+  // 🔄 새 조건 항목 추가 시 매핑 확장
+  public expandMapping(newCondition: string, donghwanJudgment: any): void {
+    // 기존 모든 조건에 새 항목 추가
+    DONGHWAN_COACHING_MAPPINGS.forEach(rule => {
+      const newKey = `${rule.condition_key}-${newCondition}`;
+      const adjustedProtocol = this.applyDonghwanJudgment(rule.protocol, donghwanJudgment);
+      
+      DONGHWAN_COACHING_MAPPINGS.push({
+        condition_key: newKey,
+        protocol: adjustedProtocol
+      });
+    });
+  }
+
+  // 🧠 김동환님 판단 적용
+  private applyDonghwanJudgment(baseProtocol: any, judgment: any): any {
+    const adjusted = JSON.parse(JSON.stringify(baseProtocol));
+    
+    // 김동환님이 새 조건에 대해 어떻게 조정하라고 했는지 적용
+    if (judgment.intensityAdjustment) {
+      adjusted.squat.weight_percent += judgment.intensityAdjustment;
+      adjusted.bench.weight_percent += judgment.intensityAdjustment;
+      adjusted.deadlift.weight_percent += judgment.intensityAdjustment;
+    }
+    
+    if (judgment.restAdjustment) {
+      adjusted.squat.rest_minutes += judgment.restAdjustment;
+      adjusted.bench.rest_minutes += judgment.restAdjustment;
+      adjusted.deadlift.rest_minutes += judgment.restAdjustment;
+    }
+    
+    return adjusted;
   }
 }
