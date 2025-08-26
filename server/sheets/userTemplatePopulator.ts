@@ -129,14 +129,13 @@ async function populateTrainingData(spreadsheetId: string, programData: WorkoutP
   const benchMax = parseInt(programData.user_maxes.bench);
   const deadliftMax = parseInt(programData.user_maxes.deadlift);
 
-  // 사용자 시트 구조에 맞춘 데이터 입력 (W1~W5까지 전체)
-  // 실제 시트 구조에서 각 주차별 시작 행 확인 필요
+  // 🎯 실제 사용자 시트 구조에 정확히 맞춘 행 번호
   const weekSections = [
-    { label: 'W1', startRow: 15, weekNum: 1 },   // W1 운동 시작행
-    { label: 'W2', startRow: 36, weekNum: 2 },   // W2 운동 시작행  
-    { label: 'W3', startRow: 57, weekNum: 3 },   // W3 운동 시작행
-    { label: 'W4', startRow: 78, weekNum: 4 },   // W4 운동 시작행
-    { label: 'W5', startRow: 99, weekNum: 5 }    // W5 운동 시작행
+    { label: 'W1', startRow: 15, weekNum: 1 },   // W1 운동 시작행 (확인됨)
+    { label: 'W2', startRow: 50, weekNum: 2 },   // W2 운동 시작행 (수정됨)
+    { label: 'W3', startRow: 85, weekNum: 3 },   // W3 운동 시작행 (수정됨)
+    { label: 'W4', startRow: 120, weekNum: 4 },  // W4 운동 시작행 (수정됨)
+    { label: 'W5', startRow: 155, weekNum: 5 }   // W5 운동 시작행 (수정됨)
   ];
   
   // 각 주차별로 데이터 입력
@@ -258,18 +257,17 @@ async function populateWeekSection(
     const minWeight = Math.max(exercise.targetWeight - 10, Math.round(exercise.max * 0.5));
     const maxWeight = exercise.targetWeight + 10;
     
-    // 사용자 시트의 실제 컬럼 순서에 맞춘 데이터 매핑
+    // 🎯 실제 사용자 시트 컬럼 순서에 정확히 맞춘 매핑
     const rowData = [
       exercise.exercise,           // A열: 운동명
-      exercise.sets,               // B열: Set수  
-      exercise.rpe,                // C열: 타겟RPE
-      `${exercise.targetWeight}`,  // D열: 타겟중량
+      exercise.sets,               // B열: Set수
+      exercise.rpe,                // C열: RPE
+      `${minWeight}`,              // D열: 최소중량
       `${maxWeight}`,              // E열: 최대중량
-      `${minWeight}`,              // F열: 최소중량
-      '',                          // G열: 실제중량 (빈칸)
-      '',                          // H열: 실제Reps (빈칸)  
-      '',                          // I열: 실제RPE (빈칸)
-      ''                           // J열: 메모 (빈칸)
+      '',                          // F열: 실제중량 (빈칸)
+      '',                          // G열: 실제Reps (빈칸)
+      '',                          // H열: 실제RPE (빈칸)
+      ''                           // I열: 메모 (빈칸)
     ];
     
     // 시트에 데이터 입력
