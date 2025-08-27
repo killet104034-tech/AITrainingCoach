@@ -1,4 +1,4 @@
-// 🎯 동적 검증기 - 스키마로부터 Zod 스키마 생성
+// 🎯 Dynamic Validator - Generate Zod schemas from survey schemas
 import { z } from 'zod';
 import type { SurveySchema, SurveyField, FieldType } from './survey-schema.js';
 
@@ -28,7 +28,7 @@ export class DynamicValidator {
         break;
 
       case 'email':
-        validator = z.string().email(field.validation?.message || '올바른 이메일을 입력해주세요');
+        validator = z.string().email(field.validation?.message || 'Please enter a valid email');
         break;
 
       case 'number':
@@ -51,7 +51,7 @@ export class DynamicValidator {
           const enumValidator = z.enum(field.options as [string, ...string[]]);
           validator = z.array(enumValidator);
           if (field.validation?.min) {
-            validator = validator.min(field.validation.min, field.validation?.message || '최소 하나를 선택해주세요');
+            validator = validator.min(field.validation.min, field.validation?.message || 'Please select at least one option');
           }
         } else {
           validator = z.array(z.string());

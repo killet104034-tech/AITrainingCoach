@@ -12,13 +12,13 @@ export const users = pgTable("users", {
 export const surveyResponses = pgTable("survey_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   
-  // 🎯 디자인용 필드들 (체크박스 포함!)
+  // Universal fields for domain-neutral data collection
   name: text("name"),
-  goals: jsonb("goals"), // 체크박스 배열
+  goals: jsonb("goals"), // Array of selected options
   email: text("email").notNull(),
   
-  // 시스템 데이터
-  trainingProgram: text("training_program"), // AI generated program
+  // System data
+  generatedContent: text("generated_content"), // AI generated content
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
 });
 
@@ -27,13 +27,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-// 🔒 안정성(운영 가드) 테이블들
+// Operational guard tables for security and reliability
 export const idempotencyKeys = pgTable("idempotency_keys", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   idempotencyKey: text("idempotency_key").notNull().unique(),
   canonicalHash: text("canonical_hash").notNull(),
   userEmail: text("user_email"),
-  response: jsonb("response"), // 캐시된 응답
+  response: jsonb("response"), // Cached response
   status: text("status").notNull().default('processing'), // processing, completed, failed
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
   expiresAt: timestamp("expires_at").notNull(), // 24h TTL
@@ -41,7 +41,7 @@ export const idempotencyKeys = pgTable("idempotency_keys", {
 
 export const rateLimits = pgTable("rate_limits", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userKey: text("user_key").notNull().unique(), // email 또는 UID
+  userKey: text("user_key").notNull().unique(), // email or UID
   isLocked: text("is_locked").notNull().default('false'), // 'true', 'false'
   lockStartedAt: timestamp("lock_started_at"),
   requestCount: text("request_count").notNull().default('0'),
@@ -53,7 +53,7 @@ export const auditLogs = pgTable("audit_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   idempotencyKey: text("idempotency_key"),
   userEmail: text("user_email"),
-  operation: text("operation").notNull(), // 'create_program', 'survey_submit'
+  operation: text("operation").notNull(), // 'create_content', 'survey_submit'
   status: text("status").notNull(), // 'success', 'error', 'retry'
   errorCategory: text("error_category"), // AUTH_KEY_PARSE, DRIVE_PERMISSION, etc.
   errorMessage: text("error_message"),
@@ -63,14 +63,14 @@ export const auditLogs = pgTable("audit_logs", {
   engineVersion: text("engine_version"),
   surveyKind: text("survey_kind"),
   surveyVersion: text("survey_version"),
-  warnings: jsonb("warnings"), // Preflight 경고들
-  metadata: jsonb("metadata"), // 추가 정보
+  warnings: jsonb("warnings"), // Preflight warnings
+  metadata: jsonb("metadata"), // Additional info
   createdAt: timestamp("created_at").default(sql`now()`).notNull(),
 });
 
 export const insertSurveyResponseSchema = createInsertSchema(surveyResponses).omit({
   id: true,
-  trainingProgram: true,
+  generatedContent: true,
   createdAt: true,
 });
 
