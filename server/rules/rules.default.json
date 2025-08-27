@@ -1,0 +1,308 @@
+{
+  "id": "default-training-rules",
+  "name": "기본 훈련 프로그램 룰셋",
+  "version": "1.0.0",
+  "description": "설문 응답에 따른 맞춤형 훈련 프로그램 추천 룰셋",
+  "strategy": "first-match",
+  "rules": [
+    {
+      "id": "beginner-strength-focus",
+      "name": "초보자 근력 향상 프로그램",
+      "description": "초보자용 기본 근력 향상 프로그램",
+      "condition": {
+        "and": [
+          {"==": [{"var": "survey.experience_level"}, "beginner"]},
+          {"includes": [{"var": "survey.goals"}, "strength"]}
+        ]
+      },
+      "result": {
+        "planId": "beginner-strength-plan",
+        "emailTemplateId": "beginner-welcome",
+        "programType": "strength-basic",
+        "duration": "12-weeks",
+        "frequency": "3-days-week",
+        "exercises": [
+          "스쿼트",
+          "벤치프레스", 
+          "데드리프트",
+          "오버헤드프레스"
+        ],
+        "progression": "linear",
+        "startingIntensity": 60,
+        "recommendations": [
+          "기초 동작 숙련에 집중하세요",
+          "충분한 휴식을 취하세요",
+          "점진적으로 중량을 늘려나가세요"
+        ]
+      },
+      "priority": 100,
+      "enabled": true,
+      "tags": ["beginner", "strength", "basic"]
+    },
+    {
+      "id": "beginner-muscle-building",
+      "name": "초보자 근육량 증가 프로그램",
+      "description": "초보자용 근비대 프로그램",
+      "condition": {
+        "and": [
+          {"==": [{"var": "survey.experience_level"}, "beginner"]},
+          {"includes": [{"var": "survey.goals"}, "muscle"]}
+        ]
+      },
+      "result": {
+        "planId": "beginner-muscle-plan",
+        "emailTemplateId": "beginner-muscle-welcome",
+        "programType": "hypertrophy-basic",
+        "duration": "16-weeks",
+        "frequency": "4-days-week",
+        "exercises": [
+          "스쿼트",
+          "벤치프레스",
+          "바벨로우",
+          "숄더프레스",
+          "바이셉컬",
+          "트라이셉딥스"
+        ],
+        "progression": "volume-based",
+        "startingIntensity": 65,
+        "recommendations": [
+          "8-12 반복 범위에 집중하세요",
+          "근육 회복을 위해 단백질 섭취를 늘리세요",
+          "충분한 수면을 취하세요"
+        ]
+      },
+      "priority": 95,
+      "enabled": true,
+      "tags": ["beginner", "muscle", "hypertrophy"]
+    },
+    {
+      "id": "intermediate-strength-powerlifting",
+      "name": "중급자 파워리프팅 프로그램",
+      "description": "중급자용 빅3 중심 프로그램",
+      "condition": {
+        "and": [
+          {"==": [{"var": "survey.experience_level"}, "intermediate"]},
+          {"includes": [{"var": "survey.goals"}, "strength"]},
+          {">": [{"var": "survey.age"}, 18]}
+        ]
+      },
+      "result": {
+        "planId": "intermediate-powerlifting-plan",
+        "emailTemplateId": "intermediate-powerlifting-welcome",
+        "programType": "powerlifting-intermediate",
+        "duration": "20-weeks",
+        "frequency": "4-days-week",
+        "exercises": [
+          "스쿼트 (하이바/로우바)",
+          "벤치프레스 (파워그립)",
+          "데드리프트 (컨벤셔널/스모)",
+          "보조운동"
+        ],
+        "progression": "periodized",
+        "startingIntensity": 75,
+        "peakingPhase": true,
+        "recommendations": [
+          "테크닉 완성에 집중하세요",
+          "보조운동으로 약점을 보완하세요",
+          "대회 출전을 고려해보세요"
+        ]
+      },
+      "priority": 90,
+      "enabled": true,
+      "tags": ["intermediate", "powerlifting", "strength", "competition"]
+    },
+    {
+      "id": "advanced-competitive",
+      "name": "고급자 대회 준비 프로그램",
+      "description": "대회 출전을 목표로 하는 고급자용 프로그램",
+      "condition": {
+        "and": [
+          {"==": [{"var": "survey.experience_level"}, "advanced"]},
+          {"includes": [{"var": "survey.goals"}, "competition"]}
+        ]
+      },
+      "result": {
+        "planId": "advanced-competition-plan",
+        "emailTemplateId": "advanced-competition-welcome",
+        "programType": "competition-prep",
+        "duration": "24-weeks",
+        "frequency": "5-6-days-week",
+        "exercises": [
+          "스쿼트 (다양한 변형)",
+          "벤치프레스 (다양한 변형)",
+          "데드리프트 (다양한 변형)",
+          "특수 보조운동"
+        ],
+        "progression": "complex-periodization",
+        "startingIntensity": 85,
+        "peakingPhase": true,
+        "deloadWeeks": [4, 8, 12, 16, 20],
+        "recommendations": [
+          "대회 규정을 숙지하세요",
+          "멘탈 트레이닝도 중요합니다",
+          "코치 지도를 받는 것을 권장합니다",
+          "영양 계획을 세우세요"
+        ]
+      },
+      "priority": 85,
+      "enabled": true,
+      "tags": ["advanced", "competition", "elite", "powerlifting"]
+    },
+    {
+      "id": "health-focused-program",
+      "name": "건강 목적 운동 프로그램",
+      "description": "건강 증진을 위한 균형잡힌 운동 프로그램",
+      "condition": {
+        "or": [
+          {"includes": [{"var": "survey.goals"}, "health"]},
+          {">": [{"var": "survey.age"}, 45]}
+        ]
+      },
+      "result": {
+        "planId": "health-focused-plan",
+        "emailTemplateId": "health-focused-welcome",
+        "programType": "health-wellness",
+        "duration": "ongoing",
+        "frequency": "3-4-days-week",
+        "exercises": [
+          "기능적 운동",
+          "유산소 운동",
+          "근력 운동 (중강도)",
+          "유연성 운동"
+        ],
+        "progression": "gradual-sustainable",
+        "startingIntensity": 50,
+        "includedActivities": [
+          "워킹",
+          "수영",
+          "요가",
+          "필라테스"
+        ],
+        "recommendations": [
+          "꾸준함이 가장 중요합니다",
+          "부상 방지에 신경쓰세요",
+          "즐거운 활동을 찾아보세요",
+          "정기적인 건강검진을 받으세요"
+        ]
+      },
+      "priority": 80,
+      "enabled": true,
+      "tags": ["health", "wellness", "sustainable", "functional"]
+    },
+    {
+      "id": "rehabilitation-program",
+      "name": "부상 회복 프로그램",
+      "description": "부상 경험자를 위한 재활 중심 프로그램",
+      "condition": {
+        "or": [
+          {"==": [{"var": "survey.injury_history"}, true]},
+          {"contains": [{"var": "survey.notes"}, "부상"]},
+          {"contains": [{"var": "survey.notes"}, "아픔"]}
+        ]
+      },
+      "result": {
+        "planId": "rehabilitation-plan",
+        "emailTemplateId": "rehabilitation-welcome",
+        "programType": "rehabilitation",
+        "duration": "12-weeks-minimum",
+        "frequency": "2-3-days-week",
+        "exercises": [
+          "모빌리티 운동",
+          "코어 강화",
+          "저중량 근력 운동",
+          "밸런스 트레이닝"
+        ],
+        "progression": "conservative",
+        "startingIntensity": 30,
+        "specialConsiderations": [
+          "통증 발생시 즉시 중단",
+          "전문가 상담 권장",
+          "점진적 부하 증가"
+        ],
+        "recommendations": [
+          "전문의 상담을 받으세요",
+          "무리하지 마세요",
+          "회복에 충분한 시간을 두세요",
+          "물리치료사와 상의하세요"
+        ]
+      },
+      "priority": 120,
+      "enabled": true,
+      "tags": ["rehabilitation", "injury", "recovery", "conservative"]
+    },
+    {
+      "id": "weight-loss-program",
+      "name": "체중 감량 운동 프로그램",
+      "description": "체중 감량을 위한 운동과 활동 프로그램",
+      "condition": {
+        "or": [
+          {"includes": [{"var": "survey.goals"}, "weight-loss"]},
+          {">": [{"var": "survey.bmi"}, 25]}
+        ]
+      },
+      "result": {
+        "planId": "weight-loss-plan",
+        "emailTemplateId": "weight-loss-welcome",
+        "programType": "weight-loss",
+        "duration": "24-weeks",
+        "frequency": "4-5-days-week",
+        "exercises": [
+          "HIIT 운동",
+          "근력 운동 (써킷)",
+          "유산소 운동",
+          "코어 운동"
+        ],
+        "progression": "volume-intensity-based",
+        "startingIntensity": 55,
+        "cardioComponent": "high",
+        "nutritionGuidance": true,
+        "recommendations": [
+          "칼로리 균형을 맞추세요",
+          "근력 운동도 포함하세요",
+          "수분 섭취를 늘리세요",
+          "충분한 수면을 취하세요",
+          "영양사 상담을 고려하세요"
+        ]
+      },
+      "priority": 75,
+      "enabled": true,
+      "tags": ["weight-loss", "cardio", "circuit", "nutrition"]
+    },
+    {
+      "id": "default-fallback",
+      "name": "기본 범용 프로그램",
+      "description": "다른 조건에 해당하지 않는 경우의 기본 프로그램",
+      "condition": {
+        ">=": [{"var": "survey.age"}, 16]
+      },
+      "result": {
+        "planId": "default-general-plan",
+        "emailTemplateId": "general-welcome",
+        "programType": "general-fitness",
+        "duration": "12-weeks",
+        "frequency": "3-days-week",
+        "exercises": [
+          "기본 복합 운동",
+          "코어 운동",
+          "유연성 운동"
+        ],
+        "progression": "beginner-friendly",
+        "startingIntensity": 50,
+        "recommendations": [
+          "기초부터 천천히 시작하세요",
+          "몸의 신호를 잘 들으세요",
+          "꾸준함이 핵심입니다"
+        ]
+      },
+      "priority": 1,
+      "enabled": true,
+      "tags": ["default", "general", "fallback"]
+    }
+  ],
+  "metadata": {
+    "author": "AITrainingCoach",
+    "lastUpdated": "2024-08-27",
+    "category": "fitness-training",
+    "language": "ko"
+  }
+}
