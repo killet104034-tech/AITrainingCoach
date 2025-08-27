@@ -11,3 +11,7 @@ attached_assets/
 *.cache/
 *.log
 **/__generated__/
+
+# Demo and temporary files  
+demo-*.ts
+demo-*.js
