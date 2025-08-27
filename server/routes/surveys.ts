@@ -22,9 +22,9 @@ export function registerSurveyRoutes(app: Express): void {
         trainingProgram = {
           program_title: `${validatedData.name}님의 기본 프로그램`,
           user_maxes: {
-            exercise1: validatedData.exercise1_max || "100",
-            exercise2: validatedData.exercise2_max || "80", 
-            exercise3: validatedData.exercise3_max || "120"
+            exercise1: "100",
+            exercise2: "80", 
+            exercise3: "120"
           },
           training_weeks: [{
             week: 1,
@@ -51,7 +51,7 @@ export function registerSurveyRoutes(app: Express): void {
           }
         };
       } catch (error) {
-        console.log('프로그램 생성 오류:', error.message);
+        console.log('프로그램 생성 오류:', error instanceof Error ? error.message : String(error));
       }
       
       // 3. 프로그램 저장
@@ -62,7 +62,7 @@ export function registerSurveyRoutes(app: Express): void {
       
       if (canEmail) {
         try {
-          await sendTrainingProgram(validatedData.email, validatedData.name, trainingProgram);
+          await sendTrainingProgram(validatedData.email, validatedData.name || undefined, trainingProgram);
         } catch (emailError) {
           console.error('이메일 실패:', emailError);
         }
