@@ -5,6 +5,7 @@ import path from "path";
 import { storage } from "../storage";
 // registerDebugRoutes 제거됨
 import { registerSurveyRoutes } from "./surveys";
+import { registerEvaluateRoutes } from "./evaluate";
 // registerJobRoutes 제거됨
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -12,6 +13,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // 📋 설문 라우트 등록 (새로운 도메인 기반 아키텍처)
   registerSurveyRoutes(app);
+  
+  // 🔧 파이프라인 평가 라우트 등록 (구조 전용 시스템)
+  registerEvaluateRoutes(app);
   
   // 작업 상태 라우트 제거됨
   
