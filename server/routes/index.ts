@@ -3,12 +3,12 @@ import { createServer, type Server } from "http";
 import express from "express";
 import path from "path";
 import { storage } from "../storage";
-// registerDebugRoutes 제거됨
+import { registerDebugRoutes } from "./debug";
 import { registerSurveyRoutes } from "./surveys";
-// registerJobRoutes 제거됨
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // 디버그 라우트 제거됨
+  // 🔧 디버그 라우트 등록
+  registerDebugRoutes(app);
   
   // 📋 설문 라우트 등록 (새로운 도메인 기반 아키텍처)
   registerSurveyRoutes(app);

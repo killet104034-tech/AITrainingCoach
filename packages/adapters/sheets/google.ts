@@ -1,11 +1,19 @@
 import { google } from 'googleapis';
 import { createGoogleAuth } from '../../../apps/api/google';
 
-// Google Sheets 인증 설정
-const auth = createGoogleAuth();
+// Google Sheets 인증 설정 (lazy initialization)
+let auth: any = null;
+let sheets: any = null;
+let drive: any = null;
 
-const sheets = google.sheets({ version: 'v4', auth });
-const drive = google.drive({ version: 'v3', auth });
+function initializeGoogleServices() {
+  if (!auth) {
+    auth = createGoogleAuth();
+    sheets = google.sheets({ version: 'v4', auth });
+    drive = google.drive({ version: 'v3', auth });
+  }
+  return { auth, sheets, drive };
+}
 
 export interface WorkoutProgram {
   program_title: string;
@@ -56,8 +64,11 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
   try {
     console.log('📋 템플릿 스프레드시트 복사 시작...');
 
+    // Initialize Google services
+    const { sheets: sheetsService, drive: driveService } = initializeGoogleServices();
+
     // 1. 템플릿 스프레드시트 복사 (드라이브 API 사용)
-    const copyResponse = await drive.files.copy({
+    const copyResponse = await driveService.files.copy({
       fileId: BASIC_TEMPLATE_ID,
       supportsAllDrives: true,
       requestBody: {
@@ -102,7 +113,7 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     }
 
     // 4. 데이터 입력
-    await sheets.spreadsheets.values.update({
+    await sheetsService.spreadsheets.values.update({
       spreadsheetId,
       range: 'A1',
       valueInputOption: 'USER_ENTERED',
@@ -119,7 +130,7 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
     // 6. 권한 설정 (선택사항)
     if (programData.survey_data?.email) {
       try {
-        await drive.permissions.create({
+        await driveService.permissions.create({
           fileId: spreadsheetId,
           supportsAllDrives: true,
           requestBody: {
@@ -148,8 +159,10 @@ export async function createWorkoutSheet(programData: WorkoutProgram): Promise<s
 // 설문 데이터 시트 추가
 async function addSurveyDataSheet(spreadsheetId: string, surveyData: any): Promise<void> {
   try {
+    const { sheets: sheetsService } = initializeGoogleServices();
+
     // Survey 시트 생성
-    await sheets.spreadsheets.batchUpdate({
+    await sheetsService.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: {
         requests: [{
@@ -181,7 +194,7 @@ async function addSurveyDataSheet(spreadsheetId: string, surveyData: any): Promi
     ];
 
     // 설문 데이터 입력
-    await sheets.spreadsheets.values.update({
+    await sheetsService.spreadsheets.values.update({
       spreadsheetId,
       range: 'Survey Data!A1',
       valueInputOption: 'USER_ENTERED',
