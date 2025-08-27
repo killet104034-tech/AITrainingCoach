@@ -7,7 +7,7 @@ import ws from "ws";
 
 export function registerDebugRoutes(app: Express): void {
   // 🔧 환경변수 상태 확인 엔드포인트 (Enhanced with comprehensive testing)
-  app.get('/debug-env', async (req, res) => {
+  app.get('/api/debug-env', async (req, res) => {
     const envStatus = await testAllEnvironmentVariables();
     
     res.json({

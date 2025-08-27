@@ -30,3 +30,13 @@ export function createGoogleAuth() {
     ]
   });
 }
+
+// 🔧 Safe Google Auth Creation (for testing purposes)
+export function createGoogleAuthSafe() {
+  try {
+    return createGoogleAuth();
+  } catch (error) {
+    console.warn('⚠️ Google Auth initialization failed:', (error as Error).message);
+    return null;
+  }
+}
