@@ -12,36 +12,36 @@ export interface SurveyData {
   email?: string;
 }
 
-export async function generateTrainingProgram(surveyData: SurveyData): Promise<string> {
+export async function generateContent(surveyData: SurveyData): Promise<string> {
   try {
-    // 🎯 간소화된 프롬프트 (복잡한 조건 매핑 제거)
-    const prompt = `당신은 세계 최고의 훈련 코치입니다. 다음 정보를 바탕으로 한국어로 상세한 개인 맞춤형 훈련 프로그램을 작성해주세요.
+    // Simplified prompt (domain-neutral)
+    const prompt = `You are a world-class content generator. Based on the following information, create detailed personalized content in JSON format.
 
-설문 정보:
-- 이름: ${surveyData.name || '고객'}
-- 목표: ${Array.isArray(surveyData.goals) ? surveyData.goals.join(', ') : '근력 향상'}
+Survey Information:
+- Name: ${surveyData.name || 'User'}
+- Preferences: ${Array.isArray(surveyData.goals) ? surveyData.goals.join(', ') : 'General'}
 
-다음 형식으로 JSON 응답해주세요:
+Please respond in the following JSON format:
 {
-  "program_title": "${surveyData.name || '고객'}님의 맞춤 훈련 프로그램",
-  "overview": "프로그램 개요 설명",
-  "training_weeks": [
+  "content_title": "${surveyData.name || 'User'}'s Custom Content",
+  "overview": "Content overview description",
+  "content_blocks": [
     {
-      "week": 1,
-      "focus": "기본 적응",
-      "workouts": [
+      "block": 1,
+      "focus": "Basic Setup",
+      "items": [
         {
           "day": 1,
-          "workout_name": "전신 운동",
-          "exercises": [
+          "item_name": "Primary Activity",
+          "details": [
             {
-              "exercise": "운동 1",
+              "activity": "Activity 1",
               "sets": "3",
               "reps": "8",
-              "weight_percent": "70%",
+              "intensity_percent": "70%",
               "rest_minutes": "2-3",
-              "rpe": "7-8",
-              "notes": "기본 폼 집중"
+              "effort_rating": "7-8",
+              "notes": "Focus on technique"
             }
           ]
         }
@@ -55,7 +55,7 @@ export async function generateTrainingProgram(surveyData: SurveyData): Promise<s
       messages: [
         {
           role: "system",
-          content: "당신은 경험이 풍부한 훈련 코치입니다. 과학적 근거를 바탕으로 안전하고 효과적인 훈련 프로그램을 설계합니다."
+          content: "You are an experienced content creator. You generate personalized content based on user preferences using scientific principles and best practices."
         },
         {
           role: "user",
@@ -67,9 +67,9 @@ export async function generateTrainingProgram(surveyData: SurveyData): Promise<s
       max_tokens: 4000
     });
 
-    return response.choices[0].message.content || "프로그램 생성에 실패했습니다.";
+    return response.choices[0].message.content || "Content generation failed.";
   } catch (error) {
-    console.error("OpenAI API 오류:", error);
-    throw new Error("AI 훈련 프로그램 생성에 실패했습니다: " + (error as Error).message);
+    console.error("OpenAI API error:", error);
+    throw new Error("AI content generation failed: " + (error as Error).message);
   }
 }

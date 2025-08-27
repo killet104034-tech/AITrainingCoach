@@ -135,7 +135,7 @@ export function runBasicEvaluationTests(): boolean {
   }
 }
 
-export function runSourceManagerTests(): boolean {
+export async function runSourceManagerTests(): Promise<boolean> {
   console.log('🧪 Running source manager tests...');
   
   try {
@@ -161,12 +161,12 @@ export function runSourceManagerTests(): boolean {
   }
 }
 
-export function runAllTests(): boolean {
+export async function runAllTests(): Promise<boolean> {
   console.log('🏃 Running complete test suite with neutral data...\n');
   
   const results = [
     runBasicEvaluationTests(),
-    runSourceManagerTests()
+    await runSourceManagerTests()
   ];
   
   const passed = results.filter(r => r).length;
@@ -183,7 +183,9 @@ export function runAllTests(): boolean {
   }
 }
 
-// Run tests if called directly
-if (require.main === module) {
-  runAllTests();
+// Run tests if called directly (for ES module)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runAllTests().then(success => {
+    process.exit(success ? 0 : 1);
+  });
 }

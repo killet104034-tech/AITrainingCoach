@@ -3,8 +3,8 @@
 
 import { Express, Request, Response } from 'express';
 import { z } from 'zod';
-import { RuleEvaluator } from '../../packages/core/evaluator.js';
-import { RuleSet, EvaluationContext } from '../../packages/core/schemas.js';
+import { RuleEvaluator } from '../../../packages/core/evaluator.js';
+import { RuleSet, EvaluationContext } from '../../../packages/core/schemas.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
