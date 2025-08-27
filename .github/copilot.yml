@@ -1,0 +1,32 @@
+# .github/copilot.yml
+version: 1
+# Agent가 작업할 때 참조하는 설정
+
+# Agent가 수정/생성할 수 있는 경로 범위
+allow:
+  - "apps/**"
+  - "server/**"
+  - "packages/**"
+  - "shared/**"
+  - "docs/**"
+
+# Agent가 접근하지 못하도록 막는 경로
+deny:
+  - ".env"
+  - "node_modules/**"
+  - ".git/**"
+
+# Agent가 작업할 수 있는 권한 수준
+permissions:
+  issues: write
+  pull_requests: write
+  contents: write
+
+# 기본 브랜치 설정
+default_branch: "main"
+
+# 작업 스타일 관련 (선택사항)
+tasks:
+  create_docs: true
+  refactor_code: true
+  add_tests: true
