@@ -41,7 +41,6 @@ export class MemStorage implements IStorage {
     const surveyResponse: SurveyResponse = { 
       ...insertSurveyResponse,
       name: insertSurveyResponse.name || null,
-      goals: insertSurveyResponse.goals || null,
       id,
       generatedContent: null,
       createdAt: new Date()
@@ -52,12 +51,14 @@ export class MemStorage implements IStorage {
 
   async updateSurveyResponseContent(id: string, content: any): Promise<SurveyResponse | undefined> {
     const surveyResponse = this.surveyResponses.get(id);
-    if (surveyResponse) {
-      // Convert object to string for storage
-      surveyResponse.generatedContent = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
-      this.surveyResponses.set(id, surveyResponse);
-    }
-    return surveyResponse;
+    if (!surveyResponse) return undefined;
+    
+    const updatedResponse = {
+      ...surveyResponse,
+      generatedContent: JSON.stringify(content)
+    };
+    this.surveyResponses.set(id, updatedResponse);
+    return updatedResponse;
   }
 
   async getSurveyResponseById(id: string): Promise<SurveyResponse | undefined> {
@@ -65,4 +66,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage: IStorage = new MemStorage();

@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "rules": [],
+  "metadata": {
+    "description": "Empty domain-neutral ruleset",
+    "created": "2024-01-01T00:00:00Z",
+    "domain": "universal"
+  }
+}

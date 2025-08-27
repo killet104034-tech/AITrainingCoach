@@ -1,16 +1,16 @@
-// 🎯 동적 설문 스키마 정의 시스템
+// 🎯 Dynamic Survey Schema Definition System
 import { z } from 'zod';
 
-// 필드 타입 정의
+// Field type definitions
 export type FieldType = 'text' | 'email' | 'number' | 'select' | 'checkbox' | 'radio' | 'textarea';
 
-// 설문 필드 정의
+// Survey field definition
 export interface SurveyField {
   name: string;
   type: FieldType;
   label: string;
   required?: boolean;
-  options?: string[]; // select, checkbox, radio용
+  options?: string[]; // for select, checkbox, radio
   validation?: {
     min?: number;
     max?: number;
@@ -19,12 +19,12 @@ export interface SurveyField {
   };
   conditional?: {
     dependsOn: string;
-    condition: string; // 예: "=== 'beginner'" 또는 "includes 'strength'"
+    condition: string; // e.g. "=== 'A'" or "includes 'B'"
     value: any;
   };
 }
 
-// 설문 섹션 정의
+// Survey section definition
 export interface SurveySection {
   id: string;
   title: string;
@@ -37,7 +37,7 @@ export interface SurveySection {
   };
 }
 
-// 전체 설문 스키마
+// Complete survey schema
 export interface SurveySchema {
   id: string;
   version: string;
@@ -46,83 +46,83 @@ export interface SurveySchema {
   sections: SurveySection[];
 }
 
-// 기본 3단계 설문 스키마 (현재)
+// Basic neutral survey schema
 export const basicSurveySchema: SurveySchema = {
   id: 'basic-v1',
   version: '1.0.0',
-  title: '기본 설문',
+  title: 'Basic Survey',
   sections: [
     {
       id: 'basic_info',
-      title: '기본 정보',
+      title: 'Basic Information',
       fields: [
         {
           name: 'name',
           type: 'text',
-          label: '이름',
+          label: 'Name',
           required: true,
-          validation: { min: 1, message: '이름을 입력해주세요' }
+          validation: { min: 1, message: 'Please enter a name' }
         },
         {
           name: 'goals',
           type: 'checkbox',
-          label: '운동 목표',
+          label: 'Preferences',
           required: true,
-          options: ['strength', 'muscle', 'health', 'competition'],
-          validation: { min: 1, message: '최소 하나의 목표를 선택해주세요' }
+          options: ['A', 'B', 'C', 'D'],
+          validation: { min: 1, message: 'Please select at least one option' }
         },
         {
           name: 'email',
           type: 'email',
-          label: '이메일',
+          label: 'Email',
           required: true,
-          validation: { pattern: '^[^@]+@[^@]+\\.[^@]+$', message: '올바른 이메일을 입력해주세요' }
+          validation: { pattern: '^[^@]+@[^@]+\\.[^@]+$', message: 'Please enter a valid email' }
         }
       ]
     }
   ]
 };
 
-// 확장된 파워리프팅 설문 스키마 (예시)
-export const powerliftingSurveySchema: SurveySchema = {
-  id: 'powerlifting-v1',
+// Extended neutral survey schema (example)
+export const extendedSurveySchema: SurveySchema = {
+  id: 'extended-v1',
   version: '1.0.0',
-  title: '파워리프팅 맞춤 설문',
+  title: 'Extended Survey',
   sections: [
     {
       id: 'basic_info',
-      title: '기본 정보',
+      title: 'Basic Information',
       fields: [
-        { name: 'name', type: 'text', label: '이름', required: true },
-        { name: 'age', type: 'number', label: '나이', required: true, validation: { min: 16, max: 80 } },
-        { name: 'email', type: 'email', label: '이메일', required: true }
+        { name: 'name', type: 'text', label: 'Name', required: true },
+        { name: 'age', type: 'number', label: 'Age', required: true, validation: { min: 16, max: 80 } },
+        { name: 'email', type: 'email', label: 'Email', required: true }
       ]
     },
     {
-      id: 'experience',
-      title: '경험 수준',
+      id: 'level',
+      title: 'Experience Level',
       fields: [
         {
-          name: 'experience_level',
+          name: 'level',
           type: 'select',
-          label: '파워리프팅 경험',
+          label: 'Experience Level',
           required: true,
-          options: ['beginner', 'intermediate', 'advanced']
+          options: ['A', 'B', 'C']
         }
       ]
     },
     {
-      id: 'current_stats',
-      title: '현재 기록',
+      id: 'current_values',
+      title: 'Current Values',
       conditional: {
-        dependsOn: 'experience_level',
-        condition: '!== "beginner"',
-        value: 'not_beginner'
+        dependsOn: 'level',
+        condition: '!== "A"',
+        value: 'experienced'
       },
       fields: [
-        { name: 'squat_max', type: 'number', label: '스쿼트 1RM (kg)', validation: { min: 40, max: 400 } },
-        { name: 'bench_max', type: 'number', label: '벤치프레스 1RM (kg)', validation: { min: 30, max: 300 } },
-        { name: 'deadlift_max', type: 'number', label: '데드리프트 1RM (kg)', validation: { min: 50, max: 500 } }
+        { name: 'key1_max', type: 'number', label: 'Key1 Maximum', validation: { min: 40, max: 400 } },
+        { name: 'key2_max', type: 'number', label: 'Key2 Maximum', validation: { min: 30, max: 300 } },
+        { name: 'key3_max', type: 'number', label: 'Key3 Maximum', validation: { min: 50, max: 500 } }
       ]
     }
   ]

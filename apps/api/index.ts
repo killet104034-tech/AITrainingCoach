@@ -1,7 +1,7 @@
-// 🚀 Sinabro Strength 메인 서버 (Express.js)
-// ✨ 기능: 전문가급 훈련 프로그램 생성 서비스 백엔드
-// 🔄 API: /api/surveys 설문 제출 → Google Sheets 18주 프로그램 생성 → 이메일 발송
-// 🛡️ 안정성: 에러 처리, 로깅, CORS 등 프로덕션 레벨 보안
+// 🚀 Universal Rule Engine Main Server (Express.js)
+// ✨ Function: Universal rule-based content generation service backend
+// 🔄 API: /api/surveys survey submission → Rule evaluation → Content generation → Email delivery
+// 🛡️ Stability: Error handling, logging, CORS and production-level security
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes/index";

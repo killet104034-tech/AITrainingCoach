@@ -1,6 +1,6 @@
-# Overview
+# Universal Rule Engine Application
 
-This is a modern full-stack web application called "Sinabro Strength" that generates personalized training programs using AI. The application uses a survey-based approach where users fill out a questionnaire about their fitness goals, experience level, and available equipment, then receive a customized workout program via email. The architecture follows a monorepo pattern with shared packages and a clean separation between frontend and backend concerns.
+This is a modern full-stack web application built around a universal rule engine architecture. The application uses a survey-based approach where users fill out questionnaires with domain-neutral fields, then receive customized responses based on configurable rules. The architecture follows a monorepo pattern with shared packages and a clean separation between frontend and backend concerns.
 
 # User Preferences
 
@@ -19,9 +19,16 @@ Preferred communication style: Simple, everyday language.
 - **Server Framework**: Express.js with TypeScript
 - **Database ORM**: Drizzle ORM for type-safe database operations
 - **API Design**: RESTful APIs with both v1 and v2 endpoints
+- **Rule Engine**: Universal rule evaluation system with configurable conditions and actions
 - **Middleware**: Custom operational guard middleware for idempotency, rate limiting, and audit logging
 - **Email Service**: Nodemailer with Gmail SMTP integration
-- **AI Integration**: OpenAI API for training program generation
+- **AI Integration**: OpenAI API for content generation
+
+## Rule Engine Components
+- **Schemas**: Define rule structure, conditions, and actions
+- **Evaluator**: Process rules against input data and execute actions
+- **Sources**: Manage data sources and field mappings
+- **API Routes**: `/api/evaluate` endpoint for rule processing
 
 ## Data Storage Solutions
 - **Primary Database**: PostgreSQL with Neon serverless hosting
@@ -37,9 +44,9 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 - **Database**: Neon PostgreSQL serverless database
-- **Email Service**: Gmail SMTP for sending training programs
-- **AI Service**: OpenAI GPT-5 for generating personalized workout programs
-- **Google Services**: Google Sheets API and Google Drive API for creating downloadable workout spreadsheets
+- **Email Service**: Gmail SMTP for sending responses
+- **AI Service**: OpenAI GPT-5 for generating personalized content
+- **Google Services**: Google Sheets API and Google Drive API for creating downloadable reports
 - **Authentication**: Google Service Account for API access
 - **Fonts**: Google Fonts (Inter, Font Awesome icons)
 - **Package Management**: npm with workspace support for monorepo structure
