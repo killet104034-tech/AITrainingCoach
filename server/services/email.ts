@@ -36,7 +36,7 @@ export async function sendTrainingProgram(
       spreadsheetUrl = await createWorkoutSheet(parsedProgram);
       console.log('✅ 스프레드시트 생성 완료:', spreadsheetUrl);
     } catch (sheetError) {
-      console.error('❌ 스프레드시트 생성 실패:', sheetError.message);
+      console.error('❌ 스프레드시트 생성 실패:', sheetError instanceof Error ? sheetError.message : String(sheetError));
       console.error('상세 오류:', sheetError);
       spreadsheetUrl = '#'; // 실패시 기본값
     }

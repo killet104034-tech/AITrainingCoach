@@ -41,7 +41,7 @@ export class MemStorage implements IStorage {
     const surveyResponse: SurveyResponse = { 
       ...insertSurveyResponse,
       name: insertSurveyResponse.name || null,
-      injuryDetails: insertSurveyResponse.injuryDetails ?? null,
+      goals: insertSurveyResponse.goals || null,
       id,
       trainingProgram: null,
       createdAt: new Date()
