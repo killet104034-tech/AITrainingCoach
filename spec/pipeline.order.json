@@ -1,0 +1,26 @@
+{
+  "pipeline_order": {
+    "version": "1.0.0",
+    "strict_execution": true,
+    "stages": [
+      "S0_intake",
+      "S1_normalize",
+      "S2_constraints",
+      "S3_goal_policy",
+      "S4_corelifts",
+      "S5_role",
+      "S6_body_pref",
+      "S7_body_region",
+      "S8_sub_region",
+      "S9_volume_bucket",
+      "S10_session_structure",
+      "S11_variation_map",
+      "S12_distribution",
+      "S13_protocol",
+      "S14_progression",
+      "S15_deload",
+      "S16_validate",
+      "S17_emit"
+    ]
+  }
+}
