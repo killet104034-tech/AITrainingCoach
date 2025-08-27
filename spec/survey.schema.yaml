@@ -1,0 +1,111 @@
+# Universal Survey Schema - Structure Only
+# NO domain words, NO numeric limits, NO defaults - Labels only
+
+survey_schema:
+  version: "1.0.0"
+  
+  sections:
+    - section_id: "PROFILE"
+      fields:
+        - item_id: "user_name"
+          maps_to: "profile.user_name"
+        - item_id: "sex_label"
+          maps_to: "profile.sex_label"
+        - item_id: "age_value"
+          maps_to: "profile.age_value"
+        - item_id: "bodyweight_value"
+          maps_to: "profile.bodyweight_value"
+        - item_id: "experience_label"
+          maps_to: "profile.experience_label"
+        - item_id: "goal_label"
+          maps_to: "profile.goal_label"
+    
+    - section_id: "CONSTRAINTS"
+      fields:
+        - item_id: "frequency_cap"
+          maps_to: "constraints.frequency_cap"
+        - item_id: "day_availability"
+          maps_to: "constraints.day_availability"
+        - item_id: "timeslot_availability"
+          maps_to: "constraints.timeslot_availability"
+        - item_id: "exclusion_labels"
+          maps_to: "constraints.exclusion_labels"
+    
+    - section_id: "CORE_LIFTS"
+      fields:
+        - item_id: "corelift_topset_protocol_label"
+          maps_to: "core_lifts.topset_protocol"
+        - item_id: "corelift_backoff_proto_label"
+          maps_to: "core_lifts.backoff_protocol"
+        - item_id: "corelift_leverage_label"
+          maps_to: "core_lifts.leverage_label"
+        - item_id: "corelift_adaptation_label"
+          maps_to: "core_lifts.adaptation_label"
+    
+    - section_id: "ROLE"
+      fields:
+        - item_id: "ROLE_MAIN"
+          maps_to: "roles.main"
+        - item_id: "ROLE_ACCESSORY"
+          maps_to: "roles.accessory"
+        - item_id: "ROLE_VARIATION"
+          maps_to: "roles.variation"
+    
+    - section_id: "BODY_PREF"
+      fields:
+        - item_id: "body_pref_labels"
+          maps_to: "body_preferences.labels"
+    
+    - section_id: "BODY_REGION"
+      fields:
+        - item_id: "CAT_UPPER"
+          maps_to: "body_regions.upper"
+        - item_id: "CAT_LOWER"
+          maps_to: "body_regions.lower"
+        - item_id: "CAT_FULL"
+          maps_to: "body_regions.full"
+    
+    - section_id: "SUB_REGION"
+      fields:
+        - item_id: "CAT_SUB_A"
+          maps_to: "sub_regions.sub_a"
+        - item_id: "CAT_SUB_B"
+          maps_to: "sub_regions.sub_b"
+        - item_id: "CAT_SUB_C"
+          maps_to: "sub_regions.sub_c"
+    
+    - section_id: "VOLUME_BUCKET"
+      fields:
+        - item_id: "VOL_LOW"
+          maps_to: "volume_buckets.low"
+        - item_id: "VOL_MED"
+          maps_to: "volume_buckets.medium"
+        - item_id: "VOL_HIGH"
+          maps_to: "volume_buckets.high"
+    
+    - section_id: "SESSION_STRUCTURE"
+      fields:
+        - item_id: "split_label"
+          maps_to: "session_structure.split_label"
+        - item_id: "role_layout_label"
+          maps_to: "session_structure.role_layout_label"
+        - item_id: "ma_ratio_policy"
+          maps_to: "session_structure.ma_ratio_policy"
+        - item_id: "ma_allocation_rule"
+          maps_to: "session_structure.ma_allocation_rule"
+    
+    - section_id: "VARIATION_ACCESSORY"
+      fields:
+        - item_id: "failure_pattern_label"
+          maps_to: "variation_accessory.failure_pattern_label"
+        - item_id: "accessory_pool_label"
+          maps_to: "variation_accessory.accessory_pool_label"
+    
+    - section_id: "OUTPUT"
+      fields:
+        - item_id: "plan"
+          maps_to: "output.plan"
+        - item_id: "summary"
+          maps_to: "output.summary"
+        - item_id: "audit"
+          maps_to: "output.audit"
